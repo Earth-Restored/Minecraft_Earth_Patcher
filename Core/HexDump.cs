@@ -130,9 +130,7 @@ namespace MCEPatcher.Core
 
                 string[] split = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-                //if (split.Length < 3) return;
-
-                for (int j = 0; j < BytesPerLine/*split.Length - 1*/; j++)
+                for (int j = 0; j < BytesPerLine; j++)
                     try
                     {
                         bytes[index + j] = Convert.ToByte(split[j + 1], 16);

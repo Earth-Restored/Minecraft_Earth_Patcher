@@ -13,13 +13,24 @@ namespace MCEPatcher.Core
 
         public static bool Decode(FileInfo apk, DirectoryInfo output)
         {
-            Process process = U.Run(new FileInfo(apkToolName), new string[]
-            {
-                "d",
-                "-f",
-                "-o", $"\"{output.FullName}\"",
-                $"\"{apk.FullName}\""
-            });
+            Process process;
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                process = U.Run(apkToolName, new string[]
+                {
+                    "d",
+                    "-f",
+                    "-o", $"\"{output.FullName}\"",
+                    $"\"{apk.FullName}\""
+                });
+            else
+                process = U.Run("java", new string[]
+                {
+                    "-jar", "apktool.jar",
+                    "d",
+                    "-f",
+                    "-o", $"\"{output.FullName}\"",
+                    $"\"{apk.FullName}\""
+                });
 
             process.StandardInput.Write(" "); // Press any key to continue . . .
 
@@ -32,13 +43,24 @@ namespace MCEPatcher.Core
 
         public static bool Encode(DirectoryInfo input, FileInfo outApk)
         {
-            Process process = U.Run(new FileInfo(apkToolName), new string[]
-            {
-                "b",
-                "-f",
-                "-o", $"\"{outApk.FullName}\"",
-                $"\"{input.FullName}\""
-            });
+            Process process;
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT) 
+                process = U.Run(apkToolName, new string[]
+                {
+                    "b",
+                    "-f",
+                    "-o", $"\"{outApk.FullName}\"",
+                    $"\"{input.FullName}\""
+                });
+            else
+                process = U.Run("java", new string[]
+                {
+                    "-jar", "apktool.jar",
+                    "b",
+                    "-f",
+                    "-o", $"\"{outApk.FullName}\"",
+                    $"\"{input.FullName}\""
+                });
 
             process.StandardInput.Write(" "); // Press any key to continue . . .
 

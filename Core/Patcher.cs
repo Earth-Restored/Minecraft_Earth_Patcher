@@ -28,17 +28,22 @@ namespace MCEPatcher.Core
 
             patchAll(patchesNames, context);
 
-            Log.Information("Undoing hex dumps");
-            foreach (var file in hexDumpFiles)
+            if (hexDumpFiles.Count != 0)
             {
-                File.WriteAllBytes(file.Substring(0, file.LastIndexOf('.')), HexDump.Undo(File.ReadAllText(file)));
+                Log.Information("Undoing hex dumps");
+                foreach (var file in hexDumpFiles)
+                {
+                    File.WriteAllBytes(file.Substring(0, file.LastIndexOf('.')), HexDump.Undo(File.ReadAllText(file)));
 
-                // delete the original file
-                File.Delete(file);
+                    // delete the original file
+                    File.Delete(file);
+                }
+
+                hexDumpFiles.Clear();
+                Log.Debug("Done");
             }
 
-            hexDumpFiles.Clear();
-            Log.Debug("Done");
+            bool patchedVariables = false;
 
             Dictionary<string, byte[]> files = new Dictionary<string, byte[]>();
             foreach (var (name, info) in context.AppliedPatches)
@@ -46,6 +51,7 @@ namespace MCEPatcher.Core
                 if (info.BinaryVariables.Count == 0) continue;
 
                 Log.Information($"Patching variables for patch '{name}'");
+                patchedVariables = true;
 
                 foreach (var variable in info.BinaryVariables)
                 {
@@ -81,12 +87,16 @@ namespace MCEPatcher.Core
                         bytes[index++] = 0;
                 }
             }
-            Log.Debug("Done");
+            if (patchedVariables)
+                Log.Debug("Done");
 
-            Log.Debug("Writing files");
-            foreach (var (file, bytes) in files)
-                File.WriteAllBytes(file, bytes);
-            Log.Debug("Done");
+            if (files.Count != 0)
+            {
+                Log.Debug("Writing files");
+                foreach (var (file, bytes) in files)
+                    File.WriteAllBytes(file, bytes);
+                Log.Debug("Done");
+            }
         }
 
         private void patchAll(IEnumerable<string> patchNames, PatchContext context)
@@ -125,6 +135,7 @@ namespace MCEPatcher.Core
 
         private void patch(string patch, string patchName, Dictionary<string, string>? variables = null)
         {
+            // TODO: detect the new line used, could be differend then Environment.NewLine
             var filesToPatch = DiffPatch.DiffParserHelper.Parse(patch, Environment.NewLine);
 
             if (variables is not null && variables.Count != 0)
@@ -134,7 +145,6 @@ namespace MCEPatcher.Core
 
                 StringBuilder sb = new StringBuilder();
 
-                // kinda stupid way of doing this, but I'm not sure how to do this with the hexdumps, it would be possible to just replace if there were only text patches
                 foreach (var filePatch in textPatches)
                 {
                     string str = U.ToString(filePatch);
@@ -183,7 +193,6 @@ namespace MCEPatcher.Core
             if (!file.Exists)
                 throw new IOException($"File '{file.FullName}' doesn't exist, it is used by patch '{patchName}'");
 
-            // use to and not from because other patch(es) might have already been applied to to
             List<string> lines = File.ReadAllLines(file.FullName).ToList();
 
             foreach (var chunk in patch.Chunks)

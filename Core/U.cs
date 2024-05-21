@@ -64,17 +64,14 @@ namespace MCEPatcher.Core
             return ms.ToArray();
         }
 
-        public static Process Run(FileInfo file, params string[] args)
+        public static Process Run(string file, params string[] args)
         {
-            //workingDirectory.Create();
-
             bool shellExecute = false;
 
             ProcessStartInfo startInfo = new ProcessStartInfo()
             {
-                FileName = file.FullName,
+                FileName = file,
                 Arguments = string.Join(' ', args),
-                //WorkingDirectory = workingDirectory.FullName,
                 UseShellExecute = shellExecute,
                 CreateNoWindow = !shellExecute,
                 RedirectStandardOutput = !shellExecute,
