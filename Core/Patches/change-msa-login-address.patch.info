@@ -1,0 +1,23 @@
+{
+    "Prerequisites":
+    [
+        {
+            "Type": "Basic",
+            "RequiredPatch": "disable-msa-login-signature-validation"
+        },
+        {
+            "Type": "Conditional",
+            "RequiredPatch": "allow-http",
+            "VariableName": "liveprotocol",
+            "VariableValue": "http"
+        }
+    ],
+    "VariablesUsed":
+    [
+        "liveprotocol",
+        "livehostname"
+    ],
+    "BinaryVariables":
+    [
+    ]
+}
