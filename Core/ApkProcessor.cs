@@ -17,6 +17,9 @@ namespace MCEPatcher.Core
             Autonomous = options.Autonomous;
             HashSet<string> patches = new(options.Patches);
 
+            if (!options.SkipBuild)
+                patches.Add("fix-official-msa-login-after-signature-change");
+
             FileInfo inApk = new FileInfo(options.InApk);
             FileInfo outApk = new FileInfo(options.OutApk);
             DirectoryInfo decodedDir = new DirectoryInfo(options.DecodedDir);

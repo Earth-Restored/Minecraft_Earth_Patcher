@@ -20,6 +20,7 @@ namespace MCEPatcher.Core
             {
                 Log.Fatal($"Unhandled exception: {e.ExceptionObject}");
                 Log.CloseAndFlush();
+                U.PAKE();
                 Environment.Exit(1);
             };
 
@@ -53,6 +54,8 @@ namespace MCEPatcher.Core
                     U.PAKE();
                     Environment.Exit(1);
                 }
+                else
+                    U.PAKE();
             }
             catch (Exception ex)
             {

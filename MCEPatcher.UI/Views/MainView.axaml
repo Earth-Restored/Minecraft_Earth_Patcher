@@ -1,0 +1,125 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:MCEPatcher.UI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
+             x:Class="MCEPatcher.UI.Views.MainView"
+             x:DataType="vm:MainViewModel">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:MainViewModel />
+  </Design.DataContext>
+	<UserControl.Styles>
+	</UserControl.Styles>
+
+	<Grid HorizontalAlignment="Stretch" RowDefinitions="1*, 5*, 1*">
+		<Label Grid.Row="0" FontSize="40" VerticalAlignment="Center" HorizontalAlignment="Center">
+			Minecraft Earth Patcher
+		</Label>
+		<ScrollViewer Grid.Row="1" HorizontalAlignment="Stretch" AllowAutoHide="False">
+			<StackPanel VerticalAlignment="Top" Margin="0 0 0 20">
+				<Grid HorizontalAlignment="Center">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+					</Grid.ColumnDefinitions>
+					<Label Grid.Column="0" VerticalAlignment="Center">APK File: Not selected</Label>
+					<Button Grid.Column="1">Select</Button>
+				</Grid>
+				<Grid  HorizontalAlignment="Center">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+					</Grid.ColumnDefinitions>
+					<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+						Disable sunset time check
+					</Label>
+					<ToggleSwitch Grid.Column="1" IsChecked="{Binding DisableSunsetTimeCheck}" OffContent="No" OnContent="Yes" >
+					</ToggleSwitch>
+				</Grid>
+
+				<Grid  HorizontalAlignment="Center">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+					</Grid.ColumnDefinitions>
+					<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+						Disable license check
+					</Label>
+					<ToggleSwitch Grid.Column="1" IsChecked="{Binding DisableLicenseCheck}" OffContent="No" OnContent="Yes" >
+					</ToggleSwitch>
+				</Grid>
+
+				<Grid HorizontalAlignment="Center">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+					</Grid.ColumnDefinitions>
+					<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+						Disable Telemetry
+					</Label>
+					<ToggleSwitch Grid.Column="1" IsChecked="{Binding DisableTelemetry}" OffContent="No" OnContent="Yes" >
+					</ToggleSwitch>
+				</Grid>
+				
+				<Grid  HorizontalAlignment="Center">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+					</Grid.ColumnDefinitions>
+					<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+						Disable msa login signature validation
+					</Label>
+					<ToggleSwitch Grid.Column="1" IsChecked="{Binding DisableMsaLoginSignatureValidation}" OffContent="No" OnContent="Yes" >
+					</ToggleSwitch>
+				</Grid>
+
+				<Grid HorizontalAlignment="Center">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+					</Grid.ColumnDefinitions>
+					<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+						Change locator address
+					</Label>
+					<ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangeLocatorAddress}" OffContent="No" OnContent="Yes" >
+					</ToggleSwitch>
+				</Grid>
+				<Border IsVisible="{Binding ChangeLocatorAddress}"  BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="350">
+					<StackPanel HorizontalAlignment="Center" Margin="10">
+						<Grid HorizontalAlignment="Center" Margin="10">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<Label Grid.Column="0" VerticalAlignment="Center">
+								Protocol:
+							</Label>
+							<ComboBox Grid.Column="1" SelectedIndex="{Binding LocatorProtocol}">
+								<ComboBoxItem>Http</ComboBoxItem>
+								<ComboBoxItem>Https</ComboBoxItem>
+							</ComboBox>
+						</Grid>
+						<Grid HorizontalAlignment="Center">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<Label Grid.Column="0" VerticalAlignment="Center">
+								Hostname:
+							</Label>
+							<TextBox Text="{Binding LocatorHostname}" Grid.Column="1" Watermark="192.168.x.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
+						</Grid>
+					</StackPanel>
+				</Border>
+				<Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5"  IsVisible="{Binding !ChangeLocatorAddress}"/>
+			</StackPanel>
+		</ScrollViewer>
+		<Button Margin="10" Width="100" Height="60" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="25" Grid.Row="2">
+			Patch
+		</Button>
+	</Grid>
+	
+</UserControl>
