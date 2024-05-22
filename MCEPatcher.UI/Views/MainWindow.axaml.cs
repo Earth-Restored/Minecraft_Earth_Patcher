@@ -1,4 +1,6 @@
 ﻿using Avalonia.Controls;
+using MCEPatcher.Core;
+using MCEPatcher.UI.ViewModels;
 
 namespace MCEPatcher.UI.Views;
 
@@ -18,5 +20,13 @@ public partial class MainWindow : Window
         //CanResize = false;
 
         InitializeComponent();
+    }
+
+    public void Patch(ApkProcessor.Options options)
+    {
+        ((Content as UserControl)?.DataContext as ViewModelBase)?.OnClose();
+        PatchView view = new PatchView();
+        view.Patch(options);
+        Content = view;
     }
 }

@@ -127,7 +127,7 @@ namespace MCEPatcher.Core
             }
 
             Log.Information($"Applying patch '{patchName}'");
-            patch(File.ReadAllText(path), patchName, context.Variables.Where(variable => info.VariablesUsed.Contains(variable.Key)).ToDictionary());
+            patch(File.ReadAllText(path), patchName, context.Variables.Where(variable => info.VariablesUsed.Contains(variable.Key)).ToDictionary(item => item.Key, item => item.Value));
             Log.Debug($"Done");
 
             context.AppliedPatches.Add(patchName, info);

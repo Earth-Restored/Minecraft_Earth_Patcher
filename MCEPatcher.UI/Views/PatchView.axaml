@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:MCEPatcher.UI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
+             x:Class="MCEPatcher.UI.Views.PatchView"
+             x:DataType="vm:PatchViewModel">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+	  <vm:PatchViewModel />
+  </Design.DataContext>
+	<UserControl.Styles>
+	</UserControl.Styles>
+
+	<Grid HorizontalAlignment="Stretch" RowDefinitions="1*, 4*">
+		<Label Grid.Row="0" FontSize="40" VerticalAlignment="Center" HorizontalAlignment="Center">
+			Minecraft Earth Patcher
+		</Label>
+		<Border Grid.Row="1" HorizontalAlignment="Center" BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Margin="10" Padding="5">
+			<ScrollViewer x:Name="scrollViewer" AllowAutoHide="False">
+			<StackPanel x:Name="chat" MinWidth="250" VerticalAlignment="Stretch">
+			</StackPanel>
+			</ScrollViewer>
+		</Border>
+	</Grid>
+	
+</UserControl>

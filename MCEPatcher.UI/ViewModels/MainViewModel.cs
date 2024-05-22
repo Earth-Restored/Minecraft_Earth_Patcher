@@ -1,5 +1,6 @@
 ﻿using Avalonia.Interactivity;
 using MCEPatcher.UI.Models;
+using MCEPatcher.UI.Utils;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -82,4 +83,22 @@ public class MainViewModel : ViewModelBase
         LocatorHostname = "locator.mceserv.net";
     }
 #pragma warning restore CS8618
+
+    public IEnumerable<string> GetPatches()
+    {
+        if (DisableSunsetTimeCheck) yield return "disable-sunset-time-check";
+        if (DisableLicenseCheck) yield return "disable-license-check";
+        if (DisableTelemetry) yield return "disable-telemetry";
+        if (DisableMsaLoginSignatureValidation) yield return "disable-msa-login-signature-validation";
+        if (ChangeLocatorAddress) yield return "change-locator-address";
+    }
+
+    public IEnumerable<string> GetVariables()
+    {
+        if (ChangeLocatorAddress)
+        {
+            yield return $"locatorprotocol={(ProtocolEnum)LocatorProtocol}";
+            yield return $"locatorhostname={LocatorHostname}";
+        }
+    }
 }

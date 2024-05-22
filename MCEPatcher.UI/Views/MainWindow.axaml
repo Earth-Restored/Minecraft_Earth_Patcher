@@ -8,5 +8,5 @@
         x:Class="MCEPatcher.UI.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="Minecraft Earth Patcher">
-        <views:MainView />
+	<views:MainView />
 </Window>

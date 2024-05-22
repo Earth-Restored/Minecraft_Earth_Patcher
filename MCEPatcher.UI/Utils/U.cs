@@ -1,10 +1,14 @@
-﻿using System;
+﻿using Avalonia.Controls;
+using MCEPatcher.UI.Views;
+using MsBox.Avalonia.Enums;
+using MsBox.Avalonia;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MCEPatcher.UI
+namespace MCEPatcher.UI.Utils
 {
     internal static class U
     {
@@ -17,6 +21,11 @@ namespace MCEPatcher.UI
             if (strLen <= 0) return ender;
 
             return str.Substring(0, strLen) + ender + str.Substring(str.Length - strLen, strLen);
+        }
+
+        public static async Task ShowError(string message)
+        {
+            await MessageBoxManager.GetMessageBoxStandard("Error", message, icon: Icon.Error, windowStartupLocation: WindowStartupLocation.CenterOwner).ShowWindowDialogAsync(MainWindow.Instance);
         }
     }
 }
