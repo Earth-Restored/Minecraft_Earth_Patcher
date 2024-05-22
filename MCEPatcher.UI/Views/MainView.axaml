@@ -117,7 +117,7 @@
 				<Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5"  IsVisible="{Binding !ChangeLocatorAddress}"/>
 			</StackPanel>
 		</ScrollViewer>
-		<Button Margin="10" Width="100" Height="60" Click="Patch" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="25" Grid.Row="2">
+		<Button Margin="10" Click="Patch" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="30" Grid.Row="2">
 			Patch
 		</Button>
 	</Grid>

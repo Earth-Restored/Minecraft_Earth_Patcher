@@ -3,12 +3,12 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
 using MCEPatcher.Core;
+using MCEPatcher.UI.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace MCEPatcher.UI.ViewModels
 {
@@ -18,7 +18,7 @@ namespace MCEPatcher.UI.ViewModels
         private StackPanel panel;
         private bool patchResult;
 
-        public void Start(ApkProcessor.Options options, ScrollViewer _scrollViewer, StackPanel _panel)
+        public void Start(ApkProcessor.Options options, ScrollViewer _scrollViewer, StackPanel _panel, Grid finishedContainer)
         {
             scrollViewer = _scrollViewer;
             panel = _panel;
@@ -31,7 +31,12 @@ namespace MCEPatcher.UI.ViewModels
             });
             task.ContinueWith(t =>
             {
-                Dispatcher.UIThread.Invoke(() => scrollViewer.ScrollToEnd());
+                Dispatcher.UIThread.Invoke(() =>
+                {
+                    finishedContainer.IsVisible = true;
+                    scrollViewer.ScrollToEnd();
+                    if (!patchResult) finishedContainer.Children[2].IsVisible = false;
+                });
             });
         }
 

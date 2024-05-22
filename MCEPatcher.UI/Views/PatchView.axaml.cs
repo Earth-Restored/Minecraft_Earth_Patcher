@@ -1,6 +1,10 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using MCEPatcher.Core;
 using MCEPatcher.UI.ViewModels;
+using System;
+using System.Diagnostics;
+using System.IO;
 
 namespace MCEPatcher.UI.Views
 {
@@ -15,7 +19,31 @@ namespace MCEPatcher.UI.Views
 
         public void Patch(ApkProcessor.Options options)
         {
-            (DataContext as PatchViewModel)?.Start(options, scrollViewer, chat);
+            (DataContext as PatchViewModel)?.Start(options, scrollViewer, chat, finishedContainer);
+        }
+
+        public void Back(object sender, RoutedEventArgs args)
+        {
+            MainWindow.Instance.OpenMainView();
+        }
+
+        public void OpenPatchedAPKLocation(object sender, RoutedEventArgs args)
+        {
+            try
+            {
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                {
+                    ProcessStartInfo info = new ProcessStartInfo();
+                    info.FileName = "explorer";
+                    info.Arguments = $"/e, /select, \"{Path.GetFullPath("Minecraft_Earth_patched.apk")}\"";
+                    Process.Start(info);
+                }
+                else
+                {
+                    Process.Start(Environment.CurrentDirectory);
+                }
+            }
+            catch { }
         }
 
         /*
