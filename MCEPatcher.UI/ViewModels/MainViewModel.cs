@@ -1,4 +1,5 @@
-﻿using MCEPatcher.UI.Models;
+﻿using Avalonia.Interactivity;
+using MCEPatcher.UI.Models;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,12 @@ namespace MCEPatcher.UI.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
-    public string Greeting => "Welcome to Avalonia!";
+    private string? apkFile;
+    public string? ApkFile
+    {
+        get => "APK File: " + (U.LimitLengthMiddle(apkFile, 60) ?? "Not selected");
+        set => this.RaiseAndSetIfChanged(ref apkFile, value);
+    }
 
     private bool disableSunsetTimeCheck;
     public bool DisableSunsetTimeCheck

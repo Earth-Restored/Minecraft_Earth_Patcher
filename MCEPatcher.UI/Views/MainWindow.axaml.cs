@@ -4,8 +4,14 @@ namespace MCEPatcher.UI.Views;
 
 public partial class MainWindow : Window
 {
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    internal static MainWindow Instance { get; private set; }
+#pragma warning restore CS8618
+
     public MainWindow()
     {
+        Instance = this;
+
         Width = 600;
         Height = 600;
 
