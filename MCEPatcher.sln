@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCEPatcher.UI", "MCEPatcher
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCEPatcher.UI.Desktop", "MCEPatcher.UI.Desktop\MCEPatcher.UI.Desktop.csproj", "{2D0D8B80-B3AF-4CE9-9A29-BBDF21524945}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCEPatcher.Cli", "MCEPatcher.Cli\MCEPatcher.Cli.csproj", "{C357F555-5706-4720-B68A-021E9B69ADA8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{2D0D8B80-B3AF-4CE9-9A29-BBDF21524945}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D0D8B80-B3AF-4CE9-9A29-BBDF21524945}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D0D8B80-B3AF-4CE9-9A29-BBDF21524945}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C357F555-5706-4720-B68A-021E9B69ADA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C357F555-5706-4720-B68A-021E9B69ADA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C357F555-5706-4720-B68A-021E9B69ADA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C357F555-5706-4720-B68A-021E9B69ADA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

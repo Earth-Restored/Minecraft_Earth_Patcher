@@ -28,54 +28,7 @@
 					<TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding ApkFile}" Margin="0, 0, 10, 0"></TextBlock>
 					<Button Grid.Column="1" Click="PickApkFile">Select</Button>
 				</Grid>
-				<Grid  HorizontalAlignment="Center">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="Auto"/>
-						<ColumnDefinition Width="Auto"/>
-					</Grid.ColumnDefinitions>
-					<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
-						Disable sunset time check
-					</Label>
-					<ToggleSwitch Grid.Column="1" IsChecked="{Binding DisableSunsetTimeCheck}" OffContent="No" OnContent="Yes" >
-					</ToggleSwitch>
-				</Grid>
-
-				<Grid  HorizontalAlignment="Center">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="Auto"/>
-						<ColumnDefinition Width="Auto"/>
-					</Grid.ColumnDefinitions>
-					<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
-						Disable license check
-					</Label>
-					<ToggleSwitch Grid.Column="1" IsChecked="{Binding DisableLicenseCheck}" OffContent="No" OnContent="Yes" >
-					</ToggleSwitch>
-				</Grid>
-
-				<Grid HorizontalAlignment="Center">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="Auto"/>
-						<ColumnDefinition Width="Auto"/>
-					</Grid.ColumnDefinitions>
-					<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
-						Disable Telemetry
-					</Label>
-					<ToggleSwitch Grid.Column="1" IsChecked="{Binding DisableTelemetry}" OffContent="No" OnContent="Yes" >
-					</ToggleSwitch>
-				</Grid>
-				
-				<Grid  HorizontalAlignment="Center">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="Auto"/>
-						<ColumnDefinition Width="Auto"/>
-					</Grid.ColumnDefinitions>
-					<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
-						Disable msa login signature validation
-					</Label>
-					<ToggleSwitch Grid.Column="1" IsChecked="{Binding DisableMsaLoginSignatureValidation}" OffContent="No" OnContent="Yes" >
-					</ToggleSwitch>
-				</Grid>
-
+			
 				<Grid HorizontalAlignment="Center">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto"/>
@@ -115,6 +68,57 @@
 					</StackPanel>
 				</Border>
 				<Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5"  IsVisible="{Binding !ChangeLocatorAddress}"/>
+				<Expander HorizontalAlignment="Center" Margin="0 7 0 0" Header="Advenced">
+					<StackPanel Width="350">
+						<Grid  HorizontalAlignment="Center">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+								Disable sunset time check
+							</Label>
+							<ToggleSwitch Grid.Column="1" IsChecked="{Binding DisableSunsetTimeCheck}" OffContent="No" OnContent="Yes" >
+							</ToggleSwitch>
+						</Grid>
+
+						<Grid  HorizontalAlignment="Center">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+								Disable license check
+							</Label>
+							<ToggleSwitch Grid.Column="1" IsChecked="{Binding DisableLicenseCheck}" OffContent="No" OnContent="Yes" >
+							</ToggleSwitch>
+						</Grid>
+
+						<Grid HorizontalAlignment="Center">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+								Disable Telemetry
+							</Label>
+							<ToggleSwitch Grid.Column="1" IsChecked="{Binding DisableTelemetry}" OffContent="No" OnContent="Yes" >
+							</ToggleSwitch>
+						</Grid>
+
+						<Grid  HorizontalAlignment="Center">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+								Disable msa login signature validation
+							</Label>
+							<ToggleSwitch Grid.Column="1" IsChecked="{Binding DisableMsaLoginSignatureValidation}" OffContent="No" OnContent="Yes" >
+							</ToggleSwitch>
+						</Grid>
+					</StackPanel>
+				</Expander>
 			</StackPanel>
 		</ScrollViewer>
 		<Button Margin="10" Click="Patch" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="30" Grid.Row="2">
