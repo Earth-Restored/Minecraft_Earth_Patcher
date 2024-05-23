@@ -7,6 +7,10 @@ namespace MCEPatcher.Core
 {
     internal class Program
     {
+        /* TODO:
+         * Change the manifest
+         *
+         */
         static void Main(string[] args)
         {
             var log = new LoggerConfiguration()

@@ -59,13 +59,16 @@ namespace MCEPatcher.Core
                     foreach (var varName in info.VariablesUsed)
                     {
                         if (context.Variables.TryGetValue(varName, out string? value))
-                            val = val.Replace($"${{{varName}}}", value);
+                            val = val.Replace($"${{{varName}}}", value.ToLowerInvariant());
                         else
                             throw new Exception($"Variable '{varName}' doesn't exist");
                     }
 
                     byte[] valBytes = Encoding.ASCII.GetBytes(val + "\0");
                     byte[] lengthBytes = BitConverter.GetBytes(valBytes.Length - 1);
+
+                    if (valBytes.Length > 8 * 16 - 4)
+                        throw new Exception($"String '{val}' is too long, max length allowed is: {8 * 16 - 4}");
 
                     string file = Path.Combine(filesLocation, variable.File);
                     if (!files.TryGetValue(file, out byte[]? bytes))
@@ -82,9 +85,6 @@ namespace MCEPatcher.Core
                     // write the string
                     for (int i = 0; i < valBytes.Length; i++)
                         bytes[index++] = valBytes[i];
-                    // fill the rest with 0s
-                    while (index - variable.Address < 8 * 16)
-                        bytes[index++] = 0;
                 }
             }
             if (patchedVariables)

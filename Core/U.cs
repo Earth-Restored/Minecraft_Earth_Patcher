@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MCEPatcher.Core
 {
-    internal static class U
+    public static class U
     {
         // from: https://stackoverflow.com/a/690980/15878562
         public static void CopyDir(string sourceDirectory, string targetDirectory)
