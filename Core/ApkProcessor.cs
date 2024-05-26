@@ -87,7 +87,7 @@ namespace MCEPatcher.Core
             }
 
             Patcher patcher = new Patcher("Patches", decodedDir.FullName);
-            patcher.Patch(options.Patches, variables, patches.Contains(ExtendLibgenoa.Name) ? new()
+            patcher.Patch(patches, variables, patches.Contains(ExtendLibgenoa.Name) ? new()
             {
                 [ExtendLibgenoa.Name] = PatchInfo.Default
             } : new());

@@ -4,6 +4,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using MCEPatcher.Core;
 using MCEPatcher.UI.Views;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,15 @@ namespace MCEPatcher.UI.ViewModels
 
             Task task = Task.Run(() =>
             {
-                patchResult = ApkProcessor.Run(options);
+                try
+                {
+                    patchResult = ApkProcessor.Run(options);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex.ToString());
+                    patchResult = false;
+                }
             });
             task.ContinueWith(t =>
             {

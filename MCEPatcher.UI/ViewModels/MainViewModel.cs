@@ -21,6 +21,27 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref apkFile, value);
     }
 
+    #region locator
+    private bool changeLocatorAddress;
+    public bool ChangeLocatorAddress
+    {
+        get => changeLocatorAddress;
+        set => this.RaiseAndSetIfChanged(ref changeLocatorAddress, value);
+    }
+    private int locatorProtocol;
+    public int LocatorProtocol
+    {
+        get => locatorProtocol;
+        set => this.RaiseAndSetIfChanged(ref locatorProtocol, value);
+    }
+    private string locatorHostname;
+    public string LocatorHostname
+    {
+        get => locatorHostname;
+        set => this.RaiseAndSetIfChanged(ref locatorHostname, value);
+    }
+    #endregion
+
     private bool disableSunsetTimeCheck;
     public bool DisableSunsetTimeCheck
     {
@@ -49,38 +70,43 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref disableMsaLoginSignatureValidation, value);
     }
 
-    #region locator
-    private bool changeLocatorAddress;
-    public bool ChangeLocatorAddress
+
+    #region apk_name
+    private bool changeAppName;
+    public bool ChangeAppName
     {
-        get => changeLocatorAddress;
-        set => this.RaiseAndSetIfChanged(ref changeLocatorAddress, value);
+        get => changeAppName;
+        set => this.RaiseAndSetIfChanged(ref changeAppName, value);
     }
-    private int locatorProtocol;
-    public int LocatorProtocol
+    private string appName;
+    public string AppName
     {
-        get => locatorProtocol;
-        set => this.RaiseAndSetIfChanged(ref locatorProtocol, value);
+        get => appName;
+        set => this.RaiseAndSetIfChanged(ref appName, value);
     }
-    private string locatorHostname;
-    public string LocatorHostname
+    private string appNameShort;
+    public string AppNameShort
     {
-        get => locatorHostname;
-        set => this.RaiseAndSetIfChanged(ref locatorHostname, value);
+        get => appNameShort;
+        set => this.RaiseAndSetIfChanged(ref appNameShort, value);
     }
     #endregion
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public MainViewModel()
     {
+        ChangeLocatorAddress = true;
+        LocatorProtocol = (int)ProtocolEnum.Https;
+        LocatorHostname = "locator.mceserv.net";
+
         DisableSunsetTimeCheck = true;
         DisableLicenseCheck = true;
         DisableTelemetry = true;
         DisableMsaLoginSignatureValidation = true;
 
-        ChangeLocatorAddress = true;
-        LocatorProtocol = (int)ProtocolEnum.Https;
-        LocatorHostname = "locator.mceserv.net";
+        ChangeAppName = true;
+        AppName = "Minecraft Earth Patched";
+        AppNameShort = "MCE Patched";
     }
 #pragma warning restore CS8618
 
@@ -91,6 +117,7 @@ public class MainViewModel : ViewModelBase
         if (DisableTelemetry) yield return "disable-telemetry";
         if (DisableMsaLoginSignatureValidation) yield return "disable-msa-login-signature-validation";
         if (ChangeLocatorAddress) yield return "change-locator-address";
+        if (ChangeAppName) yield return "change-app-name";
     }
 
     public IEnumerable<string> GetVariables()
@@ -99,6 +126,11 @@ public class MainViewModel : ViewModelBase
         {
             yield return $"locatorprotocol={(ProtocolEnum)LocatorProtocol}";
             yield return $"locatorhostname={LocatorHostname}";
+        }
+        if (ChangeAppName)
+        {
+            yield return $"app_name={AppName}";
+            yield return $"app_name_short={AppNameShort}";
         }
     }
 }

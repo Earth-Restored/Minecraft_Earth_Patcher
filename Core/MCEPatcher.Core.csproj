@@ -20,6 +20,12 @@
     <None Update="Patches\allow-http.patch">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Patches\change-app-name.patch">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Patches\change-app-name.patch.info">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Patches\change-locator-address.patch">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

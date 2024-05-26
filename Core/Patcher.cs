@@ -119,12 +119,7 @@ namespace MCEPatcher.Core
 
             string path = Path.Combine(patchesLoation, $"{patchName}.patch");
             if (!File.Exists(path))
-            {
-                Log.Fatal($"Patch '{patchName}' doesn't exist");
-                U.PAKE();
-                Environment.Exit(1);
-                return;
-            }
+                throw new FileNotFoundException($"Patch '{patchName}' doesn't exist");
 
             Log.Information($"Applying patch '{patchName}'");
             patch(File.ReadAllText(path), patchName, context.Variables.Where(variable => info.VariablesUsed.Contains(variable.Key)).ToDictionary(item => item.Key, item => item.Value));
