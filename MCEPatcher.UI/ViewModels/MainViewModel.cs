@@ -112,6 +112,8 @@ public class MainViewModel : ViewModelBase
 
     public IEnumerable<string> GetPatches()
     {
+        yield return "fix-official-msa-login-after-signature-change";
+
         if (DisableSunsetTimeCheck) yield return "disable-sunset-time-check";
         if (DisableLicenseCheck) yield return "disable-license-check";
         if (DisableTelemetry) yield return "disable-telemetry";
