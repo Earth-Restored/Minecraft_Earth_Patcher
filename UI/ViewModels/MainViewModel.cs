@@ -128,6 +128,26 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _MSALoginServiceHostname, value);
     }
     #endregion
+    #region playfab_api
+    private bool changePlayfabApiAddress;
+    public bool ChangePlayfabApiAddress
+    {
+        get => changePlayfabApiAddress;
+        set => this.RaiseAndSetIfChanged(ref changePlayfabApiAddress, value);
+    }
+    private int playfabApiProtocol;
+    public int PlayfabApiProtocol
+    {
+        get => playfabApiProtocol;
+        set => this.RaiseAndSetIfChanged(ref playfabApiProtocol, value);
+    }
+    private string playfabApiHostname;
+    public string PlayfabApiHostname
+    {
+        get => playfabApiHostname;
+        set => this.RaiseAndSetIfChanged(ref playfabApiHostname, value);
+    }
+    #endregion
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public MainViewModel()
@@ -151,6 +171,10 @@ public class MainViewModel : ViewModelBase
         ChangeMSALoginServiceAddress = false;
         MSALoginServiceProtocol = (int)ProtocolEnum.Https;
         MSALoginServiceHostname = "live.com";
+
+        ChangePlayfabApiAddress = false;
+        PlayfabApiProtocol = (int)ProtocolEnum.Https;
+        PlayfabApiHostname = "playfabapi.com";
     }
 #pragma warning restore CS8618
 
@@ -168,7 +192,8 @@ public class MainViewModel : ViewModelBase
         if (ChangeAppName) yield return "change-app-name";
         if (ChangePackageName) yield return "change-package-name";
 
-        if (changeMSALoginServiceAddress) yield return "change-msa-login-address";
+        if (ChangeMSALoginServiceAddress) yield return "change-msa-login-address";
+        if (ChangePlayfabApiAddress) yield return "change-playfab-address";
     }
 
     public IEnumerable<string> GetVariables()
@@ -193,6 +218,11 @@ public class MainViewModel : ViewModelBase
         {
             yield return $"liveprotocol={(ProtocolEnum)MSALoginServiceProtocol}";
             yield return $"livehostname={MSALoginServiceHostname}";
+        }
+        if (ChangePlayfabApiAddress)
+        {
+            yield return $"playfabprotocol={(ProtocolEnum)PlayfabApiProtocol}";
+            yield return $"playfabhostname={PlayfabApiHostname}";
         }
     }
 }
