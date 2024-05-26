@@ -5,11 +5,11 @@ VisualStudioVersion = 17.10.34607.79
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCEPatcher.Core", "Core\MCEPatcher.Core.csproj", "{FBC2131D-4996-4E71-9BE4-E2413A802C3A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCEPatcher.UI", "MCEPatcher.UI\MCEPatcher.UI.csproj", "{2760E7E6-3DE6-416C-B7B3-F4D33A26E871}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCEPatcher.UI", "UI\MCEPatcher.UI.csproj", "{2760E7E6-3DE6-416C-B7B3-F4D33A26E871}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCEPatcher.UI.Desktop", "MCEPatcher.UI.Desktop\MCEPatcher.UI.Desktop.csproj", "{2D0D8B80-B3AF-4CE9-9A29-BBDF21524945}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCEPatcher.UI.Desktop", "UI.Desktop\MCEPatcher.UI.Desktop.csproj", "{2D0D8B80-B3AF-4CE9-9A29-BBDF21524945}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCEPatcher.Cli", "MCEPatcher.Cli\MCEPatcher.Cli.csproj", "{C357F555-5706-4720-B68A-021E9B69ADA8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCEPatcher.Cli", "Cli\MCEPatcher.Cli.csproj", "{C357F555-5706-4720-B68A-021E9B69ADA8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
