@@ -14,7 +14,7 @@ namespace MCEPatcher.Core
         public static bool Decode(FileInfo apk, DirectoryInfo output)
         {
             Process process;
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT && File.Exists(apkToolName))
                 process = U.Run(apkToolName, new string[]
                 {
                     "d",
@@ -44,7 +44,7 @@ namespace MCEPatcher.Core
         public static bool Encode(DirectoryInfo input, FileInfo outApk)
         {
             Process process;
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT) 
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT && File.Exists(apkToolName)) 
                 process = U.Run(apkToolName, new string[]
                 {
                     "b",
