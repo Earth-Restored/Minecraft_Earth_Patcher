@@ -67,7 +67,11 @@ public class MainViewModel : ViewModelBase
     public bool DisableMsaLoginSignatureValidation
     {
         get => disableMsaLoginSignatureValidation;
-        set => this.RaiseAndSetIfChanged(ref disableMsaLoginSignatureValidation, value);
+        set
+        {
+            this.RaiseAndSetIfChanged(ref disableMsaLoginSignatureValidation, value);
+            if (!value) ChangeMSALoginServiceAddress = false;
+        }
     }
 
     #region app_name
@@ -148,6 +152,26 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref playfabApiHostname, value);
     }
     #endregion
+    #region xboxab
+    private bool changeXboxABAddress;
+    public bool ChangeXboxABAddress
+    {
+        get => changeXboxABAddress;
+        set => this.RaiseAndSetIfChanged(ref changeXboxABAddress, value);
+    }
+    private int xboxABProtocol;
+    public int XboxABProtocol
+    {
+        get => xboxABProtocol;
+        set => this.RaiseAndSetIfChanged(ref xboxABProtocol, value);
+    }
+    private string xboxABHostname;
+    public string XboxABHostname
+    {
+        get => xboxABHostname;
+        set => this.RaiseAndSetIfChanged(ref xboxABHostname, value);
+    }
+    #endregion
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public MainViewModel()
@@ -175,6 +199,10 @@ public class MainViewModel : ViewModelBase
         ChangePlayfabApiAddress = false;
         PlayfabApiProtocol = (int)ProtocolEnum.Https;
         PlayfabApiHostname = "playfabapi.com";
+
+        ChangeXboxABAddress = false;
+        XboxABProtocol = (int)ProtocolEnum.Https;
+        XboxABHostname = "xboxab.com";
     }
 #pragma warning restore CS8618
 
@@ -194,6 +222,7 @@ public class MainViewModel : ViewModelBase
 
         if (ChangeMSALoginServiceAddress) yield return "change-msa-login-address";
         if (ChangePlayfabApiAddress) yield return "change-playfab-address";
+        if (ChangeXboxABAddress) yield return "change-xboxab-address";
     }
 
     public IEnumerable<string> GetVariables()
@@ -223,6 +252,11 @@ public class MainViewModel : ViewModelBase
         {
             yield return $"playfabprotocol={(ProtocolEnum)PlayfabApiProtocol}";
             yield return $"playfabhostname={PlayfabApiHostname}";
+        }
+        if (ChangeXboxABAddress)
+        {
+            yield return $"playfabprotocol={(ProtocolEnum)XboxABProtocol}";
+            yield return $"playfabhostname={XboxABHostname}";
         }
     }
 }
