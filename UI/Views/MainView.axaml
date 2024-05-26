@@ -153,6 +153,73 @@
 							</StackPanel>
 						</Border>
 						<Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5"  IsVisible="{Binding !ChangeAppName}"/>
+
+						<Grid HorizontalAlignment="Center">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+								Change package name
+							</Label>
+							<ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangePackageName}" OffContent="No" OnContent="Yes" >
+							</ToggleSwitch>
+						</Grid>
+						<Border IsVisible="{Binding ChangePackageName}"  BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="350">
+							<StackPanel HorizontalAlignment="Center" Margin="10">
+								<Grid HorizontalAlignment="Center">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="Auto"/>
+									</Grid.ColumnDefinitions>
+									<Label Grid.Column="0" VerticalAlignment="Center">
+										Package name/id:
+									</Label>
+									<TextBox Text="{Binding PackageName}" Grid.Column="1" MaxLength="50" TextWrapping="Wrap" MaxWidth="200"></TextBox>
+								</Grid>
+							</StackPanel>
+						</Border>
+						<Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5"  IsVisible="{Binding !ChangePackageName}"/>
+						
+						<Grid HorizontalAlignment="Center">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+								Change MSA login service address
+							</Label>
+							<ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangeMSALoginServiceAddress}" OffContent="No" OnContent="Yes" >
+							</ToggleSwitch>
+						</Grid>
+						<Border IsVisible="{Binding ChangeMSALoginServiceAddress}"  BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="350">
+							<StackPanel HorizontalAlignment="Center" Margin="10">
+								<Grid HorizontalAlignment="Center" Margin="0 0 0 10">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="Auto"/>
+									</Grid.ColumnDefinitions>
+									<Label Grid.Column="0" VerticalAlignment="Center">
+										Protocol:
+									</Label>
+									<ComboBox Grid.Column="1" SelectedIndex="{Binding MSALoginServiceProtocol}">
+										<ComboBoxItem>Http</ComboBoxItem>
+										<ComboBoxItem>Https</ComboBoxItem>
+									</ComboBox>
+								</Grid>
+								<Grid HorizontalAlignment="Center">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="Auto"/>
+									</Grid.ColumnDefinitions>
+									<Label Grid.Column="0" VerticalAlignment="Center">
+										Hostname:
+									</Label>
+									<TextBox Text="{Binding MSALoginServiceHostname}" Grid.Column="1" Watermark="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
+								</Grid>
+							</StackPanel>
+						</Border>
+						<Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5"  IsVisible="{Binding !ChangeMSALoginServiceAddress}"/>
 					</StackPanel>
 				</Expander>
 			</StackPanel>

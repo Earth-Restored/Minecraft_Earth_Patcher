@@ -70,7 +70,6 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref disableMsaLoginSignatureValidation, value);
     }
 
-
     #region app_name
     private bool changeAppName;
     public bool ChangeAppName
@@ -91,6 +90,44 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref appNameShort, value);
     }
     #endregion
+    #region package_name
+    private bool changePackageName;
+    public bool ChangePackageName
+    {
+        get => changePackageName;
+        set => this.RaiseAndSetIfChanged(ref changePackageName, value);
+    }
+    private string packageName;
+    public string PackageName
+    {
+        get => packageName;
+        set => this.RaiseAndSetIfChanged(ref packageName, value);
+    }
+    #endregion
+    #region MSA_login_service
+    private bool changeMSALoginServiceAddress;
+    public bool ChangeMSALoginServiceAddress
+    {
+        get => changeMSALoginServiceAddress;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref changeMSALoginServiceAddress, value);
+            if (value) DisableMsaLoginSignatureValidation = true;
+        }
+    }
+    private int _MSALoginServiceProtocol;
+    public int MSALoginServiceProtocol
+    {
+        get => _MSALoginServiceProtocol;
+        set => this.RaiseAndSetIfChanged(ref _MSALoginServiceProtocol, value);
+    }
+    private string _MSALoginServiceHostname;
+    public string MSALoginServiceHostname
+    {
+        get => _MSALoginServiceHostname;
+        set => this.RaiseAndSetIfChanged(ref _MSALoginServiceHostname, value);
+    }
+    #endregion
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public MainViewModel()
@@ -107,6 +144,13 @@ public class MainViewModel : ViewModelBase
         ChangeAppName = true;
         AppName = "Minecraft Earth Patched";
         AppNameShort = "MCE Patched";
+
+        ChangePackageName = true;
+        PackageName = "com.github.bitcodercz";
+
+        ChangeMSALoginServiceAddress = false;
+        MSALoginServiceProtocol = (int)ProtocolEnum.Https;
+        MSALoginServiceHostname = "live.com";
     }
 #pragma warning restore CS8618
 
@@ -118,8 +162,13 @@ public class MainViewModel : ViewModelBase
         if (DisableLicenseCheck) yield return "disable-license-check";
         if (DisableTelemetry) yield return "disable-telemetry";
         if (DisableMsaLoginSignatureValidation) yield return "disable-msa-login-signature-validation";
+
         if (ChangeLocatorAddress) yield return "change-locator-address";
+
         if (ChangeAppName) yield return "change-app-name";
+        if (ChangePackageName) yield return "change-package-name";
+
+        if (changeMSALoginServiceAddress) yield return "change-msa-login-address";
     }
 
     public IEnumerable<string> GetVariables()
@@ -129,10 +178,21 @@ public class MainViewModel : ViewModelBase
             yield return $"locatorprotocol={(ProtocolEnum)LocatorProtocol}";
             yield return $"locatorhostname={LocatorHostname}";
         }
+
         if (ChangeAppName)
         {
             yield return $"app_name={AppName}";
             yield return $"app_name_short={AppNameShort}";
+        }
+        if (ChangePackageName)
+        {
+            yield return $"package_name={PackageName}";
+        }
+
+        if (ChangeMSALoginServiceAddress)
+        {
+            yield return $"liveprotocol={(ProtocolEnum)MSALoginServiceProtocol}";
+            yield return $"livehostname={MSALoginServiceHostname}";
         }
     }
 }
