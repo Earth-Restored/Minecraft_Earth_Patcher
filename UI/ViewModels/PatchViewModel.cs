@@ -44,7 +44,7 @@ namespace MCEPatcher.UI.ViewModels
                 {
                     finishedContainer.IsVisible = true;
                     scrollViewer.ScrollToEnd();
-                    if (!patchResult) finishedContainer.Children[2].IsVisible = false;
+                    if (!patchResult) finishedContainer.Children[1].IsVisible = false;
                 });
             });
         }

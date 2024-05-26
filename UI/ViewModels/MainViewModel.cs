@@ -172,6 +172,26 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref xboxABHostname, value);
     }
     #endregion
+    #region xboxlive
+    private bool changeXboxLiveAddress;
+    public bool ChangeXboxLiveAddress
+    {
+        get => changeXboxLiveAddress;
+        set => this.RaiseAndSetIfChanged(ref changeXboxLiveAddress, value);
+    }
+    private int xboxLiveProtocol;
+    public int XboxLiveProtocol
+    {
+        get => xboxLiveProtocol;
+        set => this.RaiseAndSetIfChanged(ref xboxLiveProtocol, value);
+    }
+    private string xboxLiveHostname;
+    public string XboxLiveHostname
+    {
+        get => xboxLiveHostname;
+        set => this.RaiseAndSetIfChanged(ref xboxLiveHostname, value);
+    }
+    #endregion
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public MainViewModel()
@@ -203,6 +223,10 @@ public class MainViewModel : ViewModelBase
         ChangeXboxABAddress = false;
         XboxABProtocol = (int)ProtocolEnum.Https;
         XboxABHostname = "xboxab.com";
+
+        ChangeXboxLiveAddress = false;
+        XboxLiveProtocol = (int)ProtocolEnum.Https;
+        XboxLiveHostname = "xboxlive.com";
     }
 #pragma warning restore CS8618
 
@@ -223,6 +247,11 @@ public class MainViewModel : ViewModelBase
         if (ChangeMSALoginServiceAddress) yield return "change-msa-login-address";
         if (ChangePlayfabApiAddress) yield return "change-playfab-address";
         if (ChangeXboxABAddress) yield return "change-xboxab-address";
+        if (ChangeXboxLiveAddress)
+        {
+            yield return "change-xboxlive-address-base";
+            yield return "change-xboxlive-address-extra";
+        }
     }
 
     public IEnumerable<string> GetVariables()
@@ -255,8 +284,13 @@ public class MainViewModel : ViewModelBase
         }
         if (ChangeXboxABAddress)
         {
-            yield return $"playfabprotocol={(ProtocolEnum)XboxABProtocol}";
-            yield return $"playfabhostname={XboxABHostname}";
+            yield return $"xboxabprotocol={(ProtocolEnum)XboxABProtocol}";
+            yield return $"xboxabhostname={XboxABHostname}";
+        }
+        if (ChangeXboxLiveAddress)
+        {
+            yield return $"xboxliveprotocol={(ProtocolEnum)XboxLiveProtocol}";
+            yield return $"xboxlivehostname={XboxLiveHostname}";
         }
     }
 }
