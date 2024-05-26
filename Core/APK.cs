@@ -27,7 +27,6 @@ namespace MCEPatcher.Core
                 process = U.Run("java", new string[]
                 {
                     "-jar", "apktool.jar",
-                    "/c",
                     "d",
                     "-f",
                     "-o", $"\"{output.FullName}\"",
@@ -49,6 +48,7 @@ namespace MCEPatcher.Core
             if (Environment.OSVersion.Platform == PlatformID.Win32NT && File.Exists(apkToolName)) 
                 process = U.Run(apkToolName, new string[]
                 {
+                    "/c",
                     "b",
                     "-f",
                     "-o", $"\"{outApk.FullName}\"",
