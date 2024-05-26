@@ -63,7 +63,7 @@
 							<Label Grid.Column="0" VerticalAlignment="Center">
 								Hostname:
 							</Label>
-							<TextBox Text="{Binding LocatorHostname}" Grid.Column="1" Watermark="192.168.x.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
+							<TextBox Text="{Binding LocatorHostname}" Grid.Column="1" Watermark="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
 						</Grid>
 					</StackPanel>
 				</Border>

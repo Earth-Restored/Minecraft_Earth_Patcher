@@ -71,7 +71,7 @@ public class MainViewModel : ViewModelBase
     }
 
 
-    #region apk_name
+    #region app_name
     private bool changeAppName;
     public bool ChangeAppName
     {
@@ -96,8 +96,8 @@ public class MainViewModel : ViewModelBase
     public MainViewModel()
     {
         ChangeLocatorAddress = true;
-        LocatorProtocol = (int)ProtocolEnum.Https;
-        LocatorHostname = "locator.mceserv.net";
+        LocatorProtocol = (int)ProtocolEnum.Http;
+        LocatorHostname = "192.168.1.x";
 
         DisableSunsetTimeCheck = true;
         DisableLicenseCheck = true;
