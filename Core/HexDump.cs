@@ -114,7 +114,8 @@ namespace MCEPatcher.Core
 
         public static byte[] Undo(string hexdump)
         {
-            string[] lines = hexdump.Split(Environment.NewLine);
+            string newLine = U.GetNewLine(hexdump);
+            string[] lines = hexdump.Split(newLine);
 
             byte[] bytes = new byte[(lines.Length - 3) * BytesPerLine];
 

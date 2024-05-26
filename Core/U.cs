@@ -198,5 +198,19 @@ namespace MCEPatcher.Core
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey(true);
         }
+
+        public static string GetNewLine(string text)
+        {
+            int index = text.IndexOf('\n');
+
+            if (index < 0)
+            {
+                if (text.Contains("\r")) return "\r";
+                else return Environment.NewLine;
+            }
+            else if (index == 0) return "\n";
+
+            return text[index - 1] == '\r' ? "\r\n" : "\n";
+        }
     }
 }

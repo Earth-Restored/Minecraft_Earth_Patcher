@@ -130,8 +130,8 @@ namespace MCEPatcher.Core
 
         private void patch(string patch, string patchName, Dictionary<string, string>? variables = null)
         {
-            // TODO: detect the new line used, could be differend then Environment.NewLine
-            var filesToPatch = DiffPatch.DiffParserHelper.Parse(patch, Environment.NewLine);
+            string newLine = U.GetNewLine(patch);
+            var filesToPatch = DiffPatch.DiffParserHelper.Parse(patch, newLine);
 
             if (variables is not null && variables.Count != 0)
             {
@@ -158,7 +158,7 @@ namespace MCEPatcher.Core
                     sb.Append(U.ToString(filePatch));
 
                 string s = sb.ToString();
-                filesToPatch = DiffPatch.DiffParserHelper.Parse(sb.ToString(), Environment.NewLine);
+                filesToPatch = DiffPatch.DiffParserHelper.Parse(sb.ToString(), newLine);
             }
 
             foreach (var filePatch in filesToPatch)
