@@ -1,0 +1,31 @@
+--- a/AndroidManifest.xml
++++ b/AndroidManifest.xml
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="utf-8"?>
+-<manifest android:versionCode="2020121703" android:versionName="0.33.0" android:installLocation="preferExternal" android:compileSdkVersion="29" android:compileSdkVersionCodename="10" package="com.mojang.minecraftearth" platformBuildVersionCode="29" platformBuildVersionName="10"
++<manifest android:versionCode="2020121703" android:versionName="0.33.0" android:installLocation="preferExternal" android:compileSdkVersion="29" android:compileSdkVersionCodename="10" package="${package_name}" platformBuildVersionCode="29" platformBuildVersionName="10"
+   xmlns:android="http://schemas.android.com/apk/res/android">
+     <uses-feature android:glEsVersion="0x20000" android:required="true" />
+     <uses-feature android:name="android.hardware.camera.ar" android:required="true" />
+@@ -130,7 +130,7 @@
+                 <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
+             </intent-filter>
+         </receiver>
+-        <provider android:name="com.google.firebase.provider.FirebaseInitProvider" android:exported="false" android:authorities="com.mojang.minecraftearth.firebaseinitprovider" android:initOrder="100" />
++        <provider android:name="com.google.firebase.provider.FirebaseInitProvider" android:exported="false" android:authorities="${package_name}.firebaseinitprovider" android:initOrder="100" />
+         <service android:name="com.google.firebase.components.ComponentDiscoveryService" android:exported="false">
+             <meta-data android:name="com.google.firebase.components:com.google.firebase.iid.Registrar" android:value="com.google.firebase.components.ComponentRegistrar" />
+         </service>
+@@ -146,9 +146,9 @@
+         </service>
+         <receiver android:name="com.mojang.minecraftpe.CustomBroadcastReceiver" android:exported="false">
+             <intent-filter>
+-                <action android:name="com.mojang.minecraftearth.intent.APPBOY_NOTIFICATION_OPENED" id="0" />
+-                <action android:name="com.mojang.minecraftearth.intent.APPBOY_PUSH_RECEIVED" id="1" />
+-                <action android:name="com.mojang.minecraftearth.intent.APPBOY_PUSH_DELETED" id="2" />
++                <action android:name="${package_name}.intent.APPBOY_NOTIFICATION_OPENED" id="0" />
++                <action android:name="${package_name}.intent.APPBOY_PUSH_RECEIVED" id="1" />
++                <action android:name="${package_name}.intent.APPBOY_PUSH_DELETED" id="2" />
+             </intent-filter>
+         </receiver>
+         <service android:name="com.google.firebase.messaging.cpp.RegistrationIntentService" android:exported="false" />
