@@ -64,7 +64,7 @@ namespace MCEPatcher.Core
             return ms.ToArray();
         }
 
-        public static Process Run(string file, params string[] args)
+        public static Process Run(string file, string workDir, params string[] args)
         {
             bool shellExecute = false;
 
@@ -72,6 +72,7 @@ namespace MCEPatcher.Core
             {
                 FileName = file,
                 Arguments = string.Join(' ', args),
+                WorkingDirectory = workDir,
                 UseShellExecute = shellExecute,
                 CreateNoWindow = !shellExecute,
                 RedirectStandardOutput = !shellExecute,
