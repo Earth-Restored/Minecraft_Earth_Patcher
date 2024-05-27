@@ -45,19 +45,5 @@ namespace MCEPatcher.UI.Views
             }
             catch { }
         }
-
-        /*
-         * TODO: once done show button "show patched apk"
-         * on windows:
-         * string p = @"C:\tmp\this path contains spaces, and,commas\target.txt";
-         * string args = string.Format("/e, /select, \"{0}\"", p);
-         *
-         * ProcessStartInfo info = new ProcessStartInfo();
-         * info.FileName = "explorer";
-         * info.Arguments = args;
-         * Process.Start(info);
-         * on linux:
-         * Process.Start(@"c:\temp");
-         */
     }
 }

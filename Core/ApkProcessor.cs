@@ -100,6 +100,17 @@ namespace MCEPatcher.Core
                 Log.Debug("Done");
             }
 
+            if (options.SkipSign)
+                Log.Information($"Signing skipped");
+            else
+            {
+                Log.Information("*****Signing apk*****");
+                if (!Signer.Sign(outApk, new DirectoryInfo("Signed")))
+                    return false;
+
+                Log.Debug("Done");
+            }
+
             Log.Information("Finished");
 
             return true;
@@ -131,6 +142,10 @@ namespace MCEPatcher.Core
 
             [Option("skip-build", Required = false, HelpText = "Skips building the apk")]
             public bool SkipBuild { get; set; }
+
+
+            [Option("skip-sign", Required = false, HelpText = "Skips signing of the apk")]
+            public bool SkipSign { get; set; }
         }
 #pragma warning restore CS8618
     }

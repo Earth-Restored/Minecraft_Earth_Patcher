@@ -1,0 +1,41 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MCEPatcher.Core
+{
+    public static class Signer
+    {
+        const string jarName = "uber-apk-signer.jar";
+
+        public static bool Sign(FileInfo apkFile, DirectoryInfo outDir)
+        {
+            Process process = U.Run("java", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), new string[]
+            {
+                "-jar", $"\"{Path.GetFullPath(jarName)}\"",
+                "-a", $"\"{apkFile.FullName}\"",
+                "-o", $"\"{outDir.FullName}\""
+            });
+            
+            process.WaitForExit();
+            int exitCode = process.ExitCode;
+            process.Close();
+
+            if (exitCode != 0) return false;
+
+            FileInfo? outApk = outDir.EnumerateFiles().Where(info => info.Extension == ".apk").FirstOrDefault();
+            if (outApk is null) return false;
+
+            apkFile.Delete();
+
+            outApk.MoveTo(apkFile.FullName);
+
+            outDir.Delete(true);
+
+            return true;
+        }
+    }
+}
