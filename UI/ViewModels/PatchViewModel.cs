@@ -3,12 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
 using MCEPatcher.Core;
-using MCEPatcher.UI.Views;
 using Serilog;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MCEPatcher.UI.ViewModels

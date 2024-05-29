@@ -1,11 +1,7 @@
 ﻿using Avalonia.Controls;
 using MCEPatcher.UI.Views;
-using MsBox.Avalonia.Enums;
 using MsBox.Avalonia;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using MsBox.Avalonia.Enums;
 using System.Threading.Tasks;
 
 namespace MCEPatcher.UI.Utils

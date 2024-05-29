@@ -1,12 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MCEPatcher.Core
 {
@@ -128,7 +123,7 @@ namespace MCEPatcher.Core
             patches = null;
 
             if (
-                context.AppliedPatches.ContainsKey(RequiredPatch) || 
+                context.AppliedPatches.ContainsKey(RequiredPatch) ||
                 !context.Variables.TryGetValue(VariableName, out string? val) ||
                 val != VariableValue
                 )

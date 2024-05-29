@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 
 namespace MCEPatcher.Core
 {
@@ -19,7 +14,7 @@ namespace MCEPatcher.Core
                 "-a", $"\"{apkFile.FullName}\"",
                 "-o", $"\"{outDir.FullName}\""
             });
-            
+
             process.WaitForExit();
             int exitCode = process.ExitCode;
             process.Close();

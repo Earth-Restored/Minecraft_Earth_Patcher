@@ -1,6 +1,4 @@
 ﻿using CommandLine;
-using Newtonsoft.Json;
-using Serilog.Events;
 using Serilog;
 
 namespace MCEPatcher.Core

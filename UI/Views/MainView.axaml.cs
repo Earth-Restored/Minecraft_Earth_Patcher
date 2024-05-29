@@ -3,10 +3,6 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using MCEPatcher.UI.Utils;
 using MCEPatcher.UI.ViewModels;
-using MsBox.Avalonia;
-using MsBox.Avalonia.Enums;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -31,7 +27,7 @@ public partial class MainView : UserControl
         {
             if (viewModel.ChangeMSALoginServiceAddress && IPAddress.TryParse(viewModel.MSALoginServiceHostname.Split(':')[0], out _))
             {
-                await U.ShowError("MSA login service address cannot be an IP"); 
+                await U.ShowError("MSA login service address cannot be an IP");
                 return;
             }
             if (viewModel.ChangePlayfabApiAddress && IPAddress.TryParse(viewModel.PlayfabApiHostname.Split(':')[0], out _))

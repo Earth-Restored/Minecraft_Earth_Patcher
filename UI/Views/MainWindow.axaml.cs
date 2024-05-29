@@ -1,7 +1,6 @@
 ﻿using Avalonia.Controls;
 using MCEPatcher.Core;
 using MCEPatcher.UI.ViewModels;
-using static MCEPatcher.Core.ApkProcessor;
 
 namespace MCEPatcher.UI.Views;
 

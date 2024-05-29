@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 
 namespace MCEPatcher.Core
 {
@@ -46,7 +41,7 @@ namespace MCEPatcher.Core
             outApk.Delete();
 
             Process process;
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT && File.Exists(apkToolName)) 
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT && File.Exists(apkToolName))
                 process = U.Run(Path.GetFullPath(apkToolName), Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), new string[]
                 {
                     "b",

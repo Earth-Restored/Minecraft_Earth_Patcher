@@ -6,7 +6,6 @@ using MCEPatcher.UI.ViewModels;
 using MCEPatcher.UI.Views;
 using Serilog;
 using System;
-using System.IO;
 using System.Text;
 
 namespace MCEPatcher.UI;
