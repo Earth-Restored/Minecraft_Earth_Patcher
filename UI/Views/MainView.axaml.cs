@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 
 namespace MCEPatcher.UI.Views;
 
@@ -28,6 +29,12 @@ public partial class MainView : UserControl
 
         if (DataContext is MainViewModel viewModel)
         {
+            if (viewModel.ChangeMSALoginServiceAddress && IPAddress.TryParse(viewModel.MSALoginServiceHostname, out _))
+            {
+                await U.ShowError("MSA login service address cannot be an IP"); 
+                return;
+            }
+
             MainWindow.Instance.Patch(new Core.ApkProcessor.Options()
             {
                 Autonomous = true,
