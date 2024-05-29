@@ -34,6 +34,21 @@ public partial class MainView : UserControl
                 await U.ShowError("MSA login service address cannot be an IP"); 
                 return;
             }
+            if (viewModel.ChangePlayfabApiAddress && IPAddress.TryParse(viewModel.PlayfabApiHostname.Split(':')[0], out _))
+            {
+                await U.ShowError("Playfab api address cannot be an IP");
+                return;
+            }
+            if (viewModel.ChangeXboxABAddress && IPAddress.TryParse(viewModel.XboxABHostname.Split(':')[0], out _))
+            {
+                await U.ShowError("XboxAB address cannot be an IP");
+                return;
+            }
+            if (viewModel.ChangeXboxLiveAddress && IPAddress.TryParse(viewModel.XboxLiveHostname.Split(':')[0], out _))
+            {
+                await U.ShowError("Xbox live address cannot be an IP");
+                return;
+            }
 
             MainWindow.Instance.Patch(new Core.ApkProcessor.Options()
             {
