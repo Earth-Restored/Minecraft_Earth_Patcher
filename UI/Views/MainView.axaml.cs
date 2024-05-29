@@ -29,7 +29,7 @@ public partial class MainView : UserControl
 
         if (DataContext is MainViewModel viewModel)
         {
-            if (viewModel.ChangeMSALoginServiceAddress && IPAddress.TryParse(viewModel.MSALoginServiceHostname, out _))
+            if (viewModel.ChangeMSALoginServiceAddress && IPAddress.TryParse(viewModel.MSALoginServiceHostname.Split(':')[0], out _))
             {
                 await U.ShowError("MSA login service address cannot be an IP"); 
                 return;
