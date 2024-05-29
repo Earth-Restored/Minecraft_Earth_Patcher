@@ -1,4 +1,5 @@
-﻿using DiffPatch.Data;
+﻿using DiffPatch.Core;
+using DiffPatch.Data;
 using Serilog;
 using System.Text;
 
@@ -126,7 +127,7 @@ namespace MCEPatcher.Core
         private void patch(string patch, string patchName, Dictionary<string, string>? variables = null)
         {
             string newLine = U.GetNewLine(patch);
-            var filesToPatch = DiffPatch.DiffParserHelper.Parse(patch, newLine);
+            var filesToPatch = parse(patch);
 
             if (variables is not null && variables.Count != 0)
             {
@@ -153,7 +154,7 @@ namespace MCEPatcher.Core
                     sb.Append(U.ToString(filePatch));
 
                 string s = sb.ToString();
-                filesToPatch = DiffPatch.DiffParserHelper.Parse(sb.ToString(), newLine);
+                filesToPatch = parse(sb.ToString());
             }
 
             foreach (var filePatch in filesToPatch)
@@ -232,6 +233,30 @@ namespace MCEPatcher.Core
             }
 
             return patches;
+        }
+
+        static IEnumerable<FileDiff> parse(string patch)
+        {
+            if (string.IsNullOrWhiteSpace(patch))
+                return Enumerable.Empty<FileDiff>();
+
+            IEnumerable<string> enumerable = splitLines(patch);
+            if (!enumerable.Any())
+                return Enumerable.Empty<FileDiff>();
+
+            return new DiffParser().Run(enumerable);
+
+            IEnumerable<string> splitLines(string input)
+            {
+                if (string.IsNullOrWhiteSpace(input))
+                    return Enumerable.Empty<string>();
+
+                string[] array = input.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+                if (array.Length != 0)
+                    return array;
+
+                return Enumerable.Empty<string>();
+            }
         }
 
         public class PatchContext
