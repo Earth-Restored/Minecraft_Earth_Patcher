@@ -18,6 +18,12 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref apkFile, value);
     }
 
+    public string? ApkFilePath
+    {
+        get => apkFile;
+        set => this.RaiseAndSetIfChanged(ref apkFile, value);
+    }
+
     #region locator
     private bool changeLocatorAddress;
     public bool ChangeLocatorAddress
@@ -255,7 +261,7 @@ public class MainViewModel : ViewModelBase
     {
         if (ChangeLocatorAddress)
         {
-            yield return $"locatorprotocol={(ProtocolEnum)LocatorProtocol}";
+            yield return $"locatorprotocol={((ProtocolEnum)LocatorProtocol).ToProtocolString()}";
             yield return $"locatorhostname={LocatorHostname}";
         }
 
@@ -271,22 +277,22 @@ public class MainViewModel : ViewModelBase
 
         if (ChangeMSALoginServiceAddress)
         {
-            yield return $"liveprotocol={(ProtocolEnum)MSALoginServiceProtocol}";
+            yield return $"liveprotocol={((ProtocolEnum)MSALoginServiceProtocol).ToProtocolString()}";
             yield return $"livehostname={MSALoginServiceHostname}";
         }
         if (ChangePlayfabApiAddress)
         {
-            yield return $"playfabprotocol={(ProtocolEnum)PlayfabApiProtocol}";
+            yield return $"playfabprotocol={((ProtocolEnum)PlayfabApiProtocol).ToProtocolString()}";
             yield return $"playfabhostname={PlayfabApiHostname}";
         }
         if (ChangeXboxABAddress)
         {
-            yield return $"xboxabprotocol={(ProtocolEnum)XboxABProtocol}";
+            yield return $"xboxabprotocol={((ProtocolEnum)XboxABProtocol).ToProtocolString()}";
             yield return $"xboxabhostname={XboxABHostname}";
         }
         if (ChangeXboxLiveAddress)
         {
-            yield return $"xboxliveprotocol={(ProtocolEnum)XboxLiveProtocol}";
+            yield return $"xboxliveprotocol={((ProtocolEnum)XboxLiveProtocol).ToProtocolString()}";
             yield return $"xboxlivehostname={XboxLiveHostname}";
         }
     }

@@ -60,11 +60,16 @@ namespace MCEPatcher.Core
             else
             {
                 Log.Information("*****Decoding apk*****");
-                if (
-                    !APK.Decode(inApk, decodedDir) ||
-                    !File.Exists(Path.Combine(decodedDir.FullName, "lib", "arm64-v8a", "libgenoa.so"))
-                    )
+                if (!APK.Decode(inApk, decodedDir))
+                {
                     return false;
+                }
+
+                if (!File.Exists(Path.Combine(decodedDir.FullName, "lib", "arm64-v8a", "libgenoa.so")))
+                {
+                    Log.Error("libgenoa.so does not exist, wrong apk?");
+                    return false;
+                }
 
                 Log.Debug("Done");
             }
