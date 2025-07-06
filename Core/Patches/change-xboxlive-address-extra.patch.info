@@ -9,7 +9,8 @@
             "Type": "Conditional",
             "RequiredPatch": "allow-http",
             "VariableName": "xboxliveprotocol",
-            "VariableValue": "http"
+            "VariableValue": "http",
+            "Equality": "StartsWith"
         }
     ],
     "VariablesUsed":

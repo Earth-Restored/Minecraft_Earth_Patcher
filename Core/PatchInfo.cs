@@ -1,5 +1,6 @@
-﻿using Newtonsoft.Json;
-using Serilog;
+﻿using Serilog;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 #nullable disable
 namespace MCEPatcher.Core
@@ -37,8 +38,11 @@ namespace MCEPatcher.Core
             {
                 try
                 {
-                    patch = JsonConvert.DeserializeObject<PatchInfo>(File.ReadAllText(path), new Prerequisite.Converter());
-                    if (patch is null) throw new JsonException("Json is null");
+                    patch = JsonSerializer.Deserialize<PatchInfo>(File.ReadAllText(path));
+                    if (patch is null)
+                    {
+                        throw new JsonException("Json is null");
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -49,7 +53,9 @@ namespace MCEPatcher.Core
                 }
             }
             else
+            {
                 patch = Default;
+            }
 
             patch.Path = System.IO.Path.GetFullPath(System.IO.Path.Combine("Patches", $"{name}.patch"));
 

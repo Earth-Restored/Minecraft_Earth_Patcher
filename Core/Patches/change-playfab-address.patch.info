@@ -9,7 +9,8 @@
             "Type": "Conditional",
             "RequiredPatch": "allow-http",
             "VariableName": "playfabprotocol",
-            "VariableValue": "http"
+            "VariableValue": "http",
+            "Equality": "StartsWith"
         }
     ],
     "VariablesUsed":

@@ -9,7 +9,8 @@
             "Type": "Conditional",
             "RequiredPatch": "allow-http",
             "VariableName": "liveprotocol",
-            "VariableValue": "http"
+            "VariableValue": "http",
+            "Equality": "StartsWith"
         }
     ],
     "VariablesUsed":
