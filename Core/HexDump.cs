@@ -7,55 +7,6 @@ namespace MCEPatcher.Core
         public const int BytesPerLine = 16;
         public const int BytesPerLineHalf = BytesPerLine / 2;
 
-        public static string CreateLine(IList<byte> bytes, int offset, int writeOffset = -1)
-        {
-            if (writeOffset == -1)
-                writeOffset = offset;
-
-            int length = Math.Min(16, bytes.Count - offset);
-
-            StringBuilder sb = new StringBuilder();
-
-            sb.Append(writeOffset.ToString("x").PadLeft(8, '0')).Append("  ");
-
-            // bytes
-            for (int i = 0; i < BytesPerLineHalf; i++)
-                sb.Append(getByte(i)).Append(" ");
-
-            sb.Append(" ");
-
-            for (int i = 0; i < BytesPerLineHalf; i++)
-                sb.Append(getByte(i + BytesPerLineHalf)).Append(" ");
-
-            // text
-            sb.Append(" |");
-            for (int i = 0; i < BytesPerLine; i++)
-                sb.Append(getChar(i));
-
-            sb.AppendLine("|");
-
-            return sb.ToString();
-
-            string getByte(int index)
-            {
-                if (index < length) return bytes[index + offset].ToString("x2");
-                else return "  ";
-            }
-
-            string getChar(int index)
-            {
-                if (index < length)
-                {
-                    char c = (char)bytes[index + offset];
-                    if (c == ' ') return " ";
-                    else if (char.IsControl(c) || c > 0b_0111_1111) return ".";
-                    else return c.ToString();
-                }
-                else
-                    return string.Empty;
-            }
-        }
-
         public static string Create(byte[] bytes)
         {
             StringBuilder sb = new StringBuilder();

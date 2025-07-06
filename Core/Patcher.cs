@@ -1,5 +1,4 @@
-﻿using DiffPatch.Core;
-using DiffPatch.Data;
+﻿using DiffPatch.Data;
 using Serilog;
 using System.Text;
 

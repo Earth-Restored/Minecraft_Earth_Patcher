@@ -13,15 +13,18 @@ namespace MCEPatcher.Core
 
             if (File.Exists(target)) return;
 
-            byte[] _bytes = File.ReadAllBytes(path);
+            byte[] oldBytes = File.ReadAllBytes(path);
 
-            byte[] bytes = new byte[_bytes.Length + 10965232];
+            byte[] newBytes = new byte[oldBytes.Length + 10965232];
 
-            Array.ConstrainedCopy(_bytes, 0, bytes, 0, _bytes.Length);
-            Array.Fill(bytes, (byte)0xFF, 0x07000000, bytes.Length - 0x07000000);
+            Array.ConstrainedCopy(oldBytes, 0, newBytes, 0, oldBytes.Length);
+            Array.Fill(newBytes, (byte)0xFF, 0x07000000, newBytes.Length - 0x07000000);
+
+            ((ReadOnlySpan<byte>)[0x00, 0x20, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00])
+                .CopyTo(newBytes.AsSpan(0x60));
 
             Log.Information($"Creating hexdump for '{path}'");
-            File.WriteAllText(target, HexDump.Create(bytes));
+            File.WriteAllText(target, HexDump.Create(newBytes));
         }
     }
 }
