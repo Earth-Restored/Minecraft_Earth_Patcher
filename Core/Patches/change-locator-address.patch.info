@@ -16,7 +16,7 @@
         {
             "File": "lib/arm64-v8a/libgenoa.so",
             "HexAddress": "0x07000300",
-            "TemplateString": "${locatorprotocol}://${locatorhostname}"
+            "TemplateString": "${locatorprotocol}${locatorhostname}"
         }
     ]
 }

@@ -61,7 +61,7 @@
 								<ColumnDefinition Width="Auto"/>
 							</Grid.ColumnDefinitions>
 							<Label Grid.Column="0" VerticalAlignment="Center">
-								Hostname:
+								Hostname/IP:
 							</Label>
 							<TextBox Text="{Binding LocatorHostname}" Grid.Column="1" Watermark="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
 						</Grid>
@@ -69,7 +69,7 @@
 				</Border>
 				<Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5"  IsVisible="{Binding !ChangeLocatorAddress}"/>
 				<Expander HorizontalAlignment="Center" Margin="0 7 0 0" Header="Advenced">
-					<StackPanel Width="350">
+					<StackPanel Width="370">
 						<Grid  HorizontalAlignment="Center">
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="Auto"/>
@@ -180,166 +180,252 @@
 							</StackPanel>
 						</Border>
 						<Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5"  IsVisible="{Binding !ChangePackageName}"/>
-						
-						<Grid HorizontalAlignment="Center">
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="Auto"/>
-								<ColumnDefinition Width="Auto"/>
-							</Grid.ColumnDefinitions>
-							<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
-								Change MSA login service address
-							</Label>
-							<ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangeMSALoginServiceAddress}" OffContent="No" OnContent="Yes" >
-							</ToggleSwitch>
-						</Grid>
-						<Border IsVisible="{Binding ChangeMSALoginServiceAddress}"  BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="350">
-							<StackPanel HorizontalAlignment="Center" Margin="10">
-								<Grid HorizontalAlignment="Center" Margin="0 0 0 10">
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="Auto"/>
-										<ColumnDefinition Width="Auto"/>
-									</Grid.ColumnDefinitions>
-									<Label Grid.Column="0" VerticalAlignment="Center">
-										Protocol:
-									</Label>
-									<ComboBox Grid.Column="1" SelectedIndex="{Binding MSALoginServiceProtocol}">
-										<ComboBoxItem>Http</ComboBoxItem>
-										<ComboBoxItem>Https</ComboBoxItem>
-									</ComboBox>
-								</Grid>
-								<Grid HorizontalAlignment="Center">
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="Auto"/>
-										<ColumnDefinition Width="Auto"/>
-									</Grid.ColumnDefinitions>
-									<Label Grid.Column="0" VerticalAlignment="Center">
-										Hostname:
-									</Label>
-									<TextBox Text="{Binding MSALoginServiceHostname}" Grid.Column="1" Watermark="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
-								</Grid>
-							</StackPanel>
-						</Border>
-						<Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5"  IsVisible="{Binding !ChangeMSALoginServiceAddress}"/>
 
-						<Grid HorizontalAlignment="Center">
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="Auto"/>
-								<ColumnDefinition Width="Auto"/>
-							</Grid.ColumnDefinitions>
-							<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
-								Change PlayFab API address
-							</Label>
-							<ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangePlayfabApiAddress}" OffContent="No" OnContent="Yes" >
-							</ToggleSwitch>
-						</Grid>
-						<Border IsVisible="{Binding ChangePlayfabApiAddress}"  BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="350">
-							<StackPanel HorizontalAlignment="Center" Margin="10">
-								<Grid HorizontalAlignment="Center" Margin="0 0 0 10">
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="Auto"/>
-										<ColumnDefinition Width="Auto"/>
-									</Grid.ColumnDefinitions>
-									<Label Grid.Column="0" VerticalAlignment="Center">
-										Protocol:
-									</Label>
-									<ComboBox Grid.Column="1" SelectedIndex="{Binding PlayfabApiProtocol}">
-										<ComboBoxItem>Http</ComboBoxItem>
-										<ComboBoxItem>Https</ComboBoxItem>
-									</ComboBox>
-								</Grid>
-								<Grid HorizontalAlignment="Center">
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="Auto"/>
-										<ColumnDefinition Width="Auto"/>
-									</Grid.ColumnDefinitions>
-									<Label Grid.Column="0" VerticalAlignment="Center">
-										Hostname:
-									</Label>
-									<TextBox Text="{Binding PlayfabApiHostname}" Grid.Column="1" Watermark="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
-								</Grid>
-							</StackPanel>
-						</Border>
-						<Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5"  IsVisible="{Binding !ChangePlayfabApiAddress}"/>
+                        <Grid HorizontalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+                                Login server single domain mode
+                            </Label>
+                            <ToggleSwitch Grid.Column="1" IsChecked="{Binding LoginServerSingleDomainMode}" OffContent="No" OnContent="Yes" >
+                            </ToggleSwitch>
+                        </Grid>
+                        <Border IsVisible="{Binding LoginServerSingleDomainMode}"  BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="350">
+                            <StackPanel HorizontalAlignment="Center" Margin="10">
+                                <Grid HorizontalAlignment="Center" Margin="0 0 0 10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Grid.Column="0" VerticalAlignment="Center">
+                                        Protocol:
+                                    </Label>
+                                    <ComboBox Grid.Column="1" SelectedIndex="{Binding LoginServerProtocol}">
+                                        <ComboBoxItem>Http</ComboBoxItem>
+                                        <ComboBoxItem>Https</ComboBoxItem>
+                                    </ComboBox>
+                                </Grid>
+                                <Grid HorizontalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Grid.Column="0" VerticalAlignment="Center">
+                                        Hostname/IP:
+                                    </Label>
+                                    <TextBox Text="{Binding LoginServerHostname}" Grid.Column="1" Watermark="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
+                                </Grid>
+                                <Grid HorizontalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+                                        Change MSA login service address
+                                    </Label>
+                                    <ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangeMSALoginServiceAddress}" OffContent="No" OnContent="Yes" >
+                                    </ToggleSwitch>
+                                </Grid>
+                                <Grid HorizontalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+                                        Change PlayFab API address
+                                    </Label>
+                                    <ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangePlayfabApiAddress}" OffContent="No" OnContent="Yes" >
+                                    </ToggleSwitch>
+                                </Grid>
+                                <Grid HorizontalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+                                        Change XboxAB address
+                                    </Label>
+                                    <ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangeXboxABAddress}" OffContent="No" OnContent="Yes" >
+                                    </ToggleSwitch>
+                                </Grid>
+                                <Grid HorizontalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+                                        Change Xbox live address
+                                    </Label>
+                                    <ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangeXboxLiveAddress}" OffContent="No" OnContent="Yes" >
+                                    </ToggleSwitch>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                        <Border IsVisible="{Binding !LoginServerSingleDomainMode}"  BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="370" Padding="10">
+                            <StackPanel>
+                                <Grid HorizontalAlignment="Center">
+							        <Grid.ColumnDefinitions>
+								        <ColumnDefinition Width="Auto"/>
+								        <ColumnDefinition Width="Auto"/>
+							        </Grid.ColumnDefinitions>
+							        <Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+								        Change MSA login service address
+							        </Label>
+							        <ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangeMSALoginServiceAddress}" OffContent="No" OnContent="Yes" >
+							        </ToggleSwitch>
+						        </Grid>
+						        <Border IsVisible="{Binding ChangeMSALoginServiceAddress}"  BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="350">
+							        <StackPanel HorizontalAlignment="Center" Margin="10">
+								        <Grid HorizontalAlignment="Center" Margin="0 0 0 10">
+									        <Grid.ColumnDefinitions>
+										        <ColumnDefinition Width="Auto"/>
+										        <ColumnDefinition Width="Auto"/>
+									        </Grid.ColumnDefinitions>
+									        <Label Grid.Column="0" VerticalAlignment="Center">
+										        Protocol:
+									        </Label>
+									        <ComboBox Grid.Column="1" SelectedIndex="{Binding MSALoginServiceProtocol}">
+										        <ComboBoxItem>Http</ComboBoxItem>
+										        <ComboBoxItem>Https</ComboBoxItem>
+									        </ComboBox>
+								        </Grid>
+								        <Grid HorizontalAlignment="Center">
+									        <Grid.ColumnDefinitions>
+										        <ColumnDefinition Width="Auto"/>
+										        <ColumnDefinition Width="Auto"/>
+									        </Grid.ColumnDefinitions>
+									        <Label Grid.Column="0" VerticalAlignment="Center">
+										        Hostname:
+									        </Label>
+									        <TextBox Text="{Binding MSALoginServiceHostname}" Grid.Column="1" Watermark="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
+								        </Grid>
+							        </StackPanel>
+						        </Border>
+						        <Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5"  IsVisible="{Binding !ChangeMSALoginServiceAddress}"/>
 
-						<Grid HorizontalAlignment="Center">
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="Auto"/>
-								<ColumnDefinition Width="Auto"/>
-							</Grid.ColumnDefinitions>
-							<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
-								Change XboxAB address
-							</Label>
-							<ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangeXboxABAddress}" OffContent="No" OnContent="Yes" >
-							</ToggleSwitch>
-						</Grid>
-						<Border IsVisible="{Binding ChangeXboxABAddress}"  BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="350">
-							<StackPanel HorizontalAlignment="Center" Margin="10">
-								<Grid HorizontalAlignment="Center" Margin="0 0 0 10">
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="Auto"/>
-										<ColumnDefinition Width="Auto"/>
-									</Grid.ColumnDefinitions>
-									<Label Grid.Column="0" VerticalAlignment="Center">
-										Protocol:
-									</Label>
-									<ComboBox Grid.Column="1" SelectedIndex="{Binding XboxABProtocol}">
-										<ComboBoxItem>Http</ComboBoxItem>
-										<ComboBoxItem>Https</ComboBoxItem>
-									</ComboBox>
-								</Grid>
-								<Grid HorizontalAlignment="Center">
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="Auto"/>
-										<ColumnDefinition Width="Auto"/>
-									</Grid.ColumnDefinitions>
-									<Label Grid.Column="0" VerticalAlignment="Center">
-										Hostname:
-									</Label>
-									<TextBox Text="{Binding XboxABHostname}" Grid.Column="1" Watermark="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
-								</Grid>
-							</StackPanel>
-						</Border>
-						<Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5"  IsVisible="{Binding !ChangeXboxABAddress}"/>
+						        <Grid HorizontalAlignment="Center">
+							        <Grid.ColumnDefinitions>
+								        <ColumnDefinition Width="Auto"/>
+								        <ColumnDefinition Width="Auto"/>
+							        </Grid.ColumnDefinitions>
+							        <Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+								        Change PlayFab API address
+							        </Label>
+							        <ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangePlayfabApiAddress}" OffContent="No" OnContent="Yes" >
+							        </ToggleSwitch>
+						        </Grid>
+						        <Border IsVisible="{Binding ChangePlayfabApiAddress}"  BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="350">
+							        <StackPanel HorizontalAlignment="Center" Margin="10">
+								        <Grid HorizontalAlignment="Center" Margin="0 0 0 10">
+									        <Grid.ColumnDefinitions>
+										        <ColumnDefinition Width="Auto"/>
+										        <ColumnDefinition Width="Auto"/>
+									        </Grid.ColumnDefinitions>
+									        <Label Grid.Column="0" VerticalAlignment="Center">
+										        Protocol:
+									        </Label>
+									        <ComboBox Grid.Column="1" SelectedIndex="{Binding PlayfabApiProtocol}">
+										        <ComboBoxItem>Http</ComboBoxItem>
+										        <ComboBoxItem>Https</ComboBoxItem>
+									        </ComboBox>
+								        </Grid>
+								        <Grid HorizontalAlignment="Center">
+									        <Grid.ColumnDefinitions>
+										        <ColumnDefinition Width="Auto"/>
+										        <ColumnDefinition Width="Auto"/>
+									        </Grid.ColumnDefinitions>
+									        <Label Grid.Column="0" VerticalAlignment="Center">
+										        Hostname:
+									        </Label>
+									        <TextBox Text="{Binding PlayfabApiHostname}" Grid.Column="1" Watermark="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
+								        </Grid>
+							        </StackPanel>
+						        </Border>
+						        <Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5"  IsVisible="{Binding !ChangePlayfabApiAddress}"/>
 
-						<Grid HorizontalAlignment="Center">
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="Auto"/>
-								<ColumnDefinition Width="Auto"/>
-							</Grid.ColumnDefinitions>
-							<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
-								Change Xbox live address
-							</Label>
-							<ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangeXboxLiveAddress}" OffContent="No" OnContent="Yes" >
-							</ToggleSwitch>
-						</Grid>
-						<Border IsVisible="{Binding ChangeXboxLiveAddress}"  BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="350">
-							<StackPanel HorizontalAlignment="Center" Margin="10">
-								<Grid HorizontalAlignment="Center" Margin="0 0 0 10">
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="Auto"/>
-										<ColumnDefinition Width="Auto"/>
-									</Grid.ColumnDefinitions>
-									<Label Grid.Column="0" VerticalAlignment="Center">
-										Protocol:
-									</Label>
-									<ComboBox Grid.Column="1" SelectedIndex="{Binding XboxLiveProtocol}">
-										<ComboBoxItem>Http</ComboBoxItem>
-										<ComboBoxItem>Https</ComboBoxItem>
-									</ComboBox>
-								</Grid>
-								<Grid HorizontalAlignment="Center">
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="Auto"/>
-										<ColumnDefinition Width="Auto"/>
-									</Grid.ColumnDefinitions>
-									<Label Grid.Column="0" VerticalAlignment="Center">
-										Hostname:
-									</Label>
-									<TextBox Text="{Binding XboxLiveHostname}" Grid.Column="1" Watermark="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
-								</Grid>
-							</StackPanel>
-						</Border>
-						<Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5"  IsVisible="{Binding !ChangeXboxLiveAddress}"/>
+						        <Grid HorizontalAlignment="Center">
+							        <Grid.ColumnDefinitions>
+								        <ColumnDefinition Width="Auto"/>
+								        <ColumnDefinition Width="Auto"/>
+							        </Grid.ColumnDefinitions>
+							        <Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+								        Change XboxAB address
+							        </Label>
+							        <ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangeXboxABAddress}" OffContent="No" OnContent="Yes" >
+							        </ToggleSwitch>
+						        </Grid>
+						        <Border IsVisible="{Binding ChangeXboxABAddress}"  BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="350">
+							        <StackPanel HorizontalAlignment="Center" Margin="10">
+								        <Grid HorizontalAlignment="Center" Margin="0 0 0 10">
+									        <Grid.ColumnDefinitions>
+										        <ColumnDefinition Width="Auto"/>
+										        <ColumnDefinition Width="Auto"/>
+									        </Grid.ColumnDefinitions>
+									        <Label Grid.Column="0" VerticalAlignment="Center">
+										        Protocol:
+									        </Label>
+									        <ComboBox Grid.Column="1" SelectedIndex="{Binding XboxABProtocol}">
+										        <ComboBoxItem>Http</ComboBoxItem>
+										        <ComboBoxItem>Https</ComboBoxItem>
+									        </ComboBox>
+								        </Grid>
+								        <Grid HorizontalAlignment="Center">
+									        <Grid.ColumnDefinitions>
+										        <ColumnDefinition Width="Auto"/>
+										        <ColumnDefinition Width="Auto"/>
+									        </Grid.ColumnDefinitions>
+									        <Label Grid.Column="0" VerticalAlignment="Center">
+										        Hostname:
+									        </Label>
+									        <TextBox Text="{Binding XboxABHostname}" Grid.Column="1" Watermark="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
+								        </Grid>
+							        </StackPanel>
+						        </Border>
+						        <Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5"  IsVisible="{Binding !ChangeXboxABAddress}"/>
+
+						        <Grid HorizontalAlignment="Center">
+							        <Grid.ColumnDefinitions>
+								        <ColumnDefinition Width="Auto"/>
+								        <ColumnDefinition Width="Auto"/>
+							        </Grid.ColumnDefinitions>
+							        <Label Grid.Column="0" VerticalAlignment="Center" Margin="10">
+								        Change Xbox live address
+							        </Label>
+							        <ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangeXboxLiveAddress}" OffContent="No" OnContent="Yes" >
+							        </ToggleSwitch>
+						        </Grid>
+						        <Border IsVisible="{Binding ChangeXboxLiveAddress}"  BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="350">
+							        <StackPanel HorizontalAlignment="Center" Margin="10">
+								        <Grid HorizontalAlignment="Center" Margin="0 0 0 10">
+									        <Grid.ColumnDefinitions>
+										        <ColumnDefinition Width="Auto"/>
+										        <ColumnDefinition Width="Auto"/>
+									        </Grid.ColumnDefinitions>
+									        <Label Grid.Column="0" VerticalAlignment="Center">
+										        Protocol:
+									        </Label>
+									        <ComboBox Grid.Column="1" SelectedIndex="{Binding XboxLiveProtocol}">
+										        <ComboBoxItem>Http</ComboBoxItem>
+										        <ComboBoxItem>Https</ComboBoxItem>
+									        </ComboBox>
+								        </Grid>
+								        <Grid HorizontalAlignment="Center">
+									        <Grid.ColumnDefinitions>
+										        <ColumnDefinition Width="Auto"/>
+										        <ColumnDefinition Width="Auto"/>
+									        </Grid.ColumnDefinitions>
+									        <Label Grid.Column="0" VerticalAlignment="Center">
+										        Hostname:
+									        </Label>
+									        <TextBox Text="{Binding XboxLiveHostname}" Grid.Column="1" Watermark="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
+								        </Grid>
+							        </StackPanel>
+						        </Border>
+						        <Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5"  IsVisible="{Binding !ChangeXboxLiveAddress}"/>
+                            </StackPanel>
+                        </Border>
 					</StackPanel>
 				</Expander>
 			</StackPanel>

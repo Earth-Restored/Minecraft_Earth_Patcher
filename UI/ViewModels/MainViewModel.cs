@@ -111,6 +111,28 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref packageName, value);
     }
     #endregion
+
+    private bool loginServerSingleDomainMode;
+    public bool LoginServerSingleDomainMode
+    {
+        get => loginServerSingleDomainMode;
+        set => this.RaiseAndSetIfChanged(ref loginServerSingleDomainMode, value);
+    }
+
+    private int loginServerProtocol;
+    public int LoginServerProtocol
+    {
+        get => loginServerProtocol;
+        set => this.RaiseAndSetIfChanged(ref loginServerProtocol, value);
+    }
+
+    private string loginServerHostname;
+    public string LoginServerHostname
+    {
+        get => loginServerHostname;
+        set => this.RaiseAndSetIfChanged(ref loginServerHostname, value);
+    }
+
     #region MSA_login_service
     private bool changeMSALoginServiceAddress;
     public bool ChangeMSALoginServiceAddress
@@ -215,6 +237,10 @@ public class MainViewModel : ViewModelBase
         ChangePackageName = true;
         PackageName = "com.github.bitcodercz";
 
+        LoginServerSingleDomainMode = false;
+        LoginServerProtocol = (int)ProtocolEnum.Http;
+        LoginServerHostname = "192.168.1.x";
+
         ChangeMSALoginServiceAddress = false;
         MSALoginServiceProtocol = (int)ProtocolEnum.Https;
         MSALoginServiceHostname = "live.com";
@@ -261,7 +287,7 @@ public class MainViewModel : ViewModelBase
     {
         if (ChangeLocatorAddress)
         {
-            yield return $"locatorprotocol={((ProtocolEnum)LocatorProtocol).ToProtocolString()}";
+            yield return $"locatorprotocol={((ProtocolEnum)LocatorProtocol).ToProtocolString()}://";
             yield return $"locatorhostname={LocatorHostname}";
         }
 
@@ -275,25 +301,51 @@ public class MainViewModel : ViewModelBase
             yield return $"package_name={PackageName}";
         }
 
-        if (ChangeMSALoginServiceAddress)
+        if (LoginServerSingleDomainMode)
         {
-            yield return $"liveprotocol={((ProtocolEnum)MSALoginServiceProtocol).ToProtocolString()}";
-            yield return $"livehostname={MSALoginServiceHostname}";
+            if (ChangeMSALoginServiceAddress)
+            {
+                yield return $"liveprotocol={((ProtocolEnum)LoginServerProtocol).ToProtocolString()}://{LoginServerHostname}/";
+                yield return "livehostname=live.com";
+            }
+            if (ChangePlayfabApiAddress)
+            {
+                yield return $"playfabprotocol={((ProtocolEnum)LoginServerProtocol).ToProtocolString()}://{LoginServerHostname}/";
+                yield return "playfabhostname=playfabapi.com";
+            }
+            if (ChangeXboxABAddress)
+            {
+                yield return $"xboxabprotocol={((ProtocolEnum)LoginServerProtocol).ToProtocolString()}://{LoginServerHostname}/";
+                yield return "xboxabhostname=xboxab.com";
+            }
+            if (ChangeXboxLiveAddress)
+            {
+                yield return $"xboxliveprotocol={((ProtocolEnum)LoginServerProtocol).ToProtocolString()}://{LoginServerHostname}/";
+                yield return "xboxlivehostname=xboxlive.com";
+            }
         }
-        if (ChangePlayfabApiAddress)
+        else
         {
-            yield return $"playfabprotocol={((ProtocolEnum)PlayfabApiProtocol).ToProtocolString()}";
-            yield return $"playfabhostname={PlayfabApiHostname}";
-        }
-        if (ChangeXboxABAddress)
-        {
-            yield return $"xboxabprotocol={((ProtocolEnum)XboxABProtocol).ToProtocolString()}";
-            yield return $"xboxabhostname={XboxABHostname}";
-        }
-        if (ChangeXboxLiveAddress)
-        {
-            yield return $"xboxliveprotocol={((ProtocolEnum)XboxLiveProtocol).ToProtocolString()}";
-            yield return $"xboxlivehostname={XboxLiveHostname}";
+            if (ChangeMSALoginServiceAddress)
+            {
+                yield return $"liveprotocol={((ProtocolEnum)MSALoginServiceProtocol).ToProtocolString()}://";
+                yield return $"livehostname={MSALoginServiceHostname}";
+            }
+            if (ChangePlayfabApiAddress)
+            {
+                yield return $"playfabprotocol={((ProtocolEnum)PlayfabApiProtocol).ToProtocolString()}://";
+                yield return $"playfabhostname={PlayfabApiHostname}";
+            }
+            if (ChangeXboxABAddress)
+            {
+                yield return $"xboxabprotocol={((ProtocolEnum)XboxABProtocol).ToProtocolString()}://";
+                yield return $"xboxabhostname={XboxABHostname}";
+            }
+            if (ChangeXboxLiveAddress)
+            {
+                yield return $"xboxliveprotocol={((ProtocolEnum)XboxLiveProtocol).ToProtocolString()}://";
+                yield return $"xboxlivehostname={XboxLiveHostname}";
+            }
         }
     }
 }

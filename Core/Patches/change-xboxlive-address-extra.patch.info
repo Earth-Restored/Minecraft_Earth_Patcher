@@ -22,12 +22,12 @@
         {
             "File": "lib/arm64-v8a/libgenoa.so",
             "HexAddress": "0x07000180",
-            "TemplateString": "${xboxliveprotocol}://profile.${xboxlivehostname}"
+            "TemplateString": "${xboxliveprotocol}profile.${xboxlivehostname}"
         },
         {
             "File": "lib/arm64-v8a/libgenoa.so",
             "HexAddress": "0x07000200",
-            "TemplateString": "${xboxliveprotocol}://minecraft-wallet.commerce.gameservices.${xboxlivehostname}/"
+            "TemplateString": "${xboxliveprotocol}minecraft-wallet.commerce.gameservices.${xboxlivehostname}/"
         }
     ]
 }

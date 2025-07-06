@@ -113,6 +113,15 @@ namespace MCEPatcher.Core
                 if (!pre.Check(context, out var patches))
                     patchAll(patches, context); // TODO: this could cause infinite loop, add depth (limit)? or check for it in Patch?
 
+            if (patchName == ExtendLibgenoa.Name)
+            {
+                Log.Information($"Applying patch '{patchName}'");
+                ExtendLibgenoa.Extent(new DirectoryInfo(filesLocation));
+                Log.Debug("Done");
+                context.AppliedPatches.Add(patchName, info);
+                return;
+            }
+
             string path = Path.Combine(patchesLoation, $"{patchName}.patch");
             if (!File.Exists(path))
                 throw new FileNotFoundException($"Patch '{patchName}' doesn't exist");
@@ -174,6 +183,7 @@ namespace MCEPatcher.Core
 
             if (hex && !file.Exists)
             {
+                // TODO: check if dumping libgenoa and if extend-libgenoa is needed, do it
                 string _from = file.FullName.Substring(0, file.FullName.LastIndexOf('.')); // remove .hexdump
                 Log.Information($"Creating hexdump for '{_from}'");
                 File.WriteAllText(file.FullName, HexDump.Create(File.ReadAllBytes(_from)));

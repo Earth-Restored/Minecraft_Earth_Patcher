@@ -65,7 +65,7 @@
      .prologue
      .line 14
 -    const-string/jumbo v0, "https://accounts.xboxlive.com"
-+    const-string/jumbo v0, "${xboxliveprotocol}://accounts.${xboxlivehostname}"
++    const-string/jumbo v0, "${xboxliveprotocol}accounts.${xboxlivehostname}"
  
      return-object v0
  .end method
@@ -74,7 +74,7 @@
      .prologue
      .line 29
 -    const-string/jumbo v0, "https://privacy.xboxlive.com"
-+    const-string/jumbo v0, "${xboxliveprotocol}://privacy.${xboxlivehostname}"
++    const-string/jumbo v0, "${xboxliveprotocol}privacy.${xboxlivehostname}"
  
      return-object v0
  .end method
@@ -83,7 +83,7 @@
      .prologue
      .line 9
 -    const-string/jumbo v0, "https://profile.xboxlive.com"
-+    const-string/jumbo v0, "${xboxliveprotocol}://profile.${xboxlivehostname}"
++    const-string/jumbo v0, "${xboxliveprotocol}profile.${xboxlivehostname}"
  
      return-object v0
  .end method
@@ -92,7 +92,7 @@
      .prologue
      .line 19
 -    const-string/jumbo v0, "https://accountstroubleshooter.xboxlive.com"
-+    const-string/jumbo v0, "${xboxliveprotocol}://accountstroubleshooter.${xboxlivehostname}"
++    const-string/jumbo v0, "${xboxliveprotocol}accountstroubleshooter.${xboxlivehostname}"
  
      return-object v0
  .end method
@@ -101,7 +101,7 @@
      .prologue
      .line 24
 -    const-string/jumbo v0, "https://user.mgt.xboxlive.com"
-+    const-string/jumbo v0, "${xboxliveprotocol}://user.mgt.${xboxlivehostname}"
++    const-string/jumbo v0, "${xboxliveprotocol}user.mgt.${xboxlivehostname}"
  
      return-object v0
  .end method
@@ -114,7 +114,7 @@ index fcc53b9..e2c7dd3 100644
  
      :pswitch_2
 -    const-string/jumbo v0, "https://social.xboxlive.com/users/xuid(%s)/people/identityshared/xuids?method=add"
-+    const-string/jumbo v0, "${xboxliveprotocol}://social.${xboxlivehostname}/users/xuid(%s)/people/identityshared/xuids?method=add"
++    const-string/jumbo v0, "${xboxliveprotocol}social.${xboxlivehostname}/users/xuid(%s)/people/identityshared/xuids?method=add"
  
      goto :goto_0
  
@@ -123,7 +123,7 @@ index fcc53b9..e2c7dd3 100644
      .prologue
      .line 171
 -    const-string/jumbo v0, "https://settings.xboxlive.com/settings/feature/friendfinder/settings"
-+    const-string/jumbo v0, "${xboxliveprotocol}://settings.${xboxlivehostname}/settings/feature/friendfinder/settings"
++    const-string/jumbo v0, "${xboxliveprotocol}settings.${xboxlivehostname}/settings/feature/friendfinder/settings"
  
      return-object v0
  .end method
@@ -132,7 +132,7 @@ index fcc53b9..e2c7dd3 100644
      .line 209
      :pswitch_2
 -    const-string/jumbo v0, "https://profile.xboxlive.com/users/gt(%s)/profile/settings?settings=AppDisplayName,DisplayPic,Gamerscore,Gamertag,PublicGamerpic,XboxOneRep"
-+    const-string/jumbo v0, "${xboxliveprotocol}://profile.${xboxlivehostname}/users/gt(%s)/profile/settings?settings=AppDisplayName,DisplayPic,Gamerscore,Gamertag,PublicGamerpic,XboxOneRep"
++    const-string/jumbo v0, "${xboxliveprotocol}profile.${xboxlivehostname}/users/gt(%s)/profile/settings?settings=AppDisplayName,DisplayPic,Gamerscore,Gamertag,PublicGamerpic,XboxOneRep"
  
      goto :goto_0
  
@@ -141,7 +141,7 @@ index fcc53b9..e2c7dd3 100644
      .prologue
      .line 159
 -    const-string/jumbo v0, "https://privacy.xboxlive.com/users/xuid(%s)/people/mute"
-+    const-string/jumbo v0, "${xboxliveprotocol}://privacy.${xboxlivehostname}/users/xuid(%s)/people/mute"
++    const-string/jumbo v0, "${xboxliveprotocol}privacy.${xboxlivehostname}/users/xuid(%s)/people/mute"
  
      return-object v0
  .end method
@@ -150,7 +150,7 @@ index fcc53b9..e2c7dd3 100644
      .prologue
      .line 175
 -    const-string/jumbo v0, "https://peoplehub.xboxlive.com/users/me/friendfinder"
-+    const-string/jumbo v0, "${xboxliveprotocol}://peoplehub.${xboxlivehostname}/users/me/friendfinder"
++    const-string/jumbo v0, "${xboxliveprotocol}peoplehub.${xboxlivehostname}/users/me/friendfinder"
  
      return-object v0
  .end method
@@ -159,7 +159,7 @@ index fcc53b9..e2c7dd3 100644
      .prologue
      .line 191
 -    const-string/jumbo v0, "https://peoplehub.xboxlive.com/users/me/people/recommendations"
-+    const-string/jumbo v0, "${xboxliveprotocol}://peoplehub.${xboxlivehostname}/users/me/people/recommendations"
++    const-string/jumbo v0, "${xboxliveprotocol}peoplehub.${xboxlivehostname}/users/me/people/recommendations"
  
      return-object v0
  .end method
@@ -168,7 +168,7 @@ index fcc53b9..e2c7dd3 100644
      .line 86
      :pswitch_2
 -    const-string/jumbo v0, "https://social.xboxlive.com/users/me/people/favorites/xuids?method=%s"
-+    const-string/jumbo v0, "${xboxliveprotocol}://social.${xboxlivehostname}/users/me/people/favorites/xuids?method=%s"
++    const-string/jumbo v0, "${xboxliveprotocol}social.${xboxlivehostname}/users/me/people/favorites/xuids?method=%s"
  
      goto :goto_0
  
@@ -177,7 +177,7 @@ index fcc53b9..e2c7dd3 100644
      .line 72
      :pswitch_2
 -    const-string/jumbo v0, "https://privacy.xboxlive.com/users/xuid(%s)/people/never"
-+    const-string/jumbo v0, "${xboxliveprotocol}://privacy.${xboxlivehostname}/users/xuid(%s)/people/never"
++    const-string/jumbo v0, "${xboxliveprotocol}privacy.${xboxlivehostname}/users/xuid(%s)/people/never"
  
      goto :goto_0
  
@@ -186,7 +186,7 @@ index fcc53b9..e2c7dd3 100644
      .prologue
      .line 179
 -    const-string/jumbo v0, "https://privacy.xboxlive.com/users/me/privacy/settings/%s"
-+    const-string/jumbo v0, "${xboxliveprotocol}://privacy.${xboxlivehostname}/users/me/privacy/settings/%s"
++    const-string/jumbo v0, "${xboxliveprotocol}privacy.${xboxlivehostname}/users/me/privacy/settings/%s"
  
      return-object v0
  .end method
@@ -195,7 +195,7 @@ index fcc53b9..e2c7dd3 100644
  
      :pswitch_2
 -    const-string/jumbo v0, "https://social.xboxlive.com/users/xuid(%s)/summary"
-+    const-string/jumbo v0, "${xboxliveprotocol}://social.${xboxlivehostname}/users/xuid(%s)/summary"
++    const-string/jumbo v0, "${xboxliveprotocol}social.${xboxlivehostname}/users/xuid(%s)/summary"
  
      goto :goto_0
  
@@ -204,7 +204,7 @@ index fcc53b9..e2c7dd3 100644
  
      :pswitch_2
 -    const-string/jumbo v0, "https://social.xboxlive.com/users/xuid(%s)/people/identityshared/xuids?method=remove"
-+    const-string/jumbo v0, "${xboxliveprotocol}://social.${xboxlivehostname}/users/xuid(%s)/people/identityshared/xuids?method=remove"
++    const-string/jumbo v0, "${xboxliveprotocol}social.${xboxlivehostname}/users/xuid(%s)/people/identityshared/xuids?method=remove"
  
      goto :goto_0
  
@@ -213,7 +213,7 @@ index fcc53b9..e2c7dd3 100644
      .prologue
      .line 183
 -    const-string/jumbo v0, "https://friendfinder.xboxlive.com/users/me/networks/%s/optin"
-+    const-string/jumbo v0, "${xboxliveprotocol}://friendfinder.${xboxlivehostname}/users/me/networks/%s/optin"
++    const-string/jumbo v0, "${xboxliveprotocol}friendfinder.${xboxlivehostname}/users/me/networks/%s/optin"
  
      return-object v0
  .end method
@@ -222,7 +222,7 @@ index fcc53b9..e2c7dd3 100644
      .prologue
      .line 163
 -    const-string/jumbo v0, "https://reputation.xboxlive.com/users/xuid(%s)/feedback"
-+    const-string/jumbo v0, "${xboxliveprotocol}://reputation.${xboxlivehostname}/users/xuid(%s)/feedback"
++    const-string/jumbo v0, "${xboxliveprotocol}reputation.${xboxlivehostname}/users/xuid(%s)/feedback"
  
      return-object v0
  .end method
@@ -231,7 +231,7 @@ index fcc53b9..e2c7dd3 100644
      .prologue
      .line 131
 -    const-string/jumbo v0, "http://dlassets.xboxlive.com/public/content/ppl/watermarks/tenure/%s.png"
-+    const-string/jumbo v0, "${xboxliveprotocol}://dlassets.${xboxlivehostname}/public/content/ppl/watermarks/tenure/%s.png"
++    const-string/jumbo v0, "${xboxliveprotocol}dlassets.${xboxlivehostname}/public/content/ppl/watermarks/tenure/%s.png"
  
      return-object v0
  .end method
@@ -240,7 +240,7 @@ index fcc53b9..e2c7dd3 100644
      .prologue
      .line 187
 -    const-string/jumbo v0, "https://thirdpartytokens.xboxlive.com/users/me/networks/%s/token"
-+    const-string/jumbo v0, "${xboxliveprotocol}://thirdpartytokens.${xboxlivehostname}/users/me/networks/%s/token"
++    const-string/jumbo v0, "${xboxliveprotocol}thirdpartytokens.${xboxlivehostname}/users/me/networks/%s/token"
  
      return-object v0
  .end method
@@ -249,7 +249,7 @@ index fcc53b9..e2c7dd3 100644
      .line 34
      :pswitch_2
 -    const-string/jumbo v0, "https://profile.xboxlive.com/users/batch/profile/settings"
-+    const-string/jumbo v0, "${xboxliveprotocol}://profile.${xboxlivehostname}/users/batch/profile/settings"
++    const-string/jumbo v0, "${xboxliveprotocol}profile.${xboxlivehostname}/users/batch/profile/settings"
  
      goto :goto_0
  
@@ -258,7 +258,7 @@ index fcc53b9..e2c7dd3 100644
      .prologue
      .line 167
 -    const-string/jumbo v0, "https://privacy.xboxlive.com/users/me/privacy/settings"
-+    const-string/jumbo v0, "${xboxliveprotocol}://privacy.${xboxlivehostname}/users/me/privacy/settings"
++    const-string/jumbo v0, "${xboxliveprotocol}privacy.${xboxlivehostname}/users/me/privacy/settings"
  
      return-object v0
  .end method
@@ -267,56 +267,56 @@ index fcc53b9..e2c7dd3 100644
      .line 137
      :pswitch_0
 -    const-string/jumbo v0, "http://dlassets.xboxlive.com/public/content/ppl/watermarks/cheater.png"
-+    const-string/jumbo v0, "${xboxliveprotocol}://dlassets.${xboxlivehostname}/public/content/ppl/watermarks/cheater.png"
++    const-string/jumbo v0, "${xboxliveprotocol}dlassets.${xboxlivehostname}/public/content/ppl/watermarks/cheater.png"
  
      goto :goto_1
  
      .line 139
      :pswitch_1
 -    const-string/jumbo v0, "http://dlassets.xboxlive.com/public/content/ppl/watermarks/launch/xboxoriginalteam.png"
-+    const-string/jumbo v0, "${xboxliveprotocol}://dlassets.${xboxlivehostname}/public/content/ppl/watermarks/launch/xboxoriginalteam.png"
++    const-string/jumbo v0, "${xboxliveprotocol}dlassets.${xboxlivehostname}/public/content/ppl/watermarks/launch/xboxoriginalteam.png"
  
      goto :goto_1
  
      .line 141
      :pswitch_2
 -    const-string/jumbo v0, "http://dlassets.xboxlive.com/public/content/ppl/watermarks/launch/xboxlivelaunchteam.png"
-+    const-string/jumbo v0, "${xboxliveprotocol}://dlassets.${xboxlivehostname}/public/content/ppl/watermarks/launch/xboxlivelaunchteam.png"
++    const-string/jumbo v0, "${xboxliveprotocol}dlassets.${xboxlivehostname}/public/content/ppl/watermarks/launch/xboxlivelaunchteam.png"
  
      goto :goto_1
  
      .line 143
      :pswitch_3
 -    const-string/jumbo v0, "http://dlassets.xboxlive.com/public/content/ppl/watermarks/launch/launchteam.png"
-+    const-string/jumbo v0, "${xboxliveprotocol}://dlassets.${xboxlivehostname}/public/content/ppl/watermarks/launch/launchteam.png"
++    const-string/jumbo v0, "${xboxliveprotocol}dlassets.${xboxlivehostname}/public/content/ppl/watermarks/launch/launchteam.png"
  
      goto :goto_1
  
      .line 145
      :pswitch_4
 -    const-string/jumbo v0, "http://dlassets.xboxlive.com/public/content/ppl/watermarks/launch/nxeteam.png"
-+    const-string/jumbo v0, "${xboxliveprotocol}://dlassets.${xboxlivehostname}/public/content/ppl/watermarks/launch/nxeteam.png"
++    const-string/jumbo v0, "${xboxliveprotocol}dlassets.${xboxlivehostname}/public/content/ppl/watermarks/launch/nxeteam.png"
  
      goto :goto_1
  
      .line 147
      :pswitch_5
 -    const-string/jumbo v0, "http://dlassets.xboxlive.com/public/content/ppl/watermarks/launch/kinectteam.png"
-+    const-string/jumbo v0, "${xboxliveprotocol}://dlassets.${xboxlivehostname}/public/content/ppl/watermarks/launch/kinectteam.png"
++    const-string/jumbo v0, "${xboxliveprotocol}dlassets.${xboxlivehostname}/public/content/ppl/watermarks/launch/kinectteam.png"
  
      goto :goto_1
  
      .line 149
      :pswitch_6
 -    const-string/jumbo v0, "http://dlassets.xboxlive.com/public/content/ppl/watermarks/launch/xboxoneteam.png"
-+    const-string/jumbo v0, "${xboxliveprotocol}://dlassets.${xboxlivehostname}/public/content/ppl/watermarks/launch/xboxoneteam.png"
++    const-string/jumbo v0, "${xboxliveprotocol}dlassets.${xboxlivehostname}/public/content/ppl/watermarks/launch/xboxoneteam.png"
  
      goto :goto_1
  
      .line 151
      :pswitch_7
 -    const-string/jumbo v0, "http://dlassets.xboxlive.com/public/content/ppl/watermarks/launch/xboxnxoeteam.png"
-+    const-string/jumbo v0, "${xboxliveprotocol}://dlassets.${xboxlivehostname}/public/content/ppl/watermarks/launch/xboxnxoeteam.png"
++    const-string/jumbo v0, "${xboxliveprotocol}dlassets.${xboxlivehostname}/public/content/ppl/watermarks/launch/xboxnxoeteam.png"
  
      goto :goto_1
  
@@ -325,7 +325,7 @@ index fcc53b9..e2c7dd3 100644
      .line 100
      :pswitch_2
 -    const-string/jumbo v0, "https://social.xboxlive.com/users/me/people/xuids?method=%s"
-+    const-string/jumbo v0, "${xboxliveprotocol}://social.${xboxlivehostname}/users/me/people/xuids?method=%s"
++    const-string/jumbo v0, "${xboxliveprotocol}social.${xboxlivehostname}/users/me/people/xuids?method=%s"
  
      goto :goto_0
  

@@ -27,7 +27,7 @@
         {
             "File": "lib/arm64-v8a/libgenoa.so",
             "HexAddress": "0x07000380",
-            "TemplateString": "${playfabprotocol}://"
+            "TemplateString": "${playfabprotocol}"
         }
     ]
 }

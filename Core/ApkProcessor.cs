@@ -74,14 +74,11 @@ namespace MCEPatcher.Core
                 Log.Debug("Done");
             }
 
-            Log.Information("*****Applying patches*****");
-            if (patches.Contains(ExtendLibgenoa.Name))
-            {
-                Log.Information($"Applying patch '{ExtendLibgenoa.Name}'");
-                ExtendLibgenoa.Extent(decodedDir);
-                patches.Remove(ExtendLibgenoa.Name);
-                Log.Debug("Done");
-            }
+            // does not get properly extended if not done before the hexdump and will most likely be done anyway, TODO: remove once the TODO in Patcher.patchFile is fixed
+            Log.Information($"Applying patch '{ExtendLibgenoa.Name}'");
+            ExtendLibgenoa.Extent(decodedDir);
+            patches.Remove(ExtendLibgenoa.Name);
+            Log.Debug("Done");
 
             Patcher patcher = new Patcher("Patches", decodedDir.FullName);
             patcher.Patch(patches, variables, patches.Contains(ExtendLibgenoa.Name) ? new()
