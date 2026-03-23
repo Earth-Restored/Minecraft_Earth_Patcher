@@ -296,10 +296,20 @@
 										        <ColumnDefinition Width="Auto"/>
 										        <ColumnDefinition Width="Auto"/>
 									        </Grid.ColumnDefinitions>
+											<Grid.RowDefinitions>
+												<RowDefinition Height="Auto"/>
+												<RowDefinition Height="Auto"/>
+											</Grid.RowDefinitions>
 									        <Label Grid.Column="0" VerticalAlignment="Center">
 										        Hostname:
 									        </Label>
-									        <TextBox Text="{Binding MSALoginServiceHostname}" Grid.Column="1" Watermark="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
+									        <TextBox Text="{Binding MSALoginServiceHostname}" Grid.Column="1" Watermark="mce.com" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
+											<TextBlock Text="Use hostname only, not IP"
+												Grid.Row="1"
+												Grid.ColumnSpan="2"
+												FontSize="10"
+												Opacity="0.6"
+												HorizontalAlignment="Right"/>
 								        </Grid>
 							        </StackPanel>
 						        </Border>
@@ -336,10 +346,20 @@
 										        <ColumnDefinition Width="Auto"/>
 										        <ColumnDefinition Width="Auto"/>
 									        </Grid.ColumnDefinitions>
+											<Grid.RowDefinitions>
+												<RowDefinition Height="Auto"/>
+												<RowDefinition Height="Auto"/>
+											</Grid.RowDefinitions>
 									        <Label Grid.Column="0" VerticalAlignment="Center">
 										        Hostname:
 									        </Label>
-									        <TextBox Text="{Binding PlayfabApiHostname}" Grid.Column="1" Watermark="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
+									        <TextBox Text="{Binding PlayfabApiHostname}" Grid.Column="1" Watermark="mce.com" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
+											<TextBlock Text="Use hostname only, not IP"
+												Grid.Row="1"
+												Grid.ColumnSpan="2"
+												FontSize="10"
+												Opacity="0.6"
+												HorizontalAlignment="Right"/>
 								        </Grid>
 							        </StackPanel>
 						        </Border>
@@ -376,10 +396,20 @@
 										        <ColumnDefinition Width="Auto"/>
 										        <ColumnDefinition Width="Auto"/>
 									        </Grid.ColumnDefinitions>
+											<Grid.RowDefinitions>
+												<RowDefinition Height="Auto"/>
+												<RowDefinition Height="Auto"/>
+											</Grid.RowDefinitions>
 									        <Label Grid.Column="0" VerticalAlignment="Center">
 										        Hostname:
 									        </Label>
-									        <TextBox Text="{Binding XboxABHostname}" Grid.Column="1" Watermark="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
+									        <TextBox Text="{Binding XboxABHostname}" Grid.Column="1" Watermark="mce.com" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
+											<TextBlock Text="Use hostname only, not IP"
+												Grid.Row="1"
+												Grid.ColumnSpan="2"
+												FontSize="10"
+												Opacity="0.6"
+												HorizontalAlignment="Right"/>
 								        </Grid>
 							        </StackPanel>
 						        </Border>
@@ -416,10 +446,20 @@
 										        <ColumnDefinition Width="Auto"/>
 										        <ColumnDefinition Width="Auto"/>
 									        </Grid.ColumnDefinitions>
+											<Grid.RowDefinitions>
+												<RowDefinition Height="Auto"/>
+												<RowDefinition Height="Auto"/>
+											</Grid.RowDefinitions>
 									        <Label Grid.Column="0" VerticalAlignment="Center">
 										        Hostname:
 									        </Label>
-									        <TextBox Text="{Binding XboxLiveHostname}" Grid.Column="1" Watermark="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
+									        <TextBox Text="{Binding XboxLiveHostname}" Grid.Column="1" Watermark="mce.com" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"></TextBox>
+											<TextBlock Text="Use hostname only, not IP"
+												Grid.Row="1"
+												Grid.ColumnSpan="2"
+												FontSize="10"
+												Opacity="0.6"
+												HorizontalAlignment="Right"/>
 								        </Grid>
 							        </StackPanel>
 						        </Border>
