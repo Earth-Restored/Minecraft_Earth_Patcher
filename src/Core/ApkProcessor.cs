@@ -7,7 +7,7 @@ namespace MCEPatcher.Core
     {
         internal static bool Autonomous { get; private set; }
 
-        public static bool Run(Options options)
+        public static async Task<bool> Run(Options options)
         {
             Autonomous = options.Autonomous;
             HashSet<string> patches = new(options.Patches);
@@ -53,6 +53,16 @@ namespace MCEPatcher.Core
                 }
 
                 variables.Add(name, value);
+            }
+
+            if (!options.SkipDecode || !options.SkipBuild)
+            {
+                await DependencyDownloader.Download("https://github.com/iBotPeaches/Apktool/releases/download/v3.0.1/apktool_3.0.1.jar", APK.FileName);
+            }
+
+            if (!options.SkipSign)
+            {
+                await DependencyDownloader.Download("https://github.com/patrickfav/uber-apk-signer/releases/download/v1.3.0/uber-apk-signer-1.3.0.jar", Signer.FileName);
             }
 
             if (options.SkipDecode)

@@ -4,13 +4,13 @@ namespace MCEPatcher.Core
 {
     public static class Signer
     {
-        const string jarName = "uber-apk-signer.jar";
+        public const string FileName = "uber-apk-signer.jar";
 
         public static bool Sign(FileInfo apkFile, DirectoryInfo outDir)
         {
             Process process = U.Run("java", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), new string[]
             {
-                "-jar", $"\"{Path.GetFullPath(jarName)}\"",
+                "-jar", $"\"{Path.GetFullPath(FileName)}\"",
                 "-a", $"\"{apkFile.FullName}\"",
                 "-o", $"\"{outDir.FullName}\""
             });

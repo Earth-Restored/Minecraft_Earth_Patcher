@@ -22,11 +22,11 @@ namespace MCEPatcher.UI.ViewModels
 
             App.OnLogWritten += onLogWritten;
 
-            Task task = Task.Run(() =>
+            Task task = Task.Run(async () =>
             {
                 try
                 {
-                    patchResult = ApkProcessor.Run(options);
+                    patchResult = await ApkProcessor.Run(options);
                 }
                 catch (Exception ex)
                 {

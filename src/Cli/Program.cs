@@ -9,7 +9,7 @@ namespace MCEPatcher.Core
          * Change the manifest
          *
          */
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var log = new LoggerConfiguration()
                 .WriteTo.Console()
@@ -51,7 +51,7 @@ namespace MCEPatcher.Core
 
             try
             {
-                if (!ApkProcessor.Run(options))
+                if (!await ApkProcessor.Run(options))
                 {
                     U.PAKE();
                     Environment.Exit(1);

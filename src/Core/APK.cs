@@ -4,13 +4,14 @@ namespace MCEPatcher.Core
 {
     public static class APK
     {
-        const string apkToolName = "apktool.bat";
+        public const string FileName = "apktool.jar";
+        public const string FileNameBat = "apktool.bat";
 
         public static bool Decode(FileInfo apk, DirectoryInfo output)
         {
             Process process;
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT && File.Exists(apkToolName))
-                process = U.Run(Path.GetFullPath(apkToolName), Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), new string[]
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT && File.Exists(FileNameBat))
+                process = U.Run(Path.GetFullPath(FileNameBat), Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), new string[]
                 {
                     "d",
                     "-f",
@@ -20,7 +21,7 @@ namespace MCEPatcher.Core
             else
                 process = U.Run("java", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), new string[]
                 {
-                    "-jar", $"\"{Path.GetFullPath("apktool.jar")}\"",
+                    "-jar", $"\"{Path.GetFullPath(FileName)}\"",
                     "d",
                     "-f",
                     "-o", $"\"{output.FullName}\"",
@@ -41,8 +42,8 @@ namespace MCEPatcher.Core
             outApk.Delete();
 
             Process process;
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT && File.Exists(apkToolName))
-                process = U.Run(Path.GetFullPath(apkToolName), Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), new string[]
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT && File.Exists(FileNameBat))
+                process = U.Run(Path.GetFullPath(FileNameBat), Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), new string[]
                 {
                     "b",
                     "-f",
@@ -52,7 +53,7 @@ namespace MCEPatcher.Core
             else
                 process = U.Run("java", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), new string[]
                 {
-                    "-jar", $"\"{Path.GetFullPath("apktool.jar")}\"",
+                    "-jar", $"\"{Path.GetFullPath(FileName)}\"",
                     "b",
                     "-f",
                     "-o", $"\"{outApk.FullName}\"",
