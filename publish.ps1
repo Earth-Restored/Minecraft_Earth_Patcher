@@ -72,7 +72,9 @@ foreach ($proj in $projects) {
                 "--self-contained",
                 "-p:PublishSingleFile=true",
                 "-p:IncludeNativeLibrariesForSelfExtract=true",
-                "-p:PublishTrimmed=false"
+                "-p:PublishTrimmed=false",
+                "-p:DebugType=None",
+                "-p:DebugSymbols=false"
             )
             
             $process = Start-Process dotnet -ArgumentList $publishArgs -NoNewWindow -Wait -PassThru
