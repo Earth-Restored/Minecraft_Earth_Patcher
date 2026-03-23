@@ -2,6 +2,7 @@
 using MCEPatcher.UI.Utils;
 using ReactiveUI;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace MCEPatcher.UI.ViewModels;
 
@@ -11,6 +12,8 @@ namespace MCEPatcher.UI.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
+    public string AssemblyVersion => Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
+
     private string? apkFile;
     public string? ApkFile
     {

@@ -2,5 +2,10 @@
   <PropertyGroup>
     <Nullable>enable</Nullable>
     <AvaloniaVersion>11.0.2</AvaloniaVersion>
+    <Authors>BitcoderCZ</Authors>
+    <RepositoryUrl>https://github.com/Earth-Restored/Minecraft_Earth_Patcher</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 </Project>

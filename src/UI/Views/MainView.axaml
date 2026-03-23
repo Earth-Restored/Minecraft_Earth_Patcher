@@ -433,6 +433,14 @@
 		<Button Margin="10" Click="Patch" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="30" Grid.Row="2">
 			Patch
 		</Button>
+
+	<TextBlock Grid.Row="2" 
+               Text="{Binding AssemblyVersion, StringFormat='v{0}'}"
+               FontSize="12"
+               Foreground="Gray"
+               HorizontalAlignment="Right" 
+               VerticalAlignment="Bottom"
+               Margin="0,0,10,10" />
 	</Grid>
 	
 </UserControl>

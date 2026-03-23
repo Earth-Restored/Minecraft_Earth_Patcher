@@ -128,7 +128,7 @@ namespace MCEPatcher.Core
             [Option('p', "patches", Required = true, HelpText = "List of patches to apply, in format '[patch1 name] \"[patch2 name]\" ...'")]
             public IEnumerable<string> Patches { get; set; }
 
-            [Option('v', "variables", Required = true, HelpText = "Variables to use for patches, in format '[var name]=[var1 value] \"[var2 name]\"=\"[var2 value]\" ...'")]
+            [Option('v', "variables", Required = true, HelpText = "Variables to use for patches, in format '[var1 name]=[var1 value] \"[var2 name]\"=\"[var2 value]\" ...'")]
             public IEnumerable<string> Variables { get; set; }
 
             [Option('a', "autonomous", Required = false, HelpText = "If true, no interaction from user is required")]
@@ -139,7 +139,6 @@ namespace MCEPatcher.Core
 
             [Option("skip-build", Required = false, HelpText = "Skips building the apk")]
             public bool SkipBuild { get; set; }
-
 
             [Option("skip-sign", Required = false, HelpText = "Skips signing of the apk")]
             public bool SkipSign { get; set; }
