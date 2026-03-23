@@ -5,6 +5,7 @@ using MCEPatcher.UI.ViewModels;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace MCEPatcher.UI.Views
 {
@@ -29,18 +30,21 @@ namespace MCEPatcher.UI.Views
 
         public void OpenPatchedAPKLocation(object sender, RoutedEventArgs args)
         {
+            string filePath = Path.GetFullPath("Minecraft_Earth_patched.apk");
+
             try
             {
-                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    ProcessStartInfo info = new ProcessStartInfo();
-                    info.FileName = "explorer";
-                    info.Arguments = $"/e, /select, \"{Path.GetFullPath("Minecraft_Earth_patched.apk")}\"";
-                    Process.Start(info);
+                    Process.Start("explorer.exe", $"/select,\"{filePath}\"");
                 }
-                else
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 {
-                    Process.Start(Environment.CurrentDirectory);
+                    Process.Start("xdg-open", Path.GetDirectoryName(filePath));
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    Process.Start("open", $"-R \"{filePath}\"");
                 }
             }
             catch { }
