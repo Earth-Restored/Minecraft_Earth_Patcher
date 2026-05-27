@@ -7,62 +7,61 @@ using Serilog;
 using System;
 using System.Threading.Tasks;
 
-namespace MCEPatcher.UI.ViewModels
+namespace MCEPatcher.UI.ViewModels;
+
+public class PatchViewModel : ViewModelBase
 {
-    public class PatchViewModel : ViewModelBase
+    private ScrollViewer scrollViewer;
+    private StackPanel panel;
+    private bool patchResult;
+
+    public void Start(ApkProcessor.Options options, ScrollViewer _scrollViewer, StackPanel _panel, Grid finishedContainer)
     {
-        private ScrollViewer scrollViewer;
-        private StackPanel panel;
-        private bool patchResult;
+        scrollViewer = _scrollViewer;
+        panel = _panel;
 
-        public void Start(ApkProcessor.Options options, ScrollViewer _scrollViewer, StackPanel _panel, Grid finishedContainer)
+        App.OnLogWritten += onLogWritten;
+
+        Task task = Task.Run(async () =>
         {
-            scrollViewer = _scrollViewer;
-            panel = _panel;
-
-            App.OnLogWritten += onLogWritten;
-
-            Task task = Task.Run(async () =>
+            try
             {
-                try
-                {
-                    patchResult = await ApkProcessor.Run(options);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex.ToString());
-                    patchResult = false;
-                }
-            });
-            task.ContinueWith(t =>
+                patchResult = await ApkProcessor.Run(options);
+            }
+            catch (Exception ex)
             {
-                Dispatcher.UIThread.Invoke(() =>
-                {
-                    finishedContainer.IsVisible = true;
-                    scrollViewer.ScrollToEnd();
-                    if (!patchResult) finishedContainer.Children[1].IsVisible = false;
-                });
-            });
-        }
-
-        private void onLogWritten(string? text)
+                Log.Error(ex.ToString());
+                patchResult = false;
+            }
+        });
+        task.ContinueWith(t =>
         {
             Dispatcher.UIThread.Invoke(() =>
             {
-                SelectableTextBlock block = new SelectableTextBlock()
-                {
-                    Text = text,
-                    TextWrapping = TextWrapping.Wrap,
-                    Padding = new Thickness(0, 0, 0, 2)
-                };
-                panel.Children.Add(block);
+                finishedContainer.IsVisible = true;
                 scrollViewer.ScrollToEnd();
+                if (!patchResult) finishedContainer.Children[1].IsVisible = false;
             });
-        }
+        });
+    }
 
-        public override void OnClose()
+    private void onLogWritten(string? text)
+    {
+        Dispatcher.UIThread.Invoke(() =>
         {
-            App.OnLogWritten -= onLogWritten;
-        }
+            SelectableTextBlock block = new SelectableTextBlock()
+            {
+                Text = text,
+                TextWrapping = TextWrapping.Wrap,
+                Padding = new Thickness(0, 0, 0, 2)
+            };
+            panel.Children.Add(block);
+            scrollViewer.ScrollToEnd();
+        });
+    }
+
+    public override void OnClose()
+    {
+        App.OnLogWritten -= onLogWritten;
     }
 }

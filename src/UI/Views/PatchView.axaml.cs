@@ -7,47 +7,46 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace MCEPatcher.UI.Views
+namespace MCEPatcher.UI.Views;
+
+public partial class PatchView : UserControl
 {
-    public partial class PatchView : UserControl
+    public PatchView()
     {
-        public PatchView()
-        {
-            InitializeComponent();
-            PatchViewModel model = new PatchViewModel();
-            DataContext = model;
-        }
+        InitializeComponent();
+        PatchViewModel model = new PatchViewModel();
+        DataContext = model;
+    }
 
-        public void Patch(ApkProcessor.Options options)
-        {
-            (DataContext as PatchViewModel)?.Start(options, scrollViewer, chat, finishedContainer);
-        }
+    public void Patch(ApkProcessor.Options options)
+    {
+        (DataContext as PatchViewModel)?.Start(options, scrollViewer, chat, finishedContainer);
+    }
 
-        public void Back(object sender, RoutedEventArgs args)
-        {
-            MainWindow.Instance.OpenMainView();
-        }
+    public void Back(object sender, RoutedEventArgs args)
+    {
+        MainWindow.Instance.OpenMainView();
+    }
 
-        public void OpenPatchedAPKLocation(object sender, RoutedEventArgs args)
-        {
-            string filePath = Path.GetFullPath("Minecraft_Earth_patched.apk");
+    public void OpenPatchedAPKLocation(object sender, RoutedEventArgs args)
+    {
+        string filePath = Path.GetFullPath("Minecraft_Earth_patched.apk");
 
-            try
+        try
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    Process.Start("explorer.exe", $"/select,\"{filePath}\"");
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                {
-                    Process.Start("xdg-open", Path.GetDirectoryName(filePath));
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                {
-                    Process.Start("open", $"-R \"{filePath}\"");
-                }
+                Process.Start("explorer.exe", $"/select,\"{filePath}\"");
             }
-            catch { }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                Process.Start("xdg-open", Path.GetDirectoryName(filePath));
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                Process.Start("open", $"-R \"{filePath}\"");
+            }
         }
+        catch { }
     }
 }

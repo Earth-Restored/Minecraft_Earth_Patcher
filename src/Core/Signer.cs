@@ -1,36 +1,35 @@
 ﻿using System.Diagnostics;
 
-namespace MCEPatcher.Core
+namespace MCEPatcher.Core;
+
+public static class Signer
 {
-    public static class Signer
+    public const string FileName = "uber-apk-signer.jar";
+
+    public static bool Sign(FileInfo apkFile, DirectoryInfo outDir)
     {
-        public const string FileName = "uber-apk-signer.jar";
-
-        public static bool Sign(FileInfo apkFile, DirectoryInfo outDir)
+        Process process = U.Run("java", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), new string[]
         {
-            Process process = U.Run("java", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), new string[]
-            {
-                "-jar", $"\"{Path.GetFullPath(FileName)}\"",
-                "-a", $"\"{apkFile.FullName}\"",
-                "-o", $"\"{outDir.FullName}\""
-            });
+            "-jar", $"\"{Path.GetFullPath(FileName)}\"",
+            "-a", $"\"{apkFile.FullName}\"",
+            "-o", $"\"{outDir.FullName}\""
+        });
 
-            process.WaitForExit();
-            int exitCode = process.ExitCode;
-            process.Close();
+        process.WaitForExit();
+        int exitCode = process.ExitCode;
+        process.Close();
 
-            if (exitCode != 0) return false;
+        if (exitCode != 0) return false;
 
-            FileInfo? outApk = outDir.EnumerateFiles().Where(info => info.Extension == ".apk").FirstOrDefault();
-            if (outApk is null) return false;
+        FileInfo? outApk = outDir.EnumerateFiles().Where(info => info.Extension == ".apk").FirstOrDefault();
+        if (outApk is null) return false;
 
-            apkFile.Delete();
+        apkFile.Delete();
 
-            outApk.MoveTo(apkFile.FullName);
+        outApk.MoveTo(apkFile.FullName);
 
-            outDir.Delete(true);
+        outDir.Delete(true);
 
-            return true;
-        }
+        return true;
     }
 }

@@ -1,126 +1,125 @@
 ﻿using System.Text;
 
-namespace MCEPatcher.Core
+namespace MCEPatcher.Core;
+
+public static class HexDump
 {
-    public static class HexDump
+    public const int BytesPerLine = 16;
+    public const int BytesPerLineHalf = BytesPerLine / 2;
+
+    public static string Create(byte[] bytes)
     {
-        public const int BytesPerLine = 16;
-        public const int BytesPerLineHalf = BytesPerLine / 2;
+        StringBuilder sb = new StringBuilder();
 
-        public static string Create(byte[] bytes)
+        // TODO: only use getByte in last line
+        int i;
+        for (i = 0; i < bytes.Length; i += BytesPerLine)
         {
-            StringBuilder sb = new StringBuilder();
+            // offset
+            sb.Append(i.ToString("x").PadLeft(8, '0')).Append("  ");
 
-            // TODO: only use getByte in last line
-            int i;
-            for (i = 0; i < bytes.Length; i += BytesPerLine)
+            // bytes
+            for (int j = 0; j < BytesPerLineHalf; j++)
+                sb.Append(getByte(i + j)).Append(" ");
+
+            sb.Append(" ");
+
+            for (int j = 0; j < BytesPerLineHalf; j++)
+                sb.Append(getByte(i + j + BytesPerLineHalf)).Append(" ");
+
+            // text
+            sb.Append(" |");
+            for (int j = 0; j < BytesPerLine; j++)
+                sb.Append(getChar(i + j));
+
+            sb.AppendLine("|");
+        }
+
+        sb.AppendLine(i.ToString("x").PadLeft(8, '0'));
+
+        return sb.ToString();
+
+        string getByte(int index)
+        {
+            if (index < bytes.Length) return bytes[index].ToString("x2");
+            else return "  ";
+        }
+
+        string getChar(int index)
+        {
+            if (index < bytes.Length)
             {
-                // offset
-                sb.Append(i.ToString("x").PadLeft(8, '0')).Append("  ");
-
-                // bytes
-                for (int j = 0; j < BytesPerLineHalf; j++)
-                    sb.Append(getByte(i + j)).Append(" ");
-
-                sb.Append(" ");
-
-                for (int j = 0; j < BytesPerLineHalf; j++)
-                    sb.Append(getByte(i + j + BytesPerLineHalf)).Append(" ");
-
-                // text
-                sb.Append(" |");
-                for (int j = 0; j < BytesPerLine; j++)
-                    sb.Append(getChar(i + j));
-
-                sb.AppendLine("|");
+                char c = (char)bytes[index];
+                if (c == ' ') return " ";
+                else if (char.IsControl(c) || c > 0b_0111_1111) return ".";
+                else return c.ToString();
             }
+            else
+                return string.Empty;
+        }
+    }
 
-            sb.AppendLine(i.ToString("x").PadLeft(8, '0'));
+    public static byte[] Undo(string hexdump)
+    {
+        string newLine = U.GetNewLine(hexdump);
+        string[] lines = hexdump.Split(newLine);
 
-            return sb.ToString();
+        byte[] bytes = new byte[(lines.Length - 3) * BytesPerLine];
 
-            string getByte(int index)
-            {
-                if (index < bytes.Length) return bytes[index].ToString("x2");
-                else return "  ";
-            }
+        int done = 0;
+        Parallel.For(0, lines.Length - 3, new ParallelOptions()
+        {
+            MaxDegreeOfParallelism = Environment.ProcessorCount
+        }, i =>
+        {
+            string line = lines[i];
 
-            string getChar(int index)
-            {
-                if (index < bytes.Length)
+            int index = i * BytesPerLine;
+
+            string[] split = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            for (int j = 0; j < BytesPerLine; j++)
+                try
                 {
-                    char c = (char)bytes[index];
-                    if (c == ' ') return " ";
-                    else if (char.IsControl(c) || c > 0b_0111_1111) return ".";
-                    else return c.ToString();
+                    bytes[index + j] = Convert.ToByte(split[j + 1], 16);
                 }
-                else
-                    return string.Empty;
-            }
-        }
+                catch
+                {
+                    break;
+                }
 
-        public static byte[] Undo(string hexdump)
+            done++;
+        });
+
+        List<byte> end = new List<byte>();
+        for (int i = lines.Length - 3; i < lines.Length; i++)
         {
-            string newLine = U.GetNewLine(hexdump);
-            string[] lines = hexdump.Split(newLine);
+            string line = lines[i];
 
-            byte[] bytes = new byte[(lines.Length - 3) * BytesPerLine];
+            if (string.IsNullOrEmpty(line)) continue;
 
-            int done = 0;
-            Parallel.For(0, lines.Length - 3, new ParallelOptions()
-            {
-                MaxDegreeOfParallelism = Environment.ProcessorCount
-            }, i =>
-            {
-                string line = lines[i];
+            string[] split = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-                int index = i * BytesPerLine;
+            if (split.Length < 3) continue;
 
-                string[] split = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-                for (int j = 0; j < BytesPerLine; j++)
-                    try
-                    {
-                        bytes[index + j] = Convert.ToByte(split[j + 1], 16);
-                    }
-                    catch
-                    {
-                        break;
-                    }
-
-                done++;
-            });
-
-            List<byte> end = new List<byte>();
-            for (int i = lines.Length - 3; i < lines.Length; i++)
-            {
-                string line = lines[i];
-
-                if (string.IsNullOrEmpty(line)) continue;
-
-                string[] split = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-                if (split.Length < 3) continue;
-
-                for (int j = 1; j < split.Length - 1; j++)
-                    try
-                    {
-                        end.Add(Convert.ToByte(split[j], 16));
-                    }
-                    catch
-                    {
-                        break;
-                    }
-            }
-
-            if (end.Count == 0) return bytes;
-
-            int ogLength = bytes.Length;
-            Array.Resize(ref bytes, bytes.Length + end.Count);
-            for (int i = 0; i < end.Count; i++)
-                bytes[i + ogLength] = end[i];
-
-            return bytes;
+            for (int j = 1; j < split.Length - 1; j++)
+                try
+                {
+                    end.Add(Convert.ToByte(split[j], 16));
+                }
+                catch
+                {
+                    break;
+                }
         }
+
+        if (end.Count == 0) return bytes;
+
+        int ogLength = bytes.Length;
+        Array.Resize(ref bytes, bytes.Length + end.Count);
+        for (int i = 0; i < end.Count; i++)
+            bytes[i + ogLength] = end[i];
+
+        return bytes;
     }
 }
