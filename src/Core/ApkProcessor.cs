@@ -1,10 +1,13 @@
-﻿using CommandLine;
+﻿using System.Security.Cryptography;
+using CommandLine;
 using Serilog;
 
 namespace MCEPatcher.Core;
 
 public static class ApkProcessor
 {
+    public static readonly string ApkHash = "BED7864C4B1BCC2774332E6D5E1BFFBA40CAB6D27782D0C3FA272F27F613A79A";
+
     internal static bool Autonomous { get; private set; }
 
     public static async Task<bool> Run(Options options)
@@ -123,8 +126,17 @@ public static class ApkProcessor
         return true;
     }
 
+    public static bool VerifyHash(Stream stream)
+    {
+        byte[] hashBytes = SHA256.HashData(stream);
+
+        var hash = Convert.ToHexString(hashBytes);
+
+        return hash == ApkHash;
+    }
+
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-    public class Options
+    public sealed class Options
     {
         [Option('i', "in-apk", Default = "Minecraft_Earth.apk", Required = false, HelpText = "Path to the minecraft earth apk")]
         public string InApk { get; set; }

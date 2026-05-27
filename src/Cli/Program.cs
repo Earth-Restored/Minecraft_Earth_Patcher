@@ -49,6 +49,18 @@ internal class Program
             return;
         }
 
+        if (File.Exists(options.InApk))
+        {
+            using (var fs = File.OpenRead(options.InApk))
+            {
+                if (!Core.ApkProcessor.VerifyHash(fs))
+                {
+                    Console.WriteLine("Warning: The .apk file hash does not match. Patching may fail.");
+                    U.PAKE();
+                }
+            }
+        }
+
         try
         {
             if (!await ApkProcessor.Run(options))

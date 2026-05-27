@@ -3,6 +3,7 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using MCEPatcher.UI.Utils;
 using MCEPatcher.UI.ViewModels;
+using MsBox.Avalonia;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -35,6 +36,26 @@ public partial class MainView : UserControl
         {
             await U.ShowError("Selected file doesn't exist");
             return;
+        }
+
+        using (var fs = File.OpenRead(apkFile))
+        {
+            if (!Core.ApkProcessor.VerifyHash(fs))
+            {
+                var dialog = MessageBoxManager.GetMessageBoxStandard(
+                    title: "Warning",
+                    text: "The .apk file hash does not match. Patching may fail. Do you want to continue?",
+                    @enum: MsBox.Avalonia.Enums.ButtonEnum.YesNo,
+                    icon: MsBox.Avalonia.Enums.Icon.Error,
+                    windowStartupLocation: WindowStartupLocation.CenterOwner);
+
+                var result = await dialog.ShowWindowDialogAsync(MainWindow.Instance);
+
+                if (result is MsBox.Avalonia.Enums.ButtonResult.No)
+                {
+                    return;
+                }
+            }
         }
 
         if (viewModel.ChangeMSALoginServiceAddress && IPAddress.TryParse(viewModel.MSALoginServiceHostname.Split(':')[0], out _))
