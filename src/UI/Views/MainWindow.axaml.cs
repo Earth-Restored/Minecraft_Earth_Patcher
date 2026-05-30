@@ -35,4 +35,12 @@ public partial class MainWindow : Window
         view.Patch(options);
         Content = view;
     }
+
+    public void Patch(IpaProcessor.Options options)
+    {
+        ((Content as UserControl)?.DataContext as ViewModelBase)?.OnClose();
+        PatchView view = new PatchView();
+        view.Patch(options);
+        Content = view;
+    }
 }

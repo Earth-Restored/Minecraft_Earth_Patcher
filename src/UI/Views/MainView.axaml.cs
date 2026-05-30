@@ -24,6 +24,47 @@ public partial class MainView : UserControl
             return;
         }
 
+        if (viewModel.SelectedTabIndex == 1)
+        {
+            string? ipaFile = viewModel.IpaFilePath;
+
+            if (ipaFile is null)
+            {
+                await U.ShowError("Select the IPA file first");
+                return;
+            }
+
+            if (!File.Exists(ipaFile))
+            {
+                await U.ShowError("Selected file doesn't exist");
+                return;
+            }
+
+            var topLevel = TopLevel.GetTopLevel(this);
+            var ipaSaveFile = await topLevel!.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = "Save patched IPA",
+                DefaultExtension = "ipa",
+                SuggestedFileName = "Minecraft_Earth_Patched.ipa",
+                FileTypeChoices = [new FilePickerFileType("IPA") { Patterns = ["*.ipa"] }],
+            });
+
+            if (ipaSaveFile is null)
+                return;
+
+            MainWindow.Instance.Patch(new Core.IpaProcessor.Options()
+            {
+                Autonomous = true,
+                InIpa = ipaFile,
+                OutIpa = ipaSaveFile.Path.LocalPath,
+                DecodedDir = "IpaDecoded",
+                Protocol = viewModel.IosProtocol,
+                Hostname = viewModel.IosHostname,
+                AppName = viewModel.IosAppName,
+            });
+            return;
+        }
+
         string? apkFile = viewModel.ApkFilePath;
 
         if (apkFile is null)
@@ -82,11 +123,23 @@ public partial class MainView : UserControl
             return;
         }
 
+        var apkTopLevel = TopLevel.GetTopLevel(this);
+        var apkSaveFile = await apkTopLevel!.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "Save patched APK",
+            DefaultExtension = "apk",
+            SuggestedFileName = "Minecraft_Earth_Patched.apk",
+            FileTypeChoices = [new FilePickerFileType("APK") { Patterns = ["*.apk"] }],
+        });
+
+        if (apkSaveFile is null)
+            return;
+
         MainWindow.Instance.Patch(new Core.ApkProcessor.Options()
         {
             Autonomous = true,
             InApk = apkFile,
-            OutApk = "Minecraft_Earth_patched.apk",
+            OutApk = apkSaveFile.Path.LocalPath,
             DecodedDir = "Decoded",
             Patches = viewModel.GetPatches(),
             Variables = viewModel.GetVariables(),
@@ -117,5 +170,42 @@ public partial class MainView : UserControl
         {
             viewModel.ApkFile = filePath;
         }
+    }
+
+    public async void PickIpaFile(object sender, RoutedEventArgs args)
+    {
+        var topLevel = TopLevel.GetTopLevel(this);
+
+        var files = await topLevel!.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Minecraft Earth IPA file",
+            AllowMultiple = false,
+            FileTypeFilter = [ new FilePickerFileType("Ipa")
+            {
+                Patterns = ["*.ipa"],
+            } ],
+        });
+
+        IStorageFile? file;
+        string? filePath = files is not null && (file = files.FirstOrDefault()) is not null
+            ? file.Path.LocalPath
+            : null;
+
+        if (DataContext is MainViewModel viewModel)
+        {
+            viewModel.IpaFile = filePath;
+        }
+    }
+
+    public void SelectAndroid(object sender, RoutedEventArgs args)
+    {
+        if (DataContext is MainViewModel viewModel)
+            viewModel.SelectedTabIndex = 0;
+    }
+
+    public void SelectIos(object sender, RoutedEventArgs args)
+    {
+        if (DataContext is MainViewModel viewModel)
+            viewModel.SelectedTabIndex = 1;
     }
 }
