@@ -92,6 +92,17 @@ public sealed class MainViewModel : ViewModelBase
         get => apkFile;
         set => this.RaiseAndSetIfChanged(ref apkFile, value);
     }
+    private string? ipaFile;
+    public string? IpaFile
+    {
+        get => "IPA File: " + (U.LimitLengthMiddle(ipaFile, 60) ?? "Not selected");
+        set => this.RaiseAndSetIfChanged(ref ipaFile, value);
+    }
+    public string? IpaFilePath
+    {
+        get => ipaFile;
+        set => this.RaiseAndSetIfChanged(ref ipaFile, value);
+    }
     private bool changeLocatorAddress;
     public bool ChangeLocatorAddress
     {
@@ -261,6 +272,41 @@ public sealed class MainViewModel : ViewModelBase
     {
         get => xboxLiveHostname;
         set => this.RaiseAndSetIfChanged(ref xboxLiveHostname, value);
+    }
+
+    private int _selectedTabIndex;
+    public int SelectedTabIndex
+    {
+        get => _selectedTabIndex;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _selectedTabIndex, value);
+            this.RaisePropertyChanged(nameof(IsAndroidSelected));
+            this.RaisePropertyChanged(nameof(IsIosSelected));
+        }
+    }
+    public bool IsAndroidSelected => _selectedTabIndex == 0;
+    public bool IsIosSelected => _selectedTabIndex == 1;
+
+    private int _iosProtocol = (int)ProtocolEnum.Http;
+    public int IosProtocol
+    {
+        get => _iosProtocol;
+        set => this.RaiseAndSetIfChanged(ref _iosProtocol, value);
+    }
+
+    private string _iosHostname = "192.168.0.x";
+    public string IosHostname
+    {
+        get => _iosHostname;
+        set => this.RaiseAndSetIfChanged(ref _iosHostname, value);
+    }
+
+    private string _iosAppName = "Solace";
+    public string IosAppName
+    {
+        get => _iosAppName;
+        set => this.RaiseAndSetIfChanged(ref _iosAppName, value);
     }
 
     public MainViewModel()

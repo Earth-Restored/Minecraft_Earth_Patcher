@@ -5,7 +5,10 @@ using Avalonia.Threading;
 using MCEPatcher.Core;
 using Serilog;
 using System;
+using System.IO;
 using System.Threading.Tasks;
+
+
 
 namespace MCEPatcher.UI.ViewModels;
 
@@ -15,10 +18,27 @@ public class PatchViewModel : ViewModelBase
     private StackPanel panel;
     private bool patchResult;
 
+    public string? OutputFilePath { get; set; }
+
     public void Start(ApkProcessor.Options options, ScrollViewer _scrollViewer, StackPanel _panel, Grid finishedContainer)
+    {
+        RunPatch(options, _scrollViewer, _panel, finishedContainer);
+    }
+
+    public void Start(IpaProcessor.Options options, ScrollViewer _scrollViewer, StackPanel _panel, Grid finishedContainer)
+    {
+        RunPatch(options, _scrollViewer, _panel, finishedContainer);
+    }
+
+    private void RunPatch<T>(T options, ScrollViewer _scrollViewer, StackPanel _panel, Grid finishedContainer)
     {
         scrollViewer = _scrollViewer;
         panel = _panel;
+
+        if (options is ApkProcessor.Options apkOpts)
+            OutputFilePath = Path.GetFullPath(apkOpts.OutApk);
+        else if (options is IpaProcessor.Options ipaOpts)
+            OutputFilePath = Path.GetFullPath(ipaOpts.OutIpa);
 
         App.OnLogWritten += onLogWritten;
 
@@ -26,7 +46,10 @@ public class PatchViewModel : ViewModelBase
         {
             try
             {
-                patchResult = await ApkProcessor.Run(options);
+                if (options is ApkProcessor.Options apkOpts2)
+                    patchResult = await ApkProcessor.Run(apkOpts2);
+                else if (options is IpaProcessor.Options ipaOpts2)
+                    patchResult = await IpaProcessor.Run(ipaOpts2);
             }
             catch (Exception ex)
             {

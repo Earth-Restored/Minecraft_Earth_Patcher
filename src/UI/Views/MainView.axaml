@@ -6,13 +6,33 @@
 	<Design.DataContext>
 		<vm:MainViewModel/>
 	</Design.DataContext>
-	<UserControl.Styles></UserControl.Styles>
+	<UserControl.Styles>
+		<Style Selector="Button.tab">
+			<Setter Property="Background" Value="Transparent"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="Padding" Value="16,6"/>
+			<Setter Property="FontSize" Value="14"/>
+			<Setter Property="Margin" Value="0"/>
+		</Style>
+	</UserControl.Styles>
 
 	<Grid HorizontalAlignment="Stretch" RowDefinitions="1*, 5*, 1*">
 		<Label Grid.Row="0" FontSize="40" VerticalAlignment="Center" HorizontalAlignment="Center">Minecraft Earth Patcher</Label>
 
-		<ScrollViewer Grid.Row="1" HorizontalAlignment="Stretch" AllowAutoHide="False">
-			<StackPanel VerticalAlignment="Top" Margin="0 0 0 20">
+		<Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top">
+			<Grid RowDefinitions="Auto,*">
+				<StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+					<StackPanel Margin="0,0,5,0">
+						<Button Content="Android" Click="SelectAndroid" Classes="tab"/>
+						<Rectangle Height="2" Fill="{DynamicResource SystemControlHighlightAccentBrush}" IsVisible="{Binding IsAndroidSelected}"/>
+					</StackPanel>
+					<StackPanel>
+						<Button Content="iOS" Click="SelectIos" Classes="tab"/>
+						<Rectangle Height="2" Fill="{DynamicResource SystemControlHighlightAccentBrush}" IsVisible="{Binding IsIosSelected}"/>
+					</StackPanel>
+				</StackPanel>
+				<ScrollViewer Grid.Row="1" IsVisible="{Binding IsAndroidSelected}" AllowAutoHide="False">
+			<StackPanel VerticalAlignment="Top" Margin="0 0 0 60">
 
 				<Grid HorizontalAlignment="Center" Margin="0 0 0 15">
 					<Grid.ColumnDefinitions>
@@ -45,7 +65,7 @@
 									<ColumnDefinition Width="Auto"/>
 								</Grid.ColumnDefinitions>
 								<Label Grid.Column="0" VerticalAlignment="Center">Hostname/IP:</Label>
-								<TextBox Text="{Binding SimpleHostname}" Grid.Column="1" PlaceholderText="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
+								<TextBox Text="{Binding SimpleHostname}" Grid.Column="1" PlaceholderText="192.168.1.x" PlaceholderForeground="#808080" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
 							</Grid>
 							<Grid HorizontalAlignment="Center" Margin="0 0 0 10">
 								<Grid.ColumnDefinitions>
@@ -104,7 +124,7 @@
 									<ColumnDefinition Width="Auto"/>
 								</Grid.ColumnDefinitions>
 								<Label Grid.Column="0" VerticalAlignment="Center">Hostname/IP:</Label>
-								<TextBox Text="{Binding LocatorHostname}" Grid.Column="1" PlaceholderText="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
+								<TextBox Text="{Binding LocatorHostname}" Grid.Column="1" PlaceholderText="192.168.1.x" PlaceholderForeground="#808080" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
 							</Grid>
 						</StackPanel>
 					</Border>
@@ -226,7 +246,7 @@
 										<ColumnDefinition Width="Auto"/>
 									</Grid.ColumnDefinitions>
 									<Label Grid.Column="0" VerticalAlignment="Center">Hostname/IP:</Label>
-									<TextBox Text="{Binding LoginServerHostname}" Grid.Column="1" PlaceholderText="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
+									<TextBox Text="{Binding LoginServerHostname}" Grid.Column="1" PlaceholderText="192.168.1.x" PlaceholderForeground="#808080" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
 								</Grid>
 								<Grid HorizontalAlignment="Center">
 									<Grid.ColumnDefinitions>
@@ -296,7 +316,7 @@
 												<RowDefinition Height="Auto"/>
 											</Grid.RowDefinitions>
 											<Label Grid.Column="0" VerticalAlignment="Center">Hostname:</Label>
-											<TextBox Text="{Binding MSALoginServiceHostname}" Grid.Column="1" PlaceholderText="mce.com" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
+											<TextBox Text="{Binding MSALoginServiceHostname}" Grid.Column="1" PlaceholderText="mce.com" PlaceholderForeground="#808080" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
 											<TextBlock Text="Use hostname only, not IP" Grid.Row="1" Grid.ColumnSpan="2" FontSize="10" Opacity="0.6" HorizontalAlignment="Right"/>
 										</Grid>
 									</StackPanel>
@@ -334,7 +354,7 @@
 												<RowDefinition Height="Auto"/>
 											</Grid.RowDefinitions>
 											<Label Grid.Column="0" VerticalAlignment="Center">Hostname:</Label>
-											<TextBox Text="{Binding PlayfabApiHostname}" Grid.Column="1" PlaceholderText="mce.com" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
+											<TextBox Text="{Binding PlayfabApiHostname}" Grid.Column="1" PlaceholderText="mce.com" PlaceholderForeground="#808080" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
 											<TextBlock Text="Use hostname only, not IP" Grid.Row="1" Grid.ColumnSpan="2" FontSize="10" Opacity="0.6" HorizontalAlignment="Right"/>
 										</Grid>
 									</StackPanel>
@@ -372,7 +392,7 @@
 												<RowDefinition Height="Auto"/>
 											</Grid.RowDefinitions>
 											<Label Grid.Column="0" VerticalAlignment="Center">Hostname:</Label>
-											<TextBox Text="{Binding XboxABHostname}" Grid.Column="1" PlaceholderText="mce.com" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
+											<TextBox Text="{Binding XboxABHostname}" Grid.Column="1" PlaceholderText="mce.com" PlaceholderForeground="#808080" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
 											<TextBlock Text="Use hostname only, not IP" Grid.Row="1" Grid.ColumnSpan="2" FontSize="10" Opacity="0.6" HorizontalAlignment="Right"/>
 										</Grid>
 									</StackPanel>
@@ -410,7 +430,7 @@
 												<RowDefinition Height="Auto"/>
 											</Grid.RowDefinitions>
 											<Label Grid.Column="0" VerticalAlignment="Center">Hostname:</Label>
-											<TextBox Text="{Binding XboxLiveHostname}" Grid.Column="1" PlaceholderText="mce.com" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
+											<TextBox Text="{Binding XboxLiveHostname}" Grid.Column="1" PlaceholderText="mce.com" PlaceholderForeground="#808080" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
 											<TextBlock Text="Use hostname only, not IP" Grid.Row="1" Grid.ColumnSpan="2" FontSize="10" Opacity="0.6" HorizontalAlignment="Right"/>
 										</Grid>
 									</StackPanel>
@@ -422,7 +442,55 @@
 				</StackPanel>
 
 			</StackPanel>
-		</ScrollViewer>
+				</ScrollViewer>
+				<ScrollViewer Grid.Row="1" IsVisible="{Binding IsIosSelected}" AllowAutoHide="False">
+					<StackPanel VerticalAlignment="Top" Margin="0 0 0 60">
+						<Grid HorizontalAlignment="Center" Margin="0 0 0 15">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding IpaFile}" Margin="0, 0, 10, 0"/>
+							<Button Grid.Column="1" Click="PickIpaFile">Select</Button>
+						</Grid>
+						<Border BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="350">
+							<StackPanel HorizontalAlignment="Center" Margin="10">
+								<Grid HorizontalAlignment="Center" Margin="0 0 0 10">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="Auto"/>
+									</Grid.ColumnDefinitions>
+									<Label Grid.Column="0" VerticalAlignment="Center">Protocol:</Label>
+									<ComboBox Grid.Column="1" SelectedIndex="{Binding IosProtocol}">
+										<ComboBoxItem>Http</ComboBoxItem>
+										<ComboBoxItem>Https</ComboBoxItem>
+									</ComboBox>
+								</Grid>
+								<Grid HorizontalAlignment="Center" Margin="0 0 0 10">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="Auto"/>
+									</Grid.ColumnDefinitions>
+									<Label Grid.Column="0" VerticalAlignment="Center">Hostname/IP:</Label>
+									<TextBox Text="{Binding IosHostname}" Grid.Column="1" PlaceholderText="192.168.0.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
+								</Grid>
+								<Grid HorizontalAlignment="Center">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="Auto"/>
+									</Grid.ColumnDefinitions>
+									<Label Grid.Column="0" VerticalAlignment="Center">App name:</Label>
+									<TextBox Text="{Binding IosAppName}" Grid.Column="1" MaxLength="50" TextWrapping="Wrap" MaxWidth="200"/>
+								</Grid>
+							</StackPanel>
+						</Border>
+						<Border BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="350" Margin="0 10 0 0">
+							<TextBlock TextWrapping="Wrap" Margin="10" Text="Warning: Custom login server is currently not supported for iOS due to limitations."/>
+						</Border>
+					</StackPanel>
+				</ScrollViewer>
+			</Grid>
+		</Grid>
 
 		<Button Margin="10" Click="Patch" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="30" Grid.Row="2">Patch</Button>
 		<TextBlock Grid.Row="2" Text="{Binding AssemblyVersion, StringFormat='v{0}'}" FontSize="12" Foreground="Gray" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10"/>

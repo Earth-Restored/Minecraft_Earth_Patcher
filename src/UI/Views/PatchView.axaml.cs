@@ -23,6 +23,11 @@ public partial class PatchView : UserControl
         (DataContext as PatchViewModel)?.Start(options, scrollViewer, chat, finishedContainer);
     }
 
+    public void Patch(IpaProcessor.Options options)
+    {
+        (DataContext as PatchViewModel)?.Start(options, scrollViewer, chat, finishedContainer);
+    }
+
     public void Back(object sender, RoutedEventArgs args)
     {
         MainWindow.Instance.OpenMainView();
@@ -30,7 +35,9 @@ public partial class PatchView : UserControl
 
     public void OpenPatchedAPKLocation(object sender, RoutedEventArgs args)
     {
-        string filePath = Path.GetFullPath("Minecraft_Earth_patched.apk");
+        string? filePath = (DataContext as PatchViewModel)?.OutputFilePath;
+        if (filePath is null || !File.Exists(filePath))
+            return;
 
         try
         {

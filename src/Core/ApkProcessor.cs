@@ -141,7 +141,7 @@ public static class ApkProcessor
         [Option('i', "in-apk", Default = "Minecraft_Earth.apk", Required = false, HelpText = "Path to the minecraft earth apk")]
         public string InApk { get; set; }
 
-        [Option('o', "out-apk", Default = "Minecraft_Earth_patched.apk", Required = false, HelpText = "Path of the patched apk")]
+        [Option('o', "out-apk", Default = "Minecraft_Earth_Patched.apk", Required = false, HelpText = "Path of the patched apk")]
         public string OutApk { get; set; }
 
         [Option("decoded-dir", Default = "Decoded", Required = false, HelpText = "Path of the dir the input apk will be decoded to")]
