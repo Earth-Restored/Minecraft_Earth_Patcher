@@ -1,5 +1,6 @@
 using Serilog;
 using System.IO.Compression;
+using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Linq;
 
@@ -7,7 +8,16 @@ namespace MCEPatcher.Core;
 
 public static class IpaProcessor
 {
+    public static readonly string IpaHash = "91E235E52D430123FB73479512AD8BBE238518729BE9C6A0F372B9AFC876573B";
+
     internal static bool Autonomous { get; private set; }
+
+    public static bool VerifyHash(Stream stream)
+    {
+        byte[] hashBytes = SHA256.HashData(stream);
+        var hash = Convert.ToHexString(hashBytes);
+        return hash == IpaHash;
+    }
 
     public static async Task<bool> Run(Options options)
     {

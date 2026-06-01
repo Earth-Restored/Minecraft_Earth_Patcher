@@ -40,6 +40,26 @@ public partial class MainView : UserControl
                 return;
             }
 
+            using (var fs = File.OpenRead(ipaFile))
+            {
+                if (!Core.IpaProcessor.VerifyHash(fs))
+                {
+                    var dialog = MessageBoxManager.GetMessageBoxStandard(
+                        title: "Warning",
+                        text: "The .ipa file hash does not match. Patching may fail. Do you want to continue?",
+                        @enum: MsBox.Avalonia.Enums.ButtonEnum.YesNo,
+                        icon: MsBox.Avalonia.Enums.Icon.Error,
+                        windowStartupLocation: WindowStartupLocation.CenterOwner);
+
+                    var result = await dialog.ShowWindowDialogAsync(MainWindow.Instance);
+
+                    if (result is MsBox.Avalonia.Enums.ButtonResult.No)
+                    {
+                        return;
+                    }
+                }
+            }
+
             var topLevel = TopLevel.GetTopLevel(this);
             var ipaSaveFile = await topLevel!.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
             {
