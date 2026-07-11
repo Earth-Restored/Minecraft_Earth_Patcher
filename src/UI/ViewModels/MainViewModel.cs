@@ -28,59 +28,6 @@ public sealed class MainViewModel : ViewModelBase
         }
     }
 
-    private string _simpleHostname = "192.168.1.x";
-    public string SimpleHostname
-    {
-        get => _simpleHostname;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _simpleHostname, value);
-            if (IsSimpleMode)
-            {
-                LocatorHostname = value;
-                LoginServerHostname = value;
-            }
-        }
-    }
-
-    private int _simpleProtocol = (int)ProtocolEnum.Http;
-    public int SimpleProtocol
-    {
-        get => _simpleProtocol;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _simpleProtocol, value);
-            if (IsSimpleMode)
-            {
-                LocatorProtocol = value;
-                LoginServerProtocol = value;
-            }
-        }
-    }
-
-    private void EnforceSimpleModeDefaults()
-    {
-        ChangeLocatorAddress = true;
-        DisableSunsetTimeCheck = true;
-        DisableLicenseCheck = true;
-        DisableTelemetry = true;
-        DisableMsaLoginSignatureValidation = true;
-        ChangeAppName = true;
-        ChangePackageName = true;
-        LoginServerSingleDomainMode = true;
-
-        ChangeMSALoginServiceAddress = true;
-        ChangePlayfabApiAddress = true;
-        ChangeXboxABAddress = true;
-        ChangeXboxLiveAddress = true;
-
-        LocatorHostname = SimpleHostname;
-        LocatorProtocol = SimpleProtocol;
-        LoginServerHostname = SimpleHostname;
-        LoginServerProtocol = SimpleProtocol;
-    }
-    // -------------------------------------
-
     private string? apkFile;
     public string? ApkFile
     {
@@ -267,7 +214,7 @@ public sealed class MainViewModel : ViewModelBase
     {
         ChangeLocatorAddress = true;
         LocatorProtocol = (int)ProtocolEnum.Http;
-        LocatorHostname = "192.168.1.x";
+        LocatorHostname = "";
         DisableSunsetTimeCheck = true;
         DisableLicenseCheck = true;
         DisableTelemetry = true;
@@ -277,9 +224,9 @@ public sealed class MainViewModel : ViewModelBase
         AppNameShort = "MCE Patched";
         ChangePackageName = true;
         PackageName = "com.github.bitcodercz";
-        LoginServerSingleDomainMode = false;
+        LoginServerSingleDomainMode = true;
         LoginServerProtocol = (int)ProtocolEnum.Http;
-        LoginServerHostname = "192.168.1.x";
+        LoginServerHostname = "";
         ChangeMSALoginServiceAddress = false;
         MSALoginServiceProtocol = (int)ProtocolEnum.Https;
         MSALoginServiceHostname = "live.com";
@@ -378,5 +325,22 @@ public sealed class MainViewModel : ViewModelBase
                 yield return $"xboxlivehostname={XboxLiveHostname}";
             }
         }
+    }
+
+    private void EnforceSimpleModeDefaults()
+    {
+        ChangeLocatorAddress = true;
+        DisableSunsetTimeCheck = true;
+        DisableLicenseCheck = true;
+        DisableTelemetry = true;
+        DisableMsaLoginSignatureValidation = true;
+        ChangeAppName = true;
+        ChangePackageName = true;
+        LoginServerSingleDomainMode = true;
+
+        ChangeMSALoginServiceAddress = true;
+        ChangePlayfabApiAddress = true;
+        ChangeXboxABAddress = true;
+        ChangeXboxLiveAddress = true;
     }
 }

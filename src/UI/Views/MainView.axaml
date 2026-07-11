@@ -33,10 +33,13 @@
 									<ColumnDefinition Width="Auto"/>
 									<ColumnDefinition Width="Auto"/>
 								</Grid.ColumnDefinitions>
-								<Label Grid.Column="0" VerticalAlignment="Center">Protocol:</Label>
-								<ComboBox Grid.Column="1" SelectedIndex="{Binding SimpleProtocol}">
+								<Label Grid.Column="0" VerticalAlignment="Center">Locator Protocol:</Label>
+								<ComboBox Grid.Column="1" SelectedIndex="{Binding LocatorProtocol}">
 									<ComboBoxItem>Http</ComboBoxItem>
-									<ComboBoxItem>Https</ComboBoxItem>
+									<TextBlock FontSize="1">
+										<Run FontSize="14">Http</Run>
+										<Run FontSize="14" FontWeight="Bold">s</Run>
+									</TextBlock>
 								</ComboBox>
 							</Grid>
 							<Grid HorizontalAlignment="Center" Margin="0 0 0 10">
@@ -44,32 +47,32 @@
 									<ColumnDefinition Width="Auto"/>
 									<ColumnDefinition Width="Auto"/>
 								</Grid.ColumnDefinitions>
-								<Label Grid.Column="0" VerticalAlignment="Center">Hostname/IP:</Label>
-								<TextBox Text="{Binding SimpleHostname}" Grid.Column="1" PlaceholderText="192.168.1.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
+								<Label Grid.Column="0" VerticalAlignment="Center">Locator Address:</Label>
+								<TextBox Text="{Binding LocatorHostname}" Grid.Column="1" PlaceholderText="192.168.x.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
 							</Grid>
 							<Grid HorizontalAlignment="Center" Margin="0 0 0 10">
 								<Grid.ColumnDefinitions>
 									<ColumnDefinition Width="Auto"/>
 									<ColumnDefinition Width="Auto"/>
 								</Grid.ColumnDefinitions>
-								<Label Grid.Column="0" VerticalAlignment="Center">App name:</Label>
-								<TextBox Text="{Binding AppName}" Grid.Column="1" MaxLength="50" TextWrapping="Wrap" MaxWidth="200"/>
+								<Label Grid.Column="0" VerticalAlignment="Center">Auth Server Protocol:</Label>
+								<ComboBox Grid.Column="1" SelectedIndex="{Binding LoginServerProtocol}">
+									<ComboBoxItem>Http</ComboBoxItem>
+									<ComboBoxItem>
+										<TextBlock FontSize="1">
+											<Run FontSize="14">Http</Run>
+											<Run FontSize="14" FontWeight="Bold">s</Run>
+										</TextBlock>
+									</ComboBoxItem>
+								</ComboBox>
 							</Grid>
 							<Grid HorizontalAlignment="Center" Margin="0 0 0 10">
 								<Grid.ColumnDefinitions>
 									<ColumnDefinition Width="Auto"/>
 									<ColumnDefinition Width="Auto"/>
 								</Grid.ColumnDefinitions>
-								<Label Grid.Column="0" VerticalAlignment="Center">Short app name:</Label>
-								<TextBox Text="{Binding AppNameShort}" Grid.Column="1" MaxLength="20" TextWrapping="Wrap" MaxWidth="200"/>
-							</Grid>
-							<Grid HorizontalAlignment="Center">
-								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="Auto"/>
-									<ColumnDefinition Width="Auto"/>
-								</Grid.ColumnDefinitions>
-								<Label Grid.Column="0" VerticalAlignment="Center">Package name/id:</Label>
-								<TextBox Text="{Binding PackageName}" Grid.Column="1" MaxLength="50" TextWrapping="Wrap" MaxWidth="200"/>
+								<Label Grid.Column="0" VerticalAlignment="Center">Auth Server Address:</Label>
+								<TextBox Text="{Binding LoginServerHostname}" Grid.Column="1" PlaceholderText="192.168.x.x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
 							</Grid>
 						</StackPanel>
 					</Border>
@@ -95,7 +98,10 @@
 								<Label Grid.Column="0" VerticalAlignment="Center">Protocol:</Label>
 								<ComboBox Grid.Column="1" SelectedIndex="{Binding LocatorProtocol}">
 									<ComboBoxItem>Http</ComboBoxItem>
-									<ComboBoxItem>Https</ComboBoxItem>
+									<TextBlock FontSize="1">
+										<Run FontSize="14">Http</Run>
+										<Run FontSize="14" FontWeight="Bold">s</Run>
+									</TextBlock>
 								</ComboBox>
 							</Grid>
 							<Grid HorizontalAlignment="Center">
@@ -217,7 +223,10 @@
 									<Label Grid.Column="0" VerticalAlignment="Center">Protocol:</Label>
 									<ComboBox Grid.Column="1" SelectedIndex="{Binding LoginServerProtocol}">
 										<ComboBoxItem>Http</ComboBoxItem>
-										<ComboBoxItem>Https</ComboBoxItem>
+										<TextBlock FontSize="1">
+											<Run FontSize="14">Http</Run>
+											<Run FontSize="14" FontWeight="Bold">s</Run>
+										</TextBlock>
 									</ComboBox>
 								</Grid>
 								<Grid HorizontalAlignment="Center">
@@ -283,7 +292,10 @@
 											<Label Grid.Column="0" VerticalAlignment="Center">Protocol:</Label>
 											<ComboBox Grid.Column="1" SelectedIndex="{Binding MSALoginServiceProtocol}">
 												<ComboBoxItem>Http</ComboBoxItem>
-												<ComboBoxItem>Https</ComboBoxItem>
+												<TextBlock FontSize="1">
+													<Run FontSize="14">Http</Run>
+													<Run FontSize="14" FontWeight="Bold">s</Run>
+												</TextBlock>
 											</ComboBox>
 										</Grid>
 										<Grid HorizontalAlignment="Center">
@@ -321,7 +333,10 @@
 											<Label Grid.Column="0" VerticalAlignment="Center">Protocol:</Label>
 											<ComboBox Grid.Column="1" SelectedIndex="{Binding PlayfabApiProtocol}">
 												<ComboBoxItem>Http</ComboBoxItem>
-												<ComboBoxItem>Https</ComboBoxItem>
+												<TextBlock FontSize="1">
+													<Run FontSize="14">Http</Run>
+													<Run FontSize="14" FontWeight="Bold">s</Run>
+												</TextBlock>
 											</ComboBox>
 										</Grid>
 										<Grid HorizontalAlignment="Center">
@@ -359,7 +374,10 @@
 											<Label Grid.Column="0" VerticalAlignment="Center">Protocol:</Label>
 											<ComboBox Grid.Column="1" SelectedIndex="{Binding XboxABProtocol}">
 												<ComboBoxItem>Http</ComboBoxItem>
-												<ComboBoxItem>Https</ComboBoxItem>
+												<TextBlock FontSize="1">
+													<Run FontSize="14">Http</Run>
+													<Run FontSize="14" FontWeight="Bold">s</Run>
+												</TextBlock>
 											</ComboBox>
 										</Grid>
 										<Grid HorizontalAlignment="Center">
@@ -397,7 +415,10 @@
 											<Label Grid.Column="0" VerticalAlignment="Center">Protocol:</Label>
 											<ComboBox Grid.Column="1" SelectedIndex="{Binding XboxLiveProtocol}">
 												<ComboBoxItem>Http</ComboBoxItem>
-												<ComboBoxItem>Https</ComboBoxItem>
+												<TextBlock FontSize="1">
+													<Run FontSize="14">Http</Run>
+													<Run FontSize="14" FontWeight="Bold">s</Run>
+												</TextBlock>
 											</ComboBox>
 										</Grid>
 										<Grid HorizontalAlignment="Center">
