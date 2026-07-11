@@ -23,6 +23,15 @@
 					<Button Grid.Column="1" Click="PickApkFile">Select</Button>
 				</Grid>
 
+				<Grid HorizontalAlignment="Center" Margin="0 0 0 15">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+					</Grid.ColumnDefinitions>
+					<TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding ResourcePackFile}" Margin="0, 0, 10, 0"/>
+					<Button Grid.Column="1" Click="PickResourcePackFile">Select</Button>
+				</Grid>
+
 				<ToggleSwitch IsChecked="{Binding IsSimpleMode}" OffContent="Custom Mode" OnContent="Simple Mode" HorizontalAlignment="Center" Margin="0 0 0 15"/>
 
 				<StackPanel IsVisible="{Binding IsSimpleMode}">

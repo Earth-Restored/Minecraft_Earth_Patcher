@@ -39,6 +39,19 @@ public sealed class MainViewModel : ViewModelBase
         get => apkFile;
         set => this.RaiseAndSetIfChanged(ref apkFile, value);
     }
+
+    private string? resourcePackFile;
+    public string? ResourcePackFile
+    {
+        get => "Resource Pack File: " + (U.LimitLengthMiddle(resourcePackFile, 60) ?? "Not selected");
+        set => this.RaiseAndSetIfChanged(ref resourcePackFile, value);
+    }
+    public string? ResourcePackFilePath
+    {
+        get => resourcePackFile;
+        set => this.RaiseAndSetIfChanged(ref resourcePackFile, value);
+    }
+
     private bool changeLocatorAddress;
     public bool ChangeLocatorAddress
     {

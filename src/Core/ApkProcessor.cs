@@ -8,6 +8,8 @@ public static class ApkProcessor
 {
     public static readonly string ApkHash = "BED7864C4B1BCC2774332E6D5E1BFFBA40CAB6D27782D0C3FA272F27F613A79A";
 
+    public static readonly string ResourcePackHash = "7473B7B99FD181453D7D520903726F62F3C2433FE941EA8968E6FE589EF5A9E7";
+
     internal static bool Autonomous { get; private set; }
 
     public static async Task<bool> Run(Options options)
@@ -126,13 +128,22 @@ public static class ApkProcessor
         return true;
     }
 
-    public static bool VerifyHash(Stream stream)
+    public static bool VerifyApkHash(Stream stream)
     {
         byte[] hashBytes = SHA256.HashData(stream);
 
         var hash = Convert.ToHexString(hashBytes);
 
         return hash == ApkHash;
+    }
+
+    public static bool VerifyResourcePackHash(Stream stream)
+    {
+        byte[] hashBytes = SHA256.HashData(stream);
+
+        var hash = Convert.ToHexString(hashBytes);
+
+        return hash == ResourcePackHash;
     }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

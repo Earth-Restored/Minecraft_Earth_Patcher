@@ -34,17 +34,62 @@ public partial class MainView : UserControl
 
         if (!File.Exists(apkFile))
         {
-            await U.ShowError("Selected file doesn't exist");
+            await U.ShowError("Selected apk file doesn't exist");
             return;
         }
 
         using (var fs = File.OpenRead(apkFile))
         {
-            if (!Core.ApkProcessor.VerifyHash(fs))
+            if (!Core.ApkProcessor.VerifyApkHash(fs))
             {
                 var dialog = MessageBoxManager.GetMessageBoxStandard(
                     title: "Warning",
                     text: "The .apk file hash does not match. Patching may fail. Do you want to continue?",
+                    @enum: MsBox.Avalonia.Enums.ButtonEnum.YesNo,
+                    icon: MsBox.Avalonia.Enums.Icon.Error,
+                    windowStartupLocation: WindowStartupLocation.CenterOwner);
+
+                var result = await dialog.ShowWindowDialogAsync(MainWindow.Instance);
+
+                if (result is MsBox.Avalonia.Enums.ButtonResult.No)
+                {
+                    return;
+                }
+            }
+        }
+
+        string? resourcePackFile = viewModel.ResourcePackFilePath;
+
+        if (string.IsNullOrEmpty(resourcePackFile))
+        {
+            var dialog = MessageBoxManager.GetMessageBoxStandard(
+                   title: "Warning",
+                   text: "Resource Pack file not selected. Do you want to continue?",
+                   @enum: MsBox.Avalonia.Enums.ButtonEnum.YesNo,
+                   icon: MsBox.Avalonia.Enums.Icon.Warning,
+                   windowStartupLocation: WindowStartupLocation.CenterOwner);
+
+            var result = await dialog.ShowWindowDialogAsync(MainWindow.Instance);
+
+            if (result is MsBox.Avalonia.Enums.ButtonResult.No)
+            {
+                return;
+            }
+        }
+
+        if (!File.Exists(resourcePackFile))
+        {
+            await U.ShowError("Selected resource pack file doesn't exist");
+            return;
+        }
+
+        using (var fs = File.OpenRead(resourcePackFile))
+        {
+            if (!Core.ApkProcessor.VerifyResourcePackHash(fs))
+            {
+                var dialog = MessageBoxManager.GetMessageBoxStandard(
+                    title: "Warning",
+                    text: "The resource pack file hash does not match. Game may not function correctly. Do you want to continue?",
                     @enum: MsBox.Avalonia.Enums.ButtonEnum.YesNo,
                     icon: MsBox.Avalonia.Enums.Icon.Error,
                     windowStartupLocation: WindowStartupLocation.CenterOwner);
@@ -116,6 +161,32 @@ public partial class MainView : UserControl
         if (DataContext is MainViewModel viewModel)
         {
             viewModel.ApkFile = filePath;
+        }
+    }
+
+    public async void PickResourcePackFile(object sender, RoutedEventArgs args)
+    {
+        var topLevel = TopLevel.GetTopLevel(this);
+
+        var files = await topLevel!.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Minecraft earth resource pack file",
+            AllowMultiple = false,
+            FileTypeFilter = [ new FilePickerFileType("Zip")
+            {
+                Patterns = ["*.zip"],
+                MimeTypes = ["application/zip"]
+            } ],
+        });
+
+        IStorageFile? file;
+        string? filePath = files is not null && (file = files.FirstOrDefault()) is not null
+            ? file.Path.LocalPath
+            : null;
+
+        if (DataContext is MainViewModel viewModel)
+        {
+            viewModel.ResourcePackFile = filePath;
         }
     }
 }

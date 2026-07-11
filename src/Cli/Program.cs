@@ -53,7 +53,7 @@ internal class Program
         {
             using (var fs = File.OpenRead(options.InApk))
             {
-                if (!Core.ApkProcessor.VerifyHash(fs))
+                if (!Core.ApkProcessor.VerifyApkHash(fs))
                 {
                     Console.WriteLine("Warning: The .apk file hash does not match. Patching may fail.");
                     U.PAKE();
