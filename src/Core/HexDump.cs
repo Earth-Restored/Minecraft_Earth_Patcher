@@ -20,17 +20,23 @@ public static class HexDump
 
             // bytes
             for (int j = 0; j < BytesPerLineHalf; j++)
-                sb.Append(getByte(i + j)).Append(" ");
+            {
+                sb.Append(GetByte(i + j)).Append(" ");
+            }
 
             sb.Append(" ");
 
             for (int j = 0; j < BytesPerLineHalf; j++)
-                sb.Append(getByte(i + j + BytesPerLineHalf)).Append(" ");
+            {
+                sb.Append(GetByte(i + j + BytesPerLineHalf)).Append(" ");
+            }
 
             // text
             sb.Append(" |");
             for (int j = 0; j < BytesPerLine; j++)
-                sb.Append(getChar(i + j));
+            {
+                sb.Append(GetChar(i + j));
+            }
 
             sb.AppendLine("|");
         }
@@ -39,46 +45,66 @@ public static class HexDump
 
         return sb.ToString();
 
-        string getByte(int index)
-        {
-            if (index < bytes.Length) return bytes[index].ToString("x2");
-            else return "  ";
-        }
-
-        string getChar(int index)
+        string GetByte(int index)
         {
             if (index < bytes.Length)
             {
-                char c = (char)bytes[index];
-                if (c == ' ') return " ";
-                else if (char.IsControl(c) || c > 0b_0111_1111) return ".";
-                else return c.ToString();
+                return bytes[index].ToString("x2");
             }
             else
+            {
+                return "  ";
+            }
+        }
+
+        string GetChar(int index)
+        {
+            if (index < bytes.Length)
+            {
+                var c = (char)bytes[index];
+
+                if (c is ' ')
+                {
+                    return " ";
+                }
+                else if (char.IsControl(c) || c > 0b_0111_1111)
+                {
+                    return ".";
+                }
+                else
+                {
+                    return
+                    c.ToString();
+                }
+            }
+            else
+            {
                 return string.Empty;
+            }
         }
     }
 
     public static byte[] Undo(string hexdump)
     {
-        string newLine = U.GetNewLine(hexdump);
-        string[] lines = hexdump.Split(newLine);
+        var newLine = U.GetNewLine(hexdump);
+        var lines = hexdump.Split(newLine);
 
-        byte[] bytes = new byte[(lines.Length - 3) * BytesPerLine];
+        var bytes = new byte[(lines.Length - 3) * BytesPerLine];
 
-        int done = 0;
+        var done = 0;
         Parallel.For(0, lines.Length - 3, new ParallelOptions()
         {
             MaxDegreeOfParallelism = Environment.ProcessorCount
         }, i =>
         {
-            string line = lines[i];
+            var line = lines[i];
 
-            int index = i * BytesPerLine;
+            var index = i * BytesPerLine;
 
-            string[] split = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var split = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-            for (int j = 0; j < BytesPerLine; j++)
+            for (var j = 0; j < BytesPerLine; j++)
+            {
                 try
                 {
                     bytes[index + j] = Convert.ToByte(split[j + 1], 16);
@@ -87,22 +113,30 @@ public static class HexDump
                 {
                     break;
                 }
+            }
 
             done++;
         });
 
-        List<byte> end = new List<byte>();
-        for (int i = lines.Length - 3; i < lines.Length; i++)
+        var end = new List<byte>();
+        for (var i = lines.Length - 3; i < lines.Length; i++)
         {
-            string line = lines[i];
+            var line = lines[i];
 
-            if (string.IsNullOrEmpty(line)) continue;
+            if (string.IsNullOrEmpty(line))
+            {
+                continue;
+            }
 
-            string[] split = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var split = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-            if (split.Length < 3) continue;
+            if (split.Length < 3)
+            {
+                continue;
+            }
 
-            for (int j = 1; j < split.Length - 1; j++)
+            for (var j = 1; j < split.Length - 1; j++)
+            {
                 try
                 {
                     end.Add(Convert.ToByte(split[j], 16));
@@ -111,14 +145,20 @@ public static class HexDump
                 {
                     break;
                 }
+            }
         }
 
-        if (end.Count == 0) return bytes;
+        if (end.Count is 0)
+        {
+            return bytes;
+        }
 
-        int ogLength = bytes.Length;
+        var ogLength = bytes.Length;
         Array.Resize(ref bytes, bytes.Length + end.Count);
-        for (int i = 0; i < end.Count; i++)
+        for (var i = 0; i < end.Count; i++)
+        {
             bytes[i + ogLength] = end[i];
+        }
 
         return bytes;
     }

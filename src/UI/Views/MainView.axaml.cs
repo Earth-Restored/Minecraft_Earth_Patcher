@@ -76,29 +76,31 @@ public partial class MainView : UserControl
                 return;
             }
         }
-
-        if (!File.Exists(resourcePackFile))
+        else
         {
-            await U.ShowError("Selected resource pack file doesn't exist");
-            return;
-        }
-
-        using (var fs = File.OpenRead(resourcePackFile))
-        {
-            if (!Core.ApkProcessor.VerifyResourcePackHash(fs))
+            if (!File.Exists(resourcePackFile))
             {
-                var dialog = MessageBoxManager.GetMessageBoxStandard(
-                    title: "Warning",
-                    text: "The resource pack file hash does not match. Game may not function correctly. Do you want to continue?",
-                    @enum: MsBox.Avalonia.Enums.ButtonEnum.YesNo,
-                    icon: MsBox.Avalonia.Enums.Icon.Error,
-                    windowStartupLocation: WindowStartupLocation.CenterOwner);
+                await U.ShowError("Selected resource pack file doesn't exist");
+                return;
+            }
 
-                var result = await dialog.ShowWindowDialogAsync(MainWindow.Instance);
-
-                if (result is MsBox.Avalonia.Enums.ButtonResult.No)
+            using (var fs = File.OpenRead(resourcePackFile))
+            {
+                if (!Core.ApkProcessor.VerifyResourcePackHash(fs))
                 {
-                    return;
+                    var dialog = MessageBoxManager.GetMessageBoxStandard(
+                        title: "Warning",
+                        text: "The resource pack file hash does not match. Game may not function correctly. Do you want to continue?",
+                        @enum: MsBox.Avalonia.Enums.ButtonEnum.YesNo,
+                        icon: MsBox.Avalonia.Enums.Icon.Error,
+                        windowStartupLocation: WindowStartupLocation.CenterOwner);
+
+                    var result = await dialog.ShowWindowDialogAsync(MainWindow.Instance);
+
+                    if (result is MsBox.Avalonia.Enums.ButtonResult.No)
+                    {
+                        return;
+                    }
                 }
             }
         }
@@ -129,9 +131,10 @@ public partial class MainView : UserControl
 
         MainWindow.Instance.Patch(new Core.ApkProcessor.Options()
         {
-            Autonomous = true,
+            NonInteractive = true,
             InApk = apkFile,
             OutApk = "Minecraft_Earth_patched.apk",
+            ResourcePack = resourcePackFile,
             DecodedDir = "Decoded",
             Patches = viewModel.GetPatches(),
             Variables = viewModel.GetVariables(),

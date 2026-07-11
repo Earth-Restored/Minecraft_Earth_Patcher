@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MCEPatcher.Core;
 
-public class Patcher
+public sealed class Patcher
 {
     private string patchesLoation;
     private string filesLocation;
@@ -19,11 +19,11 @@ public class Patcher
 
     public void Patch(IEnumerable<string> patchesNames, Dictionary<string, string> variables, Dictionary<string, PatchInfo>? appliedPatches = null)
     {
-        PatchContext context = new PatchContext(appliedPatches ?? new(), variables);
+        var context = new PatchContext(appliedPatches ?? new(), variables);
 
-        patchAll(patchesNames, context);
+        PatchAll(patchesNames, context);
 
-        if (hexDumpFiles.Count != 0)
+        if (hexDumpFiles.Count is not 0)
         {
             Log.Information("Undoing hex dumps");
             foreach (var file in hexDumpFiles)
@@ -40,77 +40,104 @@ public class Patcher
 
         bool patchedVariables = false;
 
-        Dictionary<string, byte[]> files = new Dictionary<string, byte[]>();
+        var files = new Dictionary<string, byte[]>();
         foreach (var (name, info) in context.AppliedPatches)
         {
-            if (info.BinaryVariables.Count == 0) continue;
+            if (info.BinaryVariables.Count is 0)
+            {
+                continue;
+            }
 
             Log.Information($"Patching variables for patch '{name}'");
             patchedVariables = true;
 
             foreach (var variable in info.BinaryVariables)
             {
-                string val = variable.TemplateString;
+                var val = variable.TemplateString;
+
                 foreach (var varName in info.VariablesUsed)
                 {
                     if (context.Variables.TryGetValue(varName, out string? value))
+                    {
                         val = val.Replace($"${{{varName}}}", value.ToLowerInvariant());
+                    }
                     else
+                    {
                         throw new Exception($"Variable '{varName}' doesn't exist");
+                    }
                 }
 
-                byte[] valBytes = Encoding.ASCII.GetBytes(val + "\0");
-                byte[] lengthBytes = BitConverter.GetBytes(valBytes.Length - 1);
+                var valBytes = Encoding.ASCII.GetBytes(val + "\0");
+                var lengthBytes = BitConverter.GetBytes(valBytes.Length - 1);
 
                 if (valBytes.Length > 8 * 16 - 4)
+                {
                     throw new Exception($"String '{val}' is too long, max length allowed is: {8 * 16 - 4}");
+                }
 
-                string file = Path.Combine(filesLocation, variable.File);
+                var file = Path.Combine(filesLocation, variable.File);
                 if (!files.TryGetValue(file, out byte[]? bytes))
                 {
                     bytes = File.ReadAllBytes(file);
                     files.Add(file, bytes);
                 }
 
-                int index = variable.Address;
+                var index = variable.Address;
 
                 // write length
-                for (int i = 0; i < 4; i++)
+                for (var i = 0; i < 4; i++)
+                {
                     bytes[index++] = lengthBytes[i];
+                }
+
                 // write the string
-                for (int i = 0; i < valBytes.Length; i++)
+                for (var i = 0; i < valBytes.Length; i++)
+                {
                     bytes[index++] = valBytes[i];
+                }
             }
         }
         if (patchedVariables)
+        {
             Log.Debug("Done");
+        }
 
-        if (files.Count != 0)
+        if (files.Count is not 0)
         {
             Log.Debug("Writing files");
             foreach (var (file, bytes) in files)
+            {
                 File.WriteAllBytes(file, bytes);
+            }
+
             Log.Debug("Done");
         }
     }
 
-    private void patchAll(IEnumerable<string> patchNames, PatchContext context)
+    private void PatchAll(IEnumerable<string> patchNames, PatchContext context)
     {
-        var patches = loadPatches(patchNames);
+        var patches = LoadPatches(patchNames);
 
         foreach (var (name, info) in patches)
         {
-            if (context.AppliedPatches.ContainsKey(name)) continue;
+            if (context.AppliedPatches.ContainsKey(name))
+            {
+                continue;
+            }
 
-            patch(name, info, context);
+            Patch(name, info, context);
         }
     }
 
-    private void patch(string patchName, PatchInfo info, PatchContext context)
+    private void Patch(string patchName, PatchInfo info, PatchContext context)
     {
         foreach (var pre in info.Prerequisites)
+        {
             if (!pre.Check(context, out var patches))
-                patchAll(patches, context); // TODO: this could cause infinite loop, add depth (limit)? or check for it in Patch?
+            {
+                PatchAll(patches, context); // TODO: this could cause infinite loop, add depth (limit)? or check for it in Patch?
+            }
+        }
 
         if (patchName == ExtendLibgenoa.Name)
         {
@@ -123,26 +150,28 @@ public class Patcher
 
         string path = Path.Combine(patchesLoation, $"{patchName}.patch");
         if (!File.Exists(path))
+        {
             throw new FileNotFoundException($"Patch '{patchName}' doesn't exist");
+        }
 
         Log.Information($"Applying patch '{patchName}'");
-        patch(File.ReadAllText(path), patchName, context.Variables.Where(variable => info.VariablesUsed.Contains(variable.Key)).ToDictionary(item => item.Key, item => item.Value));
+        Patch(File.ReadAllText(path), patchName, context.Variables.Where(variable => info.VariablesUsed.Contains(variable.Key)).ToDictionary(item => item.Key, item => item.Value));
         Log.Debug($"Done");
 
         context.AppliedPatches.Add(patchName, info);
     }
 
-    private void patch(string patch, string patchName, Dictionary<string, string>? variables = null)
+    private void Patch(string patch, string patchName, Dictionary<string, string>? variables = null)
     {
-        string newLine = U.GetNewLine(patch);
-        var filesToPatch = parse(patch);
+        var newLine = U.GetNewLine(patch);
+        var filesToPatch = Parse(patch);
 
-        if (variables is not null && variables.Count != 0)
+        if (variables is not null && variables.Count is not 0)
         {
-            IEnumerable<FileDiff> textPatches = filesToPatch.Where(filePatch => !filePatch.IsHex());
-            IEnumerable<FileDiff> hexPatches = filesToPatch.Where(filePatch => filePatch.IsHex());
+            var textPatches = filesToPatch.Where(filePatch => !filePatch.IsHex());
+            var hexPatches = filesToPatch.Where(filePatch => filePatch.IsHex());
 
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
             foreach (var filePatch in textPatches)
             {
@@ -159,26 +188,31 @@ public class Patcher
             }
 
             foreach (var filePatch in hexPatches)
+            {
                 sb.Append(U.ToString(filePatch));
+            }
 
-            string s = sb.ToString();
-            filesToPatch = parse(sb.ToString());
+            filesToPatch = Parse(sb.ToString());
         }
 
         foreach (var filePatch in filesToPatch)
-            patchFile(filePatch, patchName);
+        {
+            PatchFile(filePatch, patchName);
+        }
     }
 
-    private void patchFile(FileDiff patch, string patchName)
+    private void PatchFile(FileDiff patch, string patchName)
     {
         if (patch.From != patch.To)
+        {
             throw new InvalidDataException($"patch.From ({patch.From}) must match patch.To ({patch.To})");
+        }
 
-        FileInfo file = new FileInfo(Path.Combine(filesLocation, patch.From));
+        var file = new FileInfo(Path.Combine(filesLocation, patch.From));
 
         file.Directory?.Create();
 
-        bool hex = patch.IsHex();
+        var hex = patch.IsHex();
 
         if (hex && !file.Exists)
         {
@@ -191,20 +225,26 @@ public class Patcher
         }
 
         if (!file.Exists)
+        {
             throw new IOException($"File '{file.FullName}' doesn't exist, it is used by patch '{patchName}'");
+        }
 
         List<string> lines = File.ReadAllLines(file.FullName).ToList();
 
         foreach (var chunk in patch.Chunks)
-            patchChunk(chunk, lines);
+        {
+            PatchChunk(chunk, lines);
+        }
 
         File.WriteAllLines(file.FullName, lines);
 
         if (hex)
+        {
             hexDumpFiles.Add(file.FullName);
+        }
     }
 
-    private void patchChunk(Chunk chunk, List<string> lines)
+    private void PatchChunk(Chunk chunk, List<string> lines)
     {
         ChunkRange range = chunk.RangeInfo.NewRange;
 
@@ -228,13 +268,16 @@ public class Patcher
         }
     }
 
-    static Dictionary<string, PatchInfo> loadPatches(IEnumerable<string> patchNames)
+    private static Dictionary<string, PatchInfo> LoadPatches(IEnumerable<string> patchNames)
     {
-        Dictionary<string, PatchInfo> patches = new Dictionary<string, PatchInfo>();
+        var patches = new Dictionary<string, PatchInfo>();
 
         foreach (string name in patchNames)
         {
-            if (patches.ContainsKey(name)) continue;
+            if (patches.ContainsKey(name))
+            {
+                continue;
+            }
 
             string path = Path.Combine("Patches", $"{name}.patch.info");
 
@@ -244,31 +287,39 @@ public class Patcher
         return patches;
     }
 
-    static IEnumerable<FileDiff> parse(string patch)
+    private static IEnumerable<FileDiff> Parse(string patch)
     {
         if (string.IsNullOrWhiteSpace(patch))
-            return Enumerable.Empty<FileDiff>();
+        {
+            return [];
+        }
 
-        IEnumerable<string> enumerable = splitLines(patch);
+        IEnumerable<string> enumerable = SplitLines(patch);
         if (!enumerable.Any())
-            return Enumerable.Empty<FileDiff>();
+        {
+            return [];
+        }
 
         return new DiffParser().Run(enumerable);
 
-        IEnumerable<string> splitLines(string input)
+        IEnumerable<string> SplitLines(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
-                return Enumerable.Empty<string>();
+            {
+                return [];
+            }
 
-            string[] array = input.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
-            if (array.Length != 0)
+            string[] array = input.Split(["\r\n", "\n"], StringSplitOptions.None);
+            if (array.Length is not 0)
+            {
                 return array;
+            }
 
-            return Enumerable.Empty<string>();
+            return [];
         }
     }
 
-    public class PatchContext
+    public sealed class PatchContext
     {
         public readonly Dictionary<string, PatchInfo> AppliedPatches;
         public readonly Dictionary<string, string> Variables;

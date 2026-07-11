@@ -26,7 +26,7 @@ public partial class App : Application
             sb.Append(args.Value);
             string str = sb.ToString();
             int index = str.IndexOf('\n');
-            if (index != -1)
+            if (index is not -1)
             {
                 OnLogWritten?.Invoke(str.Substring(0, index));
                 sb = new StringBuilder(str.Substring(index + 1));

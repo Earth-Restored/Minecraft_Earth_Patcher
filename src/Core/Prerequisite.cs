@@ -7,7 +7,7 @@ namespace MCEPatcher.Core;
 public enum PrerequisiteType
 {
     Basic,
-    Conditional
+    Conditional,
 }
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "Type")]
@@ -26,7 +26,7 @@ public abstract class Prerequisite
     public abstract bool Check(Patcher.PatchContext context, [NotNullWhen(false)] out List<string>? patches);
 }
 
-public class BasicPrerequisite : Prerequisite
+public sealed class BasicPrerequisite : Prerequisite
 {
     public string RequiredPatch { get; init; }
 
@@ -34,6 +34,7 @@ public class BasicPrerequisite : Prerequisite
         : this(string.Empty)
     {
     }
+
     public BasicPrerequisite(string requiredPatch)
     {
         RequiredPatch = requiredPatch;
@@ -52,6 +53,7 @@ public class BasicPrerequisite : Prerequisite
         [
             RequiredPatch
         ];
+
         return false;
     }
 }
@@ -59,7 +61,7 @@ public class BasicPrerequisite : Prerequisite
 /// <summary>
 /// <see cref="RequiredPatch"/> is required if <see cref="VariableName"/> == <see cref="VariableValue"/>
 /// </summary>
-public class ConditionalPrerequisite : Prerequisite
+public sealed class ConditionalPrerequisite : Prerequisite
 {
     public string RequiredPatch { get; init; }
 
@@ -84,8 +86,7 @@ public class ConditionalPrerequisite : Prerequisite
     {
         patches = null;
 
-        if (context.AppliedPatches.ContainsKey(RequiredPatch) ||
-            !context.Variables.TryGetValue(VariableName, out string? val))
+        if (context.AppliedPatches.ContainsKey(RequiredPatch) || !context.Variables.TryGetValue(VariableName, out string? val))
         {
             return true;
         }
@@ -106,6 +107,7 @@ public class ConditionalPrerequisite : Prerequisite
         [
             RequiredPatch
         ];
+
         return false;
     }
 

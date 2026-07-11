@@ -84,18 +84,18 @@ internal class DiffParser
     public DiffParser()
     {
         schema = new HandlerCollection
-    {
-        { "^diff\\s", Start },
-        { "^new file mode \\d+$", NewFile },
-        { "^deleted file mode \\d+$", DeletedFile },
-        { "^index\\s[\\da-zA-Z]+\\.\\.[\\da-zA-Z]+(\\s(\\d+))?$", Index },
-        { "^---\\s", FromFile },
-        { "^\\+\\+\\+\\s", ToFile },
-        { "^@@\\s+\\-(\\d+),?(\\d+)?\\s+\\+(\\d+),?(\\d+)?\\s@@", Chunk },
-        { "^-", DeleteLine },
-        { "^\\+", AddLine },
-        { "^Binary files (.+) and (.+) differ", BinaryDiff }
-    };
+        {
+            { "^diff\\s", Start },
+            { "^new file mode \\d+$", NewFile },
+            { "^deleted file mode \\d+$", DeletedFile },
+            { "^index\\s[\\da-zA-Z]+\\.\\.[\\da-zA-Z]+(\\s(\\d+))?$", Index },
+            { "^---\\s", FromFile },
+            { "^\\+\\+\\+\\s", ToFile },
+            { "^@@\\s+\\-(\\d+),?(\\d+)?\\s+\\+(\\d+),?(\\d+)?\\s@@", Chunk },
+            { "^-", DeleteLine },
+            { "^\\+", AddLine },
+            { "^Binary files (.+) and (.+) differ", BinaryDiff }
+        };
     }
 
     public IEnumerable<FileDiff> Run(IEnumerable<string> lines)
@@ -111,14 +111,14 @@ internal class DiffParser
         return files;
     }
 
-    private void Start(string line)
+    private void Start(string? line)
     {
         file = new FileDiff();
         files.Add(file);
-        if (file.To == null && file.From == null)
+        if (file.To is null && file.From is null)
         {
-            string[] array = ParseFileNames(line);
-            if (array != null)
+            var array = ParseFileNames(line);
+            if (array is not null)
             {
                 file.From = array[0];
                 file.To = array[1];
@@ -128,7 +128,7 @@ internal class DiffParser
 
     private void Restart()
     {
-        if (file == null || file.Chunks.Count != 0)
+        if (file is null || file.Chunks.Count is not 0)
         {
             Start(null);
         }
@@ -151,7 +151,7 @@ internal class DiffParser
     private void Index(string line)
     {
         Restart();
-        file.Index = line.Split(new char[1] { ' ' }).Skip(1);
+        file.Index = line.Split(' ').Skip(1);
     }
 
     private void FromFile(string line)
@@ -174,43 +174,43 @@ internal class DiffParser
 
     private void Chunk(string line, Match match)
     {
-        in_del = (oldStart = int.Parse(match.Groups[1].Value));
-        oldLines = (match.Groups[2].Success ? int.Parse(match.Groups[2].Value) : 0);
-        in_add = (newStart = int.Parse(match.Groups[3].Value));
-        newLines = (match.Groups[4].Success ? int.Parse(match.Groups[4].Value) : 0);
-        ChunkRangeInfo rangeInfo = new ChunkRangeInfo(new ChunkRange(oldStart, oldLines), new ChunkRange(newStart, newLines));
+        in_del = oldStart = int.Parse(match.Groups[1].Value);
+        oldLines = match.Groups[2].Success ? int.Parse(match.Groups[2].Value) : 0;
+        in_add = newStart = int.Parse(match.Groups[3].Value);
+        newLines = match.Groups[4].Success ? int.Parse(match.Groups[4].Value) : 0;
+        var rangeInfo = new ChunkRangeInfo(new ChunkRange(oldStart, oldLines), new ChunkRange(newStart, newLines));
         current = new Chunk(line, rangeInfo);
         file.Chunks.Add(current);
     }
 
     private void DeleteLine(string line)
     {
-        string content = DiffLineHelper.GetContent(line);
+        var content = DiffLineHelper.GetContent(line);
         current.Changes.Add(new LineDiff(LineChangeType.Delete, in_del++, content));
         file.Deletions++;
     }
 
     private void AddLine(string line)
     {
-        string content = DiffLineHelper.GetContent(line);
+        var content = DiffLineHelper.GetContent(line);
         current.Changes.Add(new LineDiff(LineChangeType.Add, in_add++, content));
         file.Additions++;
     }
 
     private void ParseNormalLine(string line)
     {
-        if (file != null && !string.IsNullOrEmpty(line))
+        if (file is not null && !string.IsNullOrEmpty(line))
         {
-            string content = DiffLineHelper.GetContent(line);
-            current.Changes.Add(new LineDiff((!(line == "\\ No newline at end of file")) ? in_del++ : 0, (!(line == "\\ No newline at end of file")) ? in_add++ : 0, content));
+            var content = DiffLineHelper.GetContent(line);
+            current.Changes.Add(new LineDiff((line is not "\\ No newline at end of file") ? in_del++ : 0, (line is not "\\ No newline at end of file") ? in_add++ : 0, content));
         }
     }
 
     private bool ParseLine(string line)
     {
-        foreach (HandlerRow item in schema)
+        foreach (var item in schema)
         {
-            Match match = item.Expression.Match(line);
+            var match = item.Expression.Match(line);
             if (match.Success)
             {
                 item.Action(line, match);
@@ -221,23 +221,23 @@ internal class DiffParser
         return false;
     }
 
-    private static string[] ParseFileNames(string s)
+    private static string[]? ParseFileNames(string? s)
     {
         if (string.IsNullOrEmpty(s))
         {
             return null;
         }
 
-        return (from fileName in s.Split(new char[1] { ' ' }).Reverse().Take(2)
-                .Reverse()
-                select Regex.Replace(fileName, "^(a|b)\\/", "")).ToArray();
+        return (from fileName in s.Split(' ').Reverse().Take(2)
+            .Reverse()
+            select Regex.Replace(fileName, "^(a|b)\\/", "")).ToArray();
     }
 
     private static string ParseFileName(string s)
     {
         s = s.TrimStart('-', '+');
         s = s.Trim();
-        Match match = new Regex("\\t.*|\\d{4}-\\d\\d-\\d\\d\\s\\d\\d:\\d\\d:\\d\\d(.\\d+)?\\s(\\+|-)\\d\\d\\d\\d").Match(s);
+        var match = new Regex("\\t.*|\\d{4}-\\d\\d-\\d\\d\\s\\d\\d:\\d\\d:\\d\\d(.\\d+)?\\s(\\+|-)\\d\\d\\d\\d").Match(s);
         if (match.Success)
         {
             s = s.Substring(0, match.Index).Trim();
@@ -251,7 +251,7 @@ internal class DiffParser
         return s.Substring(2);
     }
 
-    internal class DiffLineHelper
+    internal static class DiffLineHelper
     {
         public static string GetContent(string line)
         {

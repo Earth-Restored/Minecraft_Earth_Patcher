@@ -18,11 +18,18 @@ public static class Signer
         process.WaitForExit();
         int exitCode = process.ExitCode;
         process.Close();
+        process.Dispose();
 
-        if (exitCode != 0) return false;
+        if (exitCode is not 0)
+        {
+            return false;
+        }
 
-        FileInfo? outApk = outDir.EnumerateFiles().Where(info => info.Extension == ".apk").FirstOrDefault();
-        if (outApk is null) return false;
+        var outApk = outDir.EnumerateFiles().FirstOrDefault(info => info.Extension is ".apk");
+        if (outApk is null)
+        {
+            return false;
+        }
 
         apkFile.Delete();
 

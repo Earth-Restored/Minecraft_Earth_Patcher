@@ -28,14 +28,14 @@ public static class DependencyDownloader
 
         int lastPercentDownloaded = -1;
 
-        while ((bytesRead = await downloadStream.ReadAsync(buffer, 0, buffer.Length)) != 0)
+        while ((bytesRead = await downloadStream.ReadAsync(buffer, 0, buffer.Length)) is not 0)
         {
             await fileStream.WriteAsync(buffer, 0, bytesRead);
             totalRead += bytesRead;
 
             int percentDownloaded = (int)(((double)totalRead / totalBytes) * 100);
 
-            if (totalBytes != -1 && percentDownloaded != lastPercentDownloaded)
+            if (totalBytes is not -1 && percentDownloaded != lastPercentDownloaded)
             {
                 UpdateProgressBar(totalRead, totalBytes);
                 lastPercentDownloaded = percentDownloaded;

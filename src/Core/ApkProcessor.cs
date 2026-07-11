@@ -1,5 +1,4 @@
 ﻿using System.Security.Cryptography;
-using CommandLine;
 using Serilog;
 
 namespace MCEPatcher.Core;
@@ -10,11 +9,11 @@ public static class ApkProcessor
 
     public static readonly string ResourcePackHash = "7473B7B99FD181453D7D520903726F62F3C2433FE941EA8968E6FE589EF5A9E7";
 
-    internal static bool Autonomous { get; private set; }
+    internal static bool NonInteractive { get; private set; }
 
     public static async Task<bool> Run(Options options)
     {
-        Autonomous = options.Autonomous;
+        NonInteractive = options.NonInteractive;
         HashSet<string> patches = new(options.Patches);
 
         FileInfo inApk = new FileInfo(options.InApk);
@@ -149,32 +148,25 @@ public static class ApkProcessor
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public sealed class Options
     {
-        [Option('i', "in-apk", Default = "Minecraft_Earth.apk", Required = false, HelpText = "Path to the minecraft earth apk")]
-        public string InApk { get; set; }
+        public required string InApk { get; init; }
 
-        [Option('o', "out-apk", Default = "Minecraft_Earth_patched.apk", Required = false, HelpText = "Path of the patched apk")]
-        public string OutApk { get; set; }
+        public required string OutApk { get; init; }
 
-        [Option("decoded-dir", Default = "Decoded", Required = false, HelpText = "Path of the dir the input apk will be decoded to")]
-        public string DecodedDir { get; set; }
+        public required string? ResourcePack { get; init; }
 
-        [Option('p', "patches", Required = true, HelpText = "List of patches to apply, in format '[patch1 name] \"[patch2 name]\" ...'")]
-        public IEnumerable<string> Patches { get; set; }
+        public required string DecodedDir { get; init; }
 
-        [Option('v', "variables", Required = true, HelpText = "Variables to use for patches, in format '[var1 name]=[var1 value] \"[var2 name]\"=\"[var2 value]\" ...'")]
-        public IEnumerable<string> Variables { get; set; }
+        public required IEnumerable<string> Patches { get; init; }
 
-        [Option('a', "autonomous", Required = false, HelpText = "If true, no interaction from user is required")]
-        public bool Autonomous { get; set; }
+        public required IEnumerable<string> Variables { get; init; }
 
-        [Option("skip-decode", Required = false, HelpText = "Skips decoding the apk")]
-        public bool SkipDecode { get; set; }
+        public bool NonInteractive { get; init; }
 
-        [Option("skip-build", Required = false, HelpText = "Skips building the apk")]
-        public bool SkipBuild { get; set; }
+        public bool SkipDecode { get; init; }
 
-        [Option("skip-sign", Required = false, HelpText = "Skips signing of the apk")]
-        public bool SkipSign { get; set; }
+        public bool SkipBuild { get; init; }
+
+        public bool SkipSign { get; init; }
     }
 #pragma warning restore CS8618
 }

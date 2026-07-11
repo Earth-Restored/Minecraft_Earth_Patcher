@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 #nullable disable
 namespace MCEPatcher.Core;
 
-public class PatchInfo
+public sealed class PatchInfo
 {
     public static readonly PatchInfo Default = new PatchInfo()
     {
