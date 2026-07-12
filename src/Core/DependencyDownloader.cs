@@ -22,7 +22,7 @@ public static class DependencyDownloader
         using var downloadStream = await response.Content.ReadAsStreamAsync();
         using var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None);
 
-        byte[] buffer = new byte[8192]; // 8KB chunks
+        var buffer = new byte[16 * 1024]; // 16KB chunks
         long totalRead = 0;
         int bytesRead;
 
@@ -47,11 +47,11 @@ public static class DependencyDownloader
 
     private static void UpdateProgressBar(long current, long total)
     {
-        const int progressWidth = 30;
-        double percent = (double)current / total;
-        int filledWidth = (int)(percent * progressWidth);
+        const int ProgressBarWidth = 30;
+        var percent = (double)current / total;
+        var filledWidth = (int)(percent * ProgressBarWidth);
 
-        string bar = new string('#', filledWidth) + new string('-', progressWidth - filledWidth);
+        var bar = new string('#', filledWidth) + new string('-', ProgressBarWidth - filledWidth);
 
         Log.Debug($"[{bar}] {percent:P0} ");
     }

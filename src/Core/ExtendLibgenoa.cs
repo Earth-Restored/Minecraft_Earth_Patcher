@@ -11,7 +11,10 @@ public static class ExtendLibgenoa
         string path = Path.Combine(decodedFiles.FullName, "lib", "arm64-v8a", "libgenoa.so");
         string target = path + ".hexdump";
 
-        if (File.Exists(target)) return;
+        if (File.Exists(target))
+        {
+            return;
+        }
 
         byte[] oldBytes = File.ReadAllBytes(path);
 

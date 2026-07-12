@@ -1,4 +1,7 @@
-﻿using System.Security.Cryptography;
+﻿using System.IO.Compression;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 using Serilog;
 
 namespace MCEPatcher.Core;
@@ -61,7 +64,7 @@ public static class ApkProcessor
 
         if (!options.SkipDecode || !options.SkipBuild)
         {
-            await DependencyDownloader.Download("https://github.com/iBotPeaches/Apktool/releases/download/v3.0.1/apktool_3.0.1.jar", APK.FileName);
+            await DependencyDownloader.Download("https://github.com/iBotPeaches/Apktool/releases/download/v3.0.2/apktool_3.0.2.jar", APK.FileName);
         }
 
         if (!options.SkipSign)
@@ -70,7 +73,9 @@ public static class ApkProcessor
         }
 
         if (options.SkipDecode)
+        {
             Log.Information("Decoding skipped");
+        }
         else
         {
             Log.Information("*****Decoding apk*****");
@@ -88,7 +93,7 @@ public static class ApkProcessor
             Log.Debug("Done");
         }
 
-        // does not get properly extended if not done before the hexdump and will most likely be done anyway, TODO: remove once the TODO in Patcher.patchFile is fixed
+        // does not get properly extended if not done before the hexdump and will most likely be done anyway, TODO: remove once the TODO in Patcher.PatchFile is fixed
         Log.Information($"Applying patch '{ExtendLibgenoa.Name}'");
         ExtendLibgenoa.Extent(decodedDir);
         patches.Remove(ExtendLibgenoa.Name);
@@ -100,24 +105,40 @@ public static class ApkProcessor
             [ExtendLibgenoa.Name] = PatchInfo.Default
         } : new());
 
+        if (!string.IsNullOrEmpty(options.ResourcePack))
+        {
+            if (!await ResourcePackPatcher.Patch(options))
+            {
+                return false;
+            }
+        }
+
         if (options.SkipBuild)
+        {
             Log.Information($"Building skipped");
+        }
         else
         {
             Log.Information("*****Building apk*****");
             if (!APK.Encode(decodedDir, outApk))
+            {
                 return false;
+            }
 
             Log.Debug("Done");
         }
 
         if (options.SkipSign)
+        {
             Log.Information($"Signing skipped");
+        }
         else
         {
             Log.Information("*****Signing apk*****");
             if (!Signer.Sign(outApk, new DirectoryInfo("Signed")))
+            {
                 return false;
+            }
 
             Log.Debug("Done");
         }
@@ -145,7 +166,6 @@ public static class ApkProcessor
         return hash == ResourcePackHash;
     }
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public sealed class Options
     {
         public required string InApk { get; init; }
@@ -168,5 +188,4 @@ public static class ApkProcessor
 
         public bool SkipSign { get; init; }
     }
-#pragma warning restore CS8618
 }

@@ -8,15 +8,15 @@ namespace MCEPatcher.Core;
 public static class U
 {
     // from: https://stackoverflow.com/a/690980/15878562
-    public static void CopyDir(string sourceDirectory, string targetDirectory)
+    public static void CopyDir(string sourceDirectory, string targetDirectory, bool overwrite)
     {
         var diSource = new DirectoryInfo(sourceDirectory);
         var diTarget = new DirectoryInfo(targetDirectory);
 
-        CopyDir(diSource, diTarget);
+        CopyDir(diSource, diTarget, overwrite);
     }
 
-    public static void CopyDir(DirectoryInfo source, DirectoryInfo target)
+    public static void CopyDir(DirectoryInfo source, DirectoryInfo target, bool overwrite)
     {
         target.Create();
 
@@ -25,8 +25,7 @@ public static class U
         {
             try
             {
-                // don't overwrite
-                fi.CopyTo(Path.Combine(target.FullName, fi.Name), false);
+                fi.CopyTo(Path.Combine(target.FullName, fi.Name), overwrite);
             }
             catch
             {
@@ -38,7 +37,7 @@ public static class U
         {
             var nextTargetSubDir = target.CreateSubdirectory(diSourceSubDir.Name);
 
-            CopyDir(diSourceSubDir, nextTargetSubDir);
+            CopyDir(diSourceSubDir, nextTargetSubDir, overwrite);
         }
     }
 

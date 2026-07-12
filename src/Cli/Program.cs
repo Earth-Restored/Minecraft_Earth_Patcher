@@ -137,7 +137,7 @@ internal class Program
                 InApk = inApk.FullName,
                 OutApk = outApk.FullName,
                 ResourcePack = parseResult.GetValue(resourcePackOption)?.FullName,
-                DecodedDir = parseResult.GetValue(decodedDirOption)?.FullName ?? Path.GetFullPath("Decoded"),
+                DecodedDir = parseResult.GetValue(decodedDirOption)?.FullName ?? Path.GetFullPath(Path.Combine("tmp", "apk")),
                 Patches = parseResult.GetValue(patchesOption) ?? [],
                 Variables = parseResult.GetValue(variablesOption) ?? [],
                 NonInteractive = parseResult.GetValue(nonInteractiveOption),

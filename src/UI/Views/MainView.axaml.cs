@@ -135,7 +135,7 @@ public partial class MainView : UserControl
             InApk = apkFile,
             OutApk = "Minecraft_Earth_patched.apk",
             ResourcePack = resourcePackFile,
-            DecodedDir = "Decoded",
+            DecodedDir = Path.Combine("tmp", "apk"),
             Patches = viewModel.GetPatches(),
             Variables = viewModel.GetVariables(),
         });
