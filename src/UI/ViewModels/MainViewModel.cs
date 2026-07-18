@@ -233,10 +233,10 @@ public sealed class MainViewModel : ViewModelBase
         DisableTelemetry = true;
         DisableMsaLoginSignatureValidation = true;
         ChangeAppName = true;
-        AppName = "Minecraft Earth Patched";
-        AppNameShort = "MCE Patched";
+        AppName = "Solace";
+        AppNameShort = "Solace";
         ChangePackageName = true;
-        PackageName = "com.github.bitcodercz";
+        PackageName = "com.github.earth_restored";
         LoginServerSingleDomainMode = true;
         LoginServerProtocol = (int)ProtocolEnum.Http;
         LoginServerHostname = "";

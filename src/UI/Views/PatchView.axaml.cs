@@ -30,7 +30,7 @@ public partial class PatchView : UserControl
 
     public void OpenPatchedAPKLocation(object sender, RoutedEventArgs args)
     {
-        string filePath = Path.GetFullPath("Minecraft_Earth_patched.apk");
+        string filePath = Path.GetFullPath("Solace.apk");
 
         try
         {

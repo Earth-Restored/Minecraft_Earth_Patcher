@@ -133,7 +133,7 @@ public partial class MainView : UserControl
         {
             NonInteractive = true,
             InApk = apkFile,
-            OutApk = "Minecraft_Earth_patched.apk",
+            OutApk = "Solace.apk",
             ResourcePack = resourcePackFile,
             DecodedDir = Path.Combine("tmp", "apk"),
             Patches = viewModel.GetPatches(),
