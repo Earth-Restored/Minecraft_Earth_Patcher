@@ -43,7 +43,7 @@ public sealed class MainViewModel : ViewModelBase
     private string? resourcePackFile;
     public string? ResourcePackFile
     {
-        get => "Resource Pack File: " + (U.LimitLengthMiddle(resourcePackFile, 60) ?? "Not selected");
+        get => "Resource Pack File (Optional): " + (U.LimitLengthMiddle(resourcePackFile, 60) ?? "Not selected");
         set => this.RaiseAndSetIfChanged(ref resourcePackFile, value);
     }
     public string? ResourcePackFilePath
