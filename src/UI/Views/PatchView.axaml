@@ -28,10 +28,14 @@
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto"/>
 				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="Auto"/>
 			</Grid.ColumnDefinitions>
 			<Button Grid.Column="0" Margin="0 0 5 0" FontSize="20" Click="Back">Back</Button>
-			<Button Grid.Column="1" FontSize="16" Click="OpenPatchedAPKLocation">
+			<Button Grid.Column="1" FontSize="16" Click="OpenPatchedAPKLocation" Margin="0 0 5 0" IsVisible="{Binding IsApk}">
 				Open patched APK location
+			</Button>
+			<Button Grid.Column="2" FontSize="16" Click="OpenPatchedIPALocation" IsVisible="{Binding IsIpa}">
+				Open patched IPA location
 			</Button>
 		</Grid>
 	</Grid>
