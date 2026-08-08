@@ -23,6 +23,11 @@ public partial class PatchView : UserControl
         (DataContext as PatchViewModel)?.Start(options, scrollViewer, chat, finishedContainer);
     }
 
+    public void Patch(IpaProcessor.Options options)
+    {
+        (DataContext as PatchViewModel)?.Start(options, scrollViewer, chat, finishedContainer);
+    }
+
     public void Back(object sender, RoutedEventArgs args)
     {
         MainWindow.Instance.OpenMainView();
@@ -30,7 +35,18 @@ public partial class PatchView : UserControl
 
     public void OpenPatchedAPKLocation(object sender, RoutedEventArgs args)
     {
-        string filePath = Path.GetFullPath("Solace.apk");
+        OpenFileLocation(Path.GetFullPath("Solace.apk"));
+    }
+
+    public void OpenPatchedIPALocation(object sender, RoutedEventArgs args)
+    {
+        OpenFileLocation(Path.GetFullPath("Solace.ipa"));
+    }
+
+    private static void OpenFileLocation(string filePath)
+    {
+        if (!File.Exists(filePath))
+            return;
 
         try
         {

@@ -223,6 +223,240 @@ public sealed class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref xboxLiveHostname, value);
     }
 
+    private int _selectedTabIndex;
+    public int SelectedTabIndex
+    {
+        get => _selectedTabIndex;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _selectedTabIndex, value);
+            this.RaisePropertyChanged(nameof(IsAndroidSelected));
+            this.RaisePropertyChanged(nameof(IsIosSelected));
+        }
+    }
+    public bool IsAndroidSelected => _selectedTabIndex == 0;
+    public bool IsIosSelected => _selectedTabIndex == 1;
+
+    private string? ipaFile;
+    public string? IpaFile
+    {
+        get => "IPA File: " + (U.LimitLengthMiddle(ipaFile, 60) ?? "Not selected");
+        set => this.RaiseAndSetIfChanged(ref ipaFile, value);
+    }
+    public string? IpaFilePath
+    {
+        get => ipaFile;
+        set => this.RaiseAndSetIfChanged(ref ipaFile, value);
+    }
+
+    private bool _iosIsSimpleMode;
+    public bool IosIsSimpleMode
+    {
+        get => _iosIsSimpleMode;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _iosIsSimpleMode, value);
+            if (value)
+            {
+                EnforceIosSimpleModeDefaults();
+            }
+        }
+    }
+
+    private bool iosChangeLocatorAddress;
+    public bool IosChangeLocatorAddress
+    {
+        get => iosChangeLocatorAddress;
+        set => this.RaiseAndSetIfChanged(ref iosChangeLocatorAddress, value);
+    }
+    private bool iosDisableSunsetTimeCheck;
+    public bool IosDisableSunsetTimeCheck
+    {
+        get => iosDisableSunsetTimeCheck;
+        set => this.RaiseAndSetIfChanged(ref iosDisableSunsetTimeCheck, value);
+    }
+    private bool iosDisableSpeedLimit;
+    public bool IosDisableSpeedLimit
+    {
+        get => iosDisableSpeedLimit;
+        set => this.RaiseAndSetIfChanged(ref iosDisableSpeedLimit, value);
+    }
+    private bool iosChangeAppName;
+    public bool IosChangeAppName
+    {
+        get => iosChangeAppName;
+        set => this.RaiseAndSetIfChanged(ref iosChangeAppName, value);
+    }
+    private bool iosRemoveDrm;
+    public bool IosRemoveDrm
+    {
+        get => iosRemoveDrm;
+        set => this.RaiseAndSetIfChanged(ref iosRemoveDrm, value);
+    }
+
+    private bool iosChangeXalAuthAddress;
+    public bool IosChangeXalAuthAddress
+    {
+        get => iosChangeXalAuthAddress;
+        set => this.RaiseAndSetIfChanged(ref iosChangeXalAuthAddress, value);
+    }
+
+    private bool iosForceInAppWebView = true;
+    public bool IosForceInAppWebView
+    {
+        get => iosForceInAppWebView;
+        set => this.RaiseAndSetIfChanged(ref iosForceInAppWebView, value);
+    }
+
+    private bool iosForceInteractiveSignIn = true;
+    public bool IosForceInteractiveSignIn
+    {
+        get => iosForceInteractiveSignIn;
+        set => this.RaiseAndSetIfChanged(ref iosForceInteractiveSignIn, value);
+    }
+
+    private bool iosUseCustomAuthServer;
+    public bool IosUseCustomAuthServer
+    {
+        get => iosUseCustomAuthServer;
+        set => this.RaiseAndSetIfChanged(ref iosUseCustomAuthServer, value);
+    }
+
+    private int _iosProtocol = (int)ProtocolEnum.Http;
+    public int IosProtocol
+    {
+        get => _iosProtocol;
+        set => this.RaiseAndSetIfChanged(ref _iosProtocol, value);
+    }
+
+    private string _iosHostname = "";
+    public string IosHostname
+    {
+        get => _iosHostname;
+        set => this.RaiseAndSetIfChanged(ref _iosHostname, value);
+    }
+
+    private int _iosLocatorProtocol = (int)ProtocolEnum.Http;
+    public int IosLocatorProtocol
+    {
+        get => _iosLocatorProtocol;
+        set => this.RaiseAndSetIfChanged(ref _iosLocatorProtocol, value);
+    }
+
+    private string _iosLocatorHostname = "";
+    public string IosLocatorHostname
+    {
+        get => _iosLocatorHostname;
+        set => this.RaiseAndSetIfChanged(ref _iosLocatorHostname, value);
+    }
+
+    private string _iosAppName = "Solace";
+    public string IosAppName
+    {
+        get => _iosAppName;
+        set => this.RaiseAndSetIfChanged(ref _iosAppName, value);
+    }
+
+    private bool iosChangePlayfabApiAddress;
+    public bool IosChangePlayfabApiAddress
+    {
+        get => iosChangePlayfabApiAddress;
+        set => this.RaiseAndSetIfChanged(ref iosChangePlayfabApiAddress, value);
+    }
+
+    private bool iosChangeXboxABAddress;
+    public bool IosChangeXboxABAddress
+    {
+        get => iosChangeXboxABAddress;
+        set => this.RaiseAndSetIfChanged(ref iosChangeXboxABAddress, value);
+    }
+
+    private bool iosChangeXboxLiveAddress;
+    public bool IosChangeXboxLiveAddress
+    {
+        get => iosChangeXboxLiveAddress;
+        set => this.RaiseAndSetIfChanged(ref iosChangeXboxLiveAddress, value);
+    }
+
+    private bool iosLoginServerSingleDomainMode;
+    public bool IosLoginServerSingleDomainMode
+    {
+        get => iosLoginServerSingleDomainMode;
+        set => this.RaiseAndSetIfChanged(ref iosLoginServerSingleDomainMode, value);
+    }
+
+    private int _iosXalProtocol = (int)ProtocolEnum.Http;
+    public int IosXalProtocol
+    {
+        get => _iosXalProtocol;
+        set => this.RaiseAndSetIfChanged(ref _iosXalProtocol, value);
+    }
+
+    private string _iosXalHostname = "";
+    public string IosXalHostname
+    {
+        get => _iosXalHostname;
+        set => this.RaiseAndSetIfChanged(ref _iosXalHostname, value);
+    }
+
+    private int _iosPlayfabApiProtocol = (int)ProtocolEnum.Http;
+    public int IosPlayfabApiProtocol
+    {
+        get => _iosPlayfabApiProtocol;
+        set => this.RaiseAndSetIfChanged(ref _iosPlayfabApiProtocol, value);
+    }
+
+    private string _iosPlayfabApiHostname = "";
+    public string IosPlayfabApiHostname
+    {
+        get => _iosPlayfabApiHostname;
+        set => this.RaiseAndSetIfChanged(ref _iosPlayfabApiHostname, value);
+    }
+
+    private int _iosXboxABProtocol = (int)ProtocolEnum.Http;
+    public int IosXboxABProtocol
+    {
+        get => _iosXboxABProtocol;
+        set => this.RaiseAndSetIfChanged(ref _iosXboxABProtocol, value);
+    }
+
+    private string _iosXboxABHostname = "";
+    public string IosXboxABHostname
+    {
+        get => _iosXboxABHostname;
+        set => this.RaiseAndSetIfChanged(ref _iosXboxABHostname, value);
+    }
+
+    private int _iosXboxLiveProtocol = (int)ProtocolEnum.Http;
+    public int IosXboxLiveProtocol
+    {
+        get => _iosXboxLiveProtocol;
+        set => this.RaiseAndSetIfChanged(ref _iosXboxLiveProtocol, value);
+    }
+
+    private string _iosXboxLiveHostname = "";
+    public string IosXboxLiveHostname
+    {
+        get => _iosXboxLiveHostname;
+        set => this.RaiseAndSetIfChanged(ref _iosXboxLiveHostname, value);
+    }
+
+    private void EnforceIosSimpleModeDefaults()
+    {
+        IosChangeLocatorAddress = true;
+        IosDisableSunsetTimeCheck = true;
+        IosDisableSpeedLimit = false;
+        IosChangeAppName = true;
+        IosRemoveDrm = true;
+        IosChangeXalAuthAddress = true;
+        IosForceInAppWebView = true;
+        IosForceInteractiveSignIn = true;
+        IosUseCustomAuthServer = false;
+        IosChangePlayfabApiAddress = true;
+        IosChangeXboxABAddress = true;
+        IosChangeXboxLiveAddress = true;
+    }
+
     public MainViewModel()
     {
         ChangeLocatorAddress = true;
@@ -253,7 +487,20 @@ public sealed class MainViewModel : ViewModelBase
         XboxLiveProtocol = (int)ProtocolEnum.Https;
         XboxLiveHostname = "xboxlive.com";
 
+        IosProtocol = (int)ProtocolEnum.Http;
+        IosLocatorProtocol = (int)ProtocolEnum.Http;
+        IosLoginServerSingleDomainMode = true;
+        IosXalProtocol = (int)ProtocolEnum.Http;
+        IosXalHostname = "";
+        IosPlayfabApiProtocol = (int)ProtocolEnum.Http;
+        IosPlayfabApiHostname = "";
+        IosXboxABProtocol = (int)ProtocolEnum.Http;
+        IosXboxABHostname = "";
+        IosXboxLiveProtocol = (int)ProtocolEnum.Http;
+        IosXboxLiveHostname = "";
+
         IsSimpleMode = true;
+        IosIsSimpleMode = true;
     }
 
     public IEnumerable<string> GetPatches()

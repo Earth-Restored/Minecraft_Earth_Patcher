@@ -24,6 +24,130 @@ public partial class MainView : UserControl
             return;
         }
 
+        if (viewModel.SelectedTabIndex == 1)
+        {
+            string? ipaFile = viewModel.IpaFilePath;
+
+            if (ipaFile is null)
+            {
+                await U.ShowError("Select the IPA file first");
+                return;
+            }
+
+            if (!File.Exists(ipaFile))
+            {
+                await U.ShowError("Selected file doesn't exist");
+                return;
+            }
+
+            using (var fs = File.OpenRead(ipaFile))
+            {
+                if (!Core.IpaProcessor.VerifyHash(fs))
+                {
+                    var dialog = MessageBoxManager.GetMessageBoxStandard(
+                        title: "Warning",
+                        text: "The .ipa file hash does not match. Patching may fail. Do you want to continue?",
+                        @enum: MsBox.Avalonia.Enums.ButtonEnum.YesNo,
+                        icon: MsBox.Avalonia.Enums.Icon.Error,
+                        windowStartupLocation: WindowStartupLocation.CenterOwner);
+
+                    var result = await dialog.ShowWindowDialogAsync(MainWindow.Instance);
+
+                    if (result is MsBox.Avalonia.Enums.ButtonResult.No)
+                    {
+                        return;
+                    }
+                }
+            }
+
+            if (viewModel.IosChangeLocatorAddress && string.IsNullOrWhiteSpace(viewModel.IosLocatorHostname))
+            {
+                await U.ShowError("Enter a locator hostname/IP first");
+                return;
+            }
+
+            bool customAuthServer = !viewModel.IosIsSimpleMode || viewModel.IosUseCustomAuthServer;
+            bool changeXalAuthAddress = customAuthServer && viewModel.IosChangeXalAuthAddress;
+            bool changePlayfabApiAddress = customAuthServer && viewModel.IosChangePlayfabApiAddress;
+            bool changeXboxABAddress = customAuthServer && viewModel.IosChangeXboxABAddress;
+            bool changeXboxLiveAddress = customAuthServer && viewModel.IosChangeXboxLiveAddress;
+
+            if (customAuthServer)
+            {
+                if (viewModel.IosLoginServerSingleDomainMode)
+                {
+                    if ((changeXalAuthAddress || changePlayfabApiAddress || changeXboxABAddress || changeXboxLiveAddress)
+                        && string.IsNullOrWhiteSpace(viewModel.IosHostname))
+                    {
+                        await U.ShowError("Enter an auth server hostname/IP first");
+                        return;
+                    }
+                }
+                else
+                {
+                    if (changeXalAuthAddress && string.IsNullOrWhiteSpace(viewModel.IosXalHostname))
+                    {
+                        await U.ShowError("Enter a Xal auth hostname/IP first");
+                        return;
+                    }
+                    if (changePlayfabApiAddress && string.IsNullOrWhiteSpace(viewModel.IosPlayfabApiHostname))
+                    {
+                        await U.ShowError("Enter a PlayFab API hostname/IP first");
+                        return;
+                    }
+                    if (changeXboxABAddress && string.IsNullOrWhiteSpace(viewModel.IosXboxABHostname))
+                    {
+                        await U.ShowError("Enter an XboxAB hostname/IP first");
+                        return;
+                    }
+                    if (changeXboxLiveAddress && string.IsNullOrWhiteSpace(viewModel.IosXboxLiveHostname))
+                    {
+                        await U.ShowError("Enter an Xbox live hostname/IP first");
+                        return;
+                    }
+                }
+            }
+
+            var ipaOptions = new Core.IpaProcessor.Options()
+            {
+                Autonomous = true,
+                InIpa = ipaFile,
+                OutIpa = "Solace.ipa",
+                DecodedDir = "IpaDecoded",
+                Protocol = viewModel.IosProtocol,
+                Hostname = viewModel.IosHostname,
+                LocatorProtocol = viewModel.IosLocatorProtocol,
+                LocatorHostname = viewModel.IosLocatorHostname,
+                AppName = viewModel.IosAppName,
+                ChangeLocatorAddress = viewModel.IosChangeLocatorAddress,
+                ChangeXalAuthAddress = changeXalAuthAddress,
+                ForceInAppWebView = customAuthServer && viewModel.IosForceInAppWebView,
+                ForceInteractiveSignIn = viewModel.IosForceInteractiveSignIn,
+                ChangePlayfabApiAddress = changePlayfabApiAddress,
+                ChangeXboxABAddress = changeXboxABAddress,
+                ChangeXboxLiveAddress = changeXboxLiveAddress,
+                DisableSunsetTimeCheck = viewModel.IosDisableSunsetTimeCheck,
+                DisableSpeedLimit = viewModel.IosDisableSpeedLimit,
+                ChangeAppName = viewModel.IosChangeAppName,
+                RemoveDrm = viewModel.IosRemoveDrm,
+            };
+
+            if (!viewModel.IosLoginServerSingleDomainMode)
+            {
+                ipaOptions.XalProtocol = viewModel.IosXalProtocol;
+                ipaOptions.XalHostname = viewModel.IosXalHostname;
+                ipaOptions.PlayfabApiProtocol = viewModel.IosPlayfabApiProtocol;
+                ipaOptions.PlayfabApiHostname = viewModel.IosPlayfabApiHostname;
+                ipaOptions.XboxABProtocol = viewModel.IosXboxABProtocol;
+                ipaOptions.XboxABHostname = viewModel.IosXboxABHostname;
+                ipaOptions.XboxLiveProtocol = viewModel.IosXboxLiveProtocol;
+                ipaOptions.XboxLiveHostname = viewModel.IosXboxLiveHostname;
+            }
+
+            MainWindow.Instance.Patch(ipaOptions);
+            return;
+        }
+
         string? apkFile = viewModel.ApkFilePath;
 
         if (apkFile is null)
@@ -191,5 +315,42 @@ public partial class MainView : UserControl
         {
             viewModel.ResourcePackFile = filePath;
         }
+    }
+
+    public async void PickIpaFile(object sender, RoutedEventArgs args)
+    {
+        var topLevel = TopLevel.GetTopLevel(this);
+
+        var files = await topLevel!.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Minecraft Earth IPA file",
+            AllowMultiple = false,
+            FileTypeFilter = [ new FilePickerFileType("Ipa")
+            {
+                Patterns = ["*.ipa"],
+            } ],
+        });
+
+        IStorageFile? file;
+        string? filePath = files is not null && (file = files.FirstOrDefault()) is not null
+            ? file.Path.LocalPath
+            : null;
+
+        if (DataContext is MainViewModel viewModel)
+        {
+            viewModel.IpaFile = filePath;
+        }
+    }
+
+    public void SelectAndroid(object sender, RoutedEventArgs args)
+    {
+        if (DataContext is MainViewModel viewModel)
+            viewModel.SelectedTabIndex = 0;
+    }
+
+    public void SelectIos(object sender, RoutedEventArgs args)
+    {
+        if (DataContext is MainViewModel viewModel)
+            viewModel.SelectedTabIndex = 1;
     }
 }
