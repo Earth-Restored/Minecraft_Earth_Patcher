@@ -143,12 +143,12 @@ public static class IpaProcessor
 
         Log.Information("Patching ATS exceptions for redirected endpoints");
         PatchInfoPlistAts(appDir,
-            options.Hostname?.Trim().ToLowerInvariant(),
-            options.LocatorHostname?.Trim().ToLowerInvariant(),
-            options.XalHostname?.Trim().ToLowerInvariant(),
-            options.PlayfabApiHostname?.Trim().ToLowerInvariant(),
-            options.XboxABHostname?.Trim().ToLowerInvariant(),
-            options.XboxLiveHostname?.Trim().ToLowerInvariant());
+            options.Hostname?.Trim()?.ToLowerInvariant(),
+            options.LocatorHostname?.Trim()?.ToLowerInvariant(),
+            options.XalHostname?.Trim()?.ToLowerInvariant(),
+            options.PlayfabApiHostname?.Trim()?.ToLowerInvariant(),
+            options.XboxABHostname?.Trim()?.ToLowerInvariant(),
+            options.XboxLiveHostname?.Trim()?.ToLowerInvariant());
         Log.Debug("Done");
 
         if (options.ChangePlayfabApiAddress || options.ChangeXboxABAddress || options.ChangeXboxLiveAddress)
@@ -156,7 +156,7 @@ public static class IpaProcessor
             Log.Information("Patching service endpoints");
             PatchServiceEndpoints(exePath,
                 options.Protocol == 0 ? "http" : "https",
-                options.Hostname.Trim().ToLowerInvariant(),
+                options.Hostname?.Trim()?.ToLowerInvariant(),
                 options.ChangeXboxLiveAddress,
                 options.ChangeXboxABAddress,
                 options.ChangePlayfabApiAddress,
@@ -376,7 +376,7 @@ public static class IpaProcessor
         File.WriteAllBytes(xalPath, data);
     }
 
-    private static void PatchInfoPlistAts(string appDir, params string[] hostnames)
+    private static void PatchInfoPlistAts(string appDir, params ReadOnlySpan<string?> hostnames)
     {
         string plistPath = Path.Combine(appDir, "Info.plist");
         if (!File.Exists(plistPath))

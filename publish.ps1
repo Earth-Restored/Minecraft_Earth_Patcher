@@ -3,7 +3,9 @@ param (
     [ValidateSet('Debug', 'Release')]
     [string]$config = 'Release',
 
-    [string[]]$frameworks = @('win-x64', 'linux-x64')
+    [string[]]$frameworks = @('win-x64', 'win-arm64', 'linux-x64', 'linux-arm64', 'osx-x64', 'osx-arm64'),
+
+    [bool]$publishCli = $false
 )
 
 $ErrorActionPreference = 'Stop'
@@ -26,14 +28,18 @@ if (Test-Path $propsPath) {
     if (-not [string]::IsNullOrWhiteSpace($parsedVersion)) {
         $version = $parsedVersion.Trim()
     }
-} else {
+}
+else {
     Write-Warning "Directory.Build.props not found at $propsPath. Defaulting to version $version"
 }
 
 $projects = @(
-    @{ Name = "UI.Desktop"; DisplayName = "MCEPatcher_UI" },
-    @{ Name = "Cli"; DisplayName = "MCEPatcher_CLI" }
+    @{ Name = "UI.Desktop"; DisplayName = "MCEPatcher_UI" }
 )
+
+if ($publishCli) {
+    $projects += @{ Name = "Cli"; DisplayName = "MCEPatcher_CLI" }
+}
 
 # Create output directory
 $outDir = Join-Path $scriptRoot "build/$config"
