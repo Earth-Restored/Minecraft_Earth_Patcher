@@ -103,6 +103,14 @@
 										<Label Grid.Column="0" VerticalAlignment="Center">Auth Server Address:</Label>
 										<TextBox Text="{Binding LoginServerHostname}" Grid.Column="1" PlaceholderText="192.168.x.x:x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
 									</Grid>
+									<Grid HorizontalAlignment="Center">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="Auto"/>
+											<ColumnDefinition Width="Auto"/>
+										</Grid.ColumnDefinitions>
+										<Label Grid.Column="0" VerticalAlignment="Center">Android Version:</Label>
+										<NumericUpDown Grid.Column="1" Value="{Binding AndroidVersion}" Minimum="7" FormatString="0" MaxWidth="200"/>
+									</Grid>
 								</StackPanel>
 							</Border>
 						</StackPanel>
@@ -232,6 +240,19 @@
 								</Border>
 
 								<Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5" IsVisible="{Binding !ChangePackageName}"/>
+
+								<Border BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="350">
+									<StackPanel HorizontalAlignment="Center" Margin="10">
+										<Grid HorizontalAlignment="Center">
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="Auto"/>
+												<ColumnDefinition Width="Auto"/>
+											</Grid.ColumnDefinitions>
+											<Label Grid.Column="0" VerticalAlignment="Center">Android version:</Label>
+											<NumericUpDown Value="{Binding AndroidVersion}" Minimum="7" FormatString="0" Grid.Column="1" MaxWidth="200"/>
+										</Grid>
+									</StackPanel>
+								</Border>
 
 								<Grid HorizontalAlignment="Center">
 									<Grid.ColumnDefinitions>

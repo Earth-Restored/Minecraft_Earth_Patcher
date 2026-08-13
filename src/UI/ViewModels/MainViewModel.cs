@@ -128,6 +128,12 @@ public sealed class MainViewModel : ViewModelBase
         get => packageName;
         set => this.RaiseAndSetIfChanged(ref packageName, value);
     }
+    private int? androidVersion;
+    public int? AndroidVersion
+    {
+        get => androidVersion;
+        set => this.RaiseAndSetIfChanged(ref androidVersion, value);
+    }
     private bool loginServerSingleDomainMode;
     public bool LoginServerSingleDomainMode
     {

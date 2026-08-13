@@ -24,7 +24,7 @@ public partial class MainView : UserControl
             return;
         }
 
-        if (viewModel.SelectedTabIndex == 1)
+        if (viewModel.SelectedTabIndex is 1)
         {
             string? ipaFile = viewModel.IpaFilePath;
 
@@ -184,23 +184,7 @@ public partial class MainView : UserControl
 
         string? resourcePackFile = viewModel.ResourcePackFilePath;
 
-        if (string.IsNullOrEmpty(resourcePackFile))
-        {
-            var dialog = MessageBoxManager.GetMessageBoxStandard(
-                   title: "Info",
-                   text: "Resource Pack file not selected. Do you want to continue?",
-                   @enum: MsBox.Avalonia.Enums.ButtonEnum.YesNo,
-                   icon: MsBox.Avalonia.Enums.Icon.Info,
-                   windowStartupLocation: WindowStartupLocation.CenterOwner);
-
-            var result = await dialog.ShowWindowDialogAsync(MainWindow.Instance);
-
-            if (result is MsBox.Avalonia.Enums.ButtonResult.No)
-            {
-                return;
-            }
-        }
-        else
+        if (!string.IsNullOrEmpty(resourcePackFile))
         {
             if (!File.Exists(resourcePackFile))
             {
@@ -229,6 +213,12 @@ public partial class MainView : UserControl
             }
         }
 
+        if (viewModel.AndroidVersion is null or < 7)
+        {
+            await U.ShowError("Android version must be selected");
+            return;
+        }
+
         if (viewModel.ChangeMSALoginServiceAddress && IPAddress.TryParse(viewModel.MSALoginServiceHostname.Split(':')[0], out _))
         {
             await U.ShowError("MSA login service address cannot be an IP");
@@ -253,6 +243,23 @@ public partial class MainView : UserControl
             return;
         }
 
+        if (string.IsNullOrEmpty(resourcePackFile))
+        {
+            var dialog = MessageBoxManager.GetMessageBoxStandard(
+                   title: "Info",
+                   text: "Resource Pack file not selected. Do you want to continue?",
+                   @enum: MsBox.Avalonia.Enums.ButtonEnum.YesNo,
+                   icon: MsBox.Avalonia.Enums.Icon.Info,
+                   windowStartupLocation: WindowStartupLocation.CenterOwner);
+
+            var result = await dialog.ShowWindowDialogAsync(MainWindow.Instance);
+
+            if (result is MsBox.Avalonia.Enums.ButtonResult.No)
+            {
+                return;
+            }
+        }
+
         MainWindow.Instance.Patch(new Core.ApkProcessor.Options()
         {
             NonInteractive = true,
@@ -260,6 +267,7 @@ public partial class MainView : UserControl
             OutApk = "Solace.apk",
             ResourcePack = resourcePackFile,
             DecodedDir = Path.Combine("tmp", "apk"),
+            AndroidOSVersion = viewModel.AndroidVersion.Value,
             Patches = viewModel.GetPatches(),
             Variables = viewModel.GetVariables(),
         });

@@ -65,11 +65,16 @@ public static class ApkProcessor
 
         if (!options.SkipDecode || !options.SkipBuild)
         {
-            await DependencyDownloader.Download("https://github.com/iBotPeaches/Apktool/releases/download/v3.0.2/apktool_3.0.2.jar", APK.FileName);
+            await DependencyDownloader.Download("https://github.com/iBotPeaches/Apktool/releases/download/v3.0.3/apktool_3.0.3.jar", APK.FileName);
             await DependencyDownloader.Download(BuildTools.DownloadUrl, BuildTools.FileName);
         }
 
-        await DependencyDownloader.Download(PatchElf.DownloadUrl, PatchElf.FileName);
+        if (options.AndroidOSVersion >= 15)
+        {
+            await DependencyDownloader.Download(PatchElf.DownloadUrl, PatchElf.FileName);
+        }
+
+        await DependencyDownloader.Download(ArCoreUpdater.DownloadUrl, ArCoreUpdater.FileName);
 
         if (!options.SkipSign)
         {
@@ -117,7 +122,12 @@ public static class ApkProcessor
             }
         }
 
-        await PatchElf.PatchPageSizeAsync(decodedDir, Log.Logger);
+        await ArCoreUpdater.UpdateArCoreLibs(decodedDir);
+
+        if (options.AndroidOSVersion >= 15)
+        {
+            await PatchElf.PatchPageSizeAsync(decodedDir, Log.Logger);
+        }
 
         if (options.SkipBuild)
         {
@@ -189,6 +199,8 @@ public static class ApkProcessor
         public required string? ResourcePack { get; init; }
 
         public required string DecodedDir { get; init; }
+
+        public required int AndroidOSVersion { get; init; }
 
         public required IEnumerable<string> Patches { get; init; }
 
