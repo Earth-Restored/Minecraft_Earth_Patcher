@@ -8,12 +8,13 @@ public static class Signer
 
     public static bool Sign(FileInfo apkFile, DirectoryInfo outDir)
     {
-        Process process = U.Run("java", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), new string[]
-        {
+        Process process = U.Run("java", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+        [
             "-jar", $"\"{Path.GetFullPath(FileName)}\"",
             "-a", $"\"{apkFile.FullName}\"",
-            "-o", $"\"{outDir.FullName}\""
-        });
+            "-o", $"\"{outDir.FullName}\"",
+            "--skipZipAlign",
+        ]);
 
         process.WaitForExit();
         int exitCode = process.ExitCode;
@@ -31,9 +32,7 @@ public static class Signer
             return false;
         }
 
-        apkFile.Delete();
-
-        outApk.MoveTo(apkFile.FullName);
+        outApk.MoveTo(apkFile.FullName, true);
 
         outDir.Delete(true);
 

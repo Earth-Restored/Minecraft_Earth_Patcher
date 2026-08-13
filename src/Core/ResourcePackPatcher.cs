@@ -61,18 +61,33 @@ internal static class ResourcePackPatcher
             Log.Information("Generating _ui_defs.json");
 
             List<string> contents = [];
-            foreach (var file in Directory.EnumerateFiles(Path.Combine(resourcePackRoot, "ui")))
+            var uiDirectory = Path.Combine(resourcePackRoot, "ui");
+            foreach (var file in Directory.EnumerateFiles(uiDirectory))
             {
                 if (Path.GetExtension(file.AsSpan()).Equals(".json", StringComparison.OrdinalIgnoreCase) &&
                     Path.GetFileName(file.AsSpan()) is not "_ui_defs.json")
                 {
-                    contents.Add("ui/" + Path.GetFileName(file));
+                    var pathWithoutExt = Path.Combine(Path.GetDirectoryName(file)!, Path.GetFileNameWithoutExtension(file));
+
+                    var relativePath = pathWithoutExt.Replace(resourcePackRoot, "").Replace('\\', '/');
+
+                    if (relativePath.StartsWith('/'))
+                    {
+                        relativePath = relativePath[1..];
+                    }
+
+                    if (relativePath.StartsWith("ui/animation/", StringComparison.Ordinal))
+                    {
+                        continue;
+                    }
+
+                    contents.Add(relativePath);
                 }
             }
 
             File.WriteAllText(
                 Path.Combine(resourcePackRoot, "ui", "_ui_defs.json"),
-                JsonSerializer.Serialize(new { ui_defs = contents, }),
+                JsonSerializer.Serialize(new { ui_defs = contents.Order(), }),
                 Encoding.UTF8);
 
             Log.Debug("Done");

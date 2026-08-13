@@ -11,7 +11,7 @@ public static class APK
     public static bool Decode(FileInfo apk, DirectoryInfo output)
     {
         Process process;
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && File.Exists(FileNameBat))
+        if (OperatingSystem.IsWindows() && File.Exists(FileNameBat))
         {
             process = U.Run(Path.GetFullPath(FileNameBat), Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
             [
@@ -48,7 +48,7 @@ public static class APK
         outApk.Delete();
 
         Process process;
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && File.Exists(FileNameBat))
+        if (OperatingSystem.IsWindows() && File.Exists(FileNameBat))
         {
             process = U.Run(Path.GetFullPath(FileNameBat), Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
             [

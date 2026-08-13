@@ -1,4 +1,5 @@
 ﻿using System.IO.Compression;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -11,6 +12,14 @@ public static class ApkProcessor
     public static readonly string ApkHash = "BED7864C4B1BCC2774332E6D5E1BFFBA40CAB6D27782D0C3FA272F27F613A79A";
 
     public static readonly string ResourcePackHash = "7473B7B99FD181453D7D520903726F62F3C2433FE941EA8968E6FE589EF5A9E7";
+
+    private static string BuildToolsUrl => OperatingSystem.IsWindows()
+        ? "https://dl.google.com/android/repository/build-tools_r35.0.1_windows.zip"
+        : OperatingSystem.IsLinux()
+        ? "https://dl.google.com/android/repository/build-tools_r35.0.1_linux.zip"
+        : OperatingSystem.IsMacOS()
+        ? "https://dl.google.com/android/repository/build-tools_r35.0.1_macosx.zip"
+        : throw new InvalidOperationException($"OS ({RuntimeInformation.OSDescription}) is not supported.");
 
     internal static bool NonInteractive { get; private set; }
 
@@ -65,6 +74,7 @@ public static class ApkProcessor
         if (!options.SkipDecode || !options.SkipBuild)
         {
             await DependencyDownloader.Download("https://github.com/iBotPeaches/Apktool/releases/download/v3.0.2/apktool_3.0.2.jar", APK.FileName);
+            await DependencyDownloader.Download(BuildToolsUrl, BuildTools.FileName);
         }
 
         if (!options.SkipSign)
@@ -121,6 +131,14 @@ public static class ApkProcessor
         {
             Log.Information("*****Building apk*****");
             if (!APK.Encode(decodedDir, outApk))
+            {
+                return false;
+            }
+
+            Log.Debug("Done");
+
+            Log.Information("*****Aligning apk*****");
+            if (!await BuildTools.AlignAsync(outApk))
             {
                 return false;
             }
