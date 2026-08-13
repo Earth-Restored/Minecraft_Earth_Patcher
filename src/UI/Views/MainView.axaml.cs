@@ -187,10 +187,10 @@ public partial class MainView : UserControl
         if (string.IsNullOrEmpty(resourcePackFile))
         {
             var dialog = MessageBoxManager.GetMessageBoxStandard(
-                   title: "Warning",
+                   title: "Info",
                    text: "Resource Pack file not selected. Do you want to continue?",
                    @enum: MsBox.Avalonia.Enums.ButtonEnum.YesNo,
-                   icon: MsBox.Avalonia.Enums.Icon.Warning,
+                   icon: MsBox.Avalonia.Enums.Icon.Info,
                    windowStartupLocation: WindowStartupLocation.CenterOwner);
 
             var result = await dialog.ShowWindowDialogAsync(MainWindow.Instance);
