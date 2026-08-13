@@ -527,6 +527,7 @@ public sealed class MainViewModel : ViewModelBase
             yield return "change-xboxlive-address-base";
             yield return "change-xboxlive-address-extra";
         }
+        yield return "add-arcore-apikey"; // make sure it runs after change-package-name
     }
 
     public IEnumerable<string> GetVariables()
