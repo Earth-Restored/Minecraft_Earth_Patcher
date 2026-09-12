@@ -7,40 +7,6 @@ namespace MCEPatcher.Core;
 
 public static class U
 {
-    // from: https://stackoverflow.com/a/690980/15878562
-    public static void CopyDir(string sourceDirectory, string targetDirectory, bool overwrite)
-    {
-        var diSource = new DirectoryInfo(sourceDirectory);
-        var diTarget = new DirectoryInfo(targetDirectory);
-
-        CopyDir(diSource, diTarget, overwrite);
-    }
-
-    public static void CopyDir(DirectoryInfo source, DirectoryInfo target, bool overwrite)
-    {
-        target.Create();
-
-        // Copy each file into the new directory.
-        foreach (FileInfo fi in source.GetFiles())
-        {
-            try
-            {
-                fi.CopyTo(Path.Combine(target.FullName, fi.Name), overwrite);
-            }
-            catch
-            {
-            }
-        }
-
-        // Copy each subdirectory using recursion.
-        foreach (var diSourceSubDir in source.GetDirectories())
-        {
-            var nextTargetSubDir = target.CreateSubdirectory(diSourceSubDir.Name);
-
-            CopyDir(diSourceSubDir, nextTargetSubDir, overwrite);
-        }
-    }
-
     public static bool IsHex(this FileDiff filePatch)
         => Path.GetExtension(filePatch.From) is ".hexdump" || Path.GetExtension(filePatch.To) is ".hexdump";
 

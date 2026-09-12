@@ -1,6 +1,7 @@
 using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
+using BitcoderCZ.IO;
 using Serilog;
 
 namespace MCEPatcher.Core;
@@ -20,7 +21,7 @@ internal static class ResourcePackPatcher
             return false;
         }
 
-        var resourcePackFolder = Path.Combine("tmp", "resourcepack");
+        var resourcePackFolder = new RelativeDirectory("tmp").ToAbsolute() / "resourcepack";
 
         try
         {
@@ -40,7 +41,7 @@ internal static class ResourcePackPatcher
                 using (var genoaStream = await genoaEntry.OpenAsync())
                 using (var genoaZip = new ZipArchive(genoaStream, ZipArchiveMode.Read))
                 {
-                    await genoaZip.ExtractToDirectoryAsync(resourcePackFolder, overwriteFiles: true);
+                    await genoaZip.ExtractToDirectoryAsync(resourcePackFolder.Value, overwriteFiles: true);
                 }
             }
 
@@ -48,11 +49,11 @@ internal static class ResourcePackPatcher
 
             Log.Information("Copying resource pack files");
 
-            File.Delete(Path.Combine(resourcePackFolder, "manifest.json")); // So it doesn't overwrite the existing one in vanilla_base
+            (resourcePackFolder / new RelativeFile("manifest.json")).Delete(); // So it doesn't overwrite the existing one in vanilla_base
 
-            var resourcePackRoot = Path.Combine(options.DecodedDir, "assets", "resource_packs", "vanilla_base");
+            var resourcePackRoot = new AbsoluteDirectory(Path.GetFullPath(options.DecodedDir)) / "assets" / "resource_packs" / "vanilla_base";
             Log.Information(resourcePackFolder + " " + resourcePackRoot);
-            U.CopyDir(resourcePackFolder, resourcePackRoot, overwrite: true);
+            resourcePackFolder.CopyContentsTo(resourcePackRoot, overwrite: true, recursive: true);
 
             Log.Debug("Done");
 
@@ -61,15 +62,13 @@ internal static class ResourcePackPatcher
             Log.Information("Generating _ui_defs.json");
 
             List<string> contents = [];
-            var uiDirectory = Path.Combine(resourcePackRoot, "ui");
-            foreach (var file in Directory.EnumerateFiles(uiDirectory))
+            var uiDirectory = resourcePackRoot / "ui";
+            foreach (var file in uiDirectory.EnumerateFiles(SearchOption.AllDirectories))
             {
-                if (Path.GetExtension(file.AsSpan()).Equals(".json", StringComparison.OrdinalIgnoreCase) &&
-                    Path.GetFileName(file.AsSpan()) is not "_ui_defs.json")
+                if (file.ExtensionSpan.Equals(".json", StringComparison.OrdinalIgnoreCase) &&
+                    file.NameSpan is not "_ui_defs.json")
                 {
-                    var pathWithoutExt = Path.Combine(Path.GetDirectoryName(file)!, Path.GetFileNameWithoutExtension(file));
-
-                    var relativePath = pathWithoutExt.Replace(resourcePackRoot, "").Replace('\\', '/');
+                    var relativePath = file.RelativeTo(resourcePackRoot).Value.Replace('\\', '/');
 
                     if (relativePath.StartsWith('/'))
                     {
@@ -86,8 +85,8 @@ internal static class ResourcePackPatcher
             }
 
             File.WriteAllText(
-                Path.Combine(resourcePackRoot, "ui", "_ui_defs.json"),
-                JsonSerializer.Serialize(new { ui_defs = contents.Order(), }),
+                (resourcePackRoot / "ui" / "_ui_defs.json").Value,
+                JsonSerializer.Serialize(new { ui_defs = contents.Order(), }, jsonOptions),
                 Encoding.UTF8);
 
             Log.Debug("Done");
@@ -100,15 +99,15 @@ internal static class ResourcePackPatcher
                 };
             contents.Clear();
 
-            foreach (var file in Directory.EnumerateFiles(Path.Combine(resourcePackRoot, "textures"), "*.*", SearchOption.AllDirectories))
+            foreach (var file in (resourcePackRoot / "textures").EnumerateFiles(SearchOption.AllDirectories))
             {
-                var extension = Path.GetExtension(file);
+                var extension = file.Extension;
 
                 if (textureTypes.Contains(extension))
                 {
-                    var pathWithoutExt = Path.Combine(Path.GetDirectoryName(file)!, Path.GetFileNameWithoutExtension(file));
+                    var fileWithoutExtension = file.Parent! / new RelativeFile(file.NameWithoutExtension);
 
-                    var relativePath = pathWithoutExt.Replace(resourcePackRoot, "").Replace('\\', '/');
+                    var relativePath = fileWithoutExtension.RelativeTo(resourcePackRoot).Value.Replace('\\', '/');
 
                     if (relativePath.StartsWith('/'))
                     {
@@ -120,7 +119,7 @@ internal static class ResourcePackPatcher
             }
 
             File.WriteAllText(
-                Path.Combine(resourcePackRoot, "textures", "textures_list.json"),
+                (resourcePackRoot / "textures" / "textures_list.json").Value,
                 JsonSerializer.Serialize(contents, jsonOptions),
                 Encoding.UTF8);
 
@@ -130,9 +129,9 @@ internal static class ResourcePackPatcher
 
             var contents2 = new List<Dictionary<string, string>>();
 
-            foreach (string file in Directory.EnumerateFiles(resourcePackRoot, "*", SearchOption.AllDirectories))
+            foreach (var file in resourcePackRoot.EnumerateFiles(SearchOption.AllDirectories))
             {
-                var relativePath = file.Replace(resourcePackRoot, "").Replace("\\", "/");
+                var relativePath = file.RelativeTo(resourcePackRoot).Value.Replace("\\", "/");
 
                 if (relativePath.StartsWith('/'))
                 {
@@ -146,7 +145,7 @@ internal static class ResourcePackPatcher
             }
 
             File.WriteAllText(
-                Path.Combine(resourcePackRoot, "contents.json"),
+                (resourcePackRoot / "contents.json").Value,
                 JsonSerializer.Serialize(new { content = contents2.OrderBy(item => item.First().Key), }, jsonOptions),
                 Encoding.UTF8);
 
@@ -163,7 +162,7 @@ internal static class ResourcePackPatcher
         }
         finally
         {
-            // Directory.Delete(resourcePackFolder, true);
+            resourcePackFolder.Delete(true);
         }
     }
 }
