@@ -1,4 +1,4 @@
-﻿using System.CommandLine;
+using System.CommandLine;
 using Serilog;
 
 namespace MCEPatcher.Core;
@@ -88,6 +88,13 @@ internal class Program
             DefaultValueFactory = _ => false,
         };
 
+        var androidOSVersionOption = new Option<int>("--android-os-version")
+        {
+            Description = "Target Android OS version (e.g. 14, 15)",
+            Required = false,
+            DefaultValueFactory = _ => 14,
+        };
+
         RootCommand rootCommand = new("Patch minecraft earth apk")
         {
 
@@ -104,6 +111,7 @@ internal class Program
         rootCommand.Options.Add(skipDecodeOption);
         rootCommand.Options.Add(skipBuildOption);
         rootCommand.Options.Add(skipSignOption);
+        rootCommand.Options.Add(androidOSVersionOption);
 
         rootCommand.SetAction(async parseResult =>
         {
@@ -138,6 +146,7 @@ internal class Program
                 OutApk = outApk.FullName,
                 ResourcePack = parseResult.GetValue(resourcePackOption)?.FullName,
                 DecodedDir = parseResult.GetValue(decodedDirOption)?.FullName ?? Path.GetFullPath(Path.Combine("tmp", "apk")),
+                AndroidOSVersion = parseResult.GetValue(androidOSVersionOption),
                 Patches = parseResult.GetValue(patchesOption) ?? [],
                 Variables = parseResult.GetValue(variablesOption) ?? [],
                 NonInteractive = parseResult.GetValue(nonInteractiveOption),

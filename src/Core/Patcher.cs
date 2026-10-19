@@ -1,4 +1,4 @@
-﻿using DiffPatch.Data;
+using DiffPatch.Data;
 using Serilog;
 using System.Text;
 
@@ -9,7 +9,7 @@ public sealed class Patcher
     private string patchesLoation;
     private string filesLocation;
 
-    private HashSet<string> hexDumpFiles = new HashSet<string>();
+    private readonly Dictionary<string, FileStream> binaryStreams = new();
 
     public Patcher(string _patchesLoation, string _filesLocation = "")
     {
@@ -17,100 +17,86 @@ public sealed class Patcher
         filesLocation = _filesLocation;
     }
 
+    private FileStream GetBinaryStream(string fullPath)
+    {
+        if (!binaryStreams.TryGetValue(fullPath, out var stream))
+        {
+            stream = new FileStream(fullPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+            binaryStreams.Add(fullPath, stream);
+        }
+        return stream;
+    }
+
     public void Patch(IEnumerable<string> patchesNames, Dictionary<string, string> variables, Dictionary<string, PatchInfo>? appliedPatches = null)
     {
         var context = new PatchContext(appliedPatches ?? new(), variables);
 
-        PatchAll(patchesNames, context);
-
-        if (hexDumpFiles.Count is not 0)
+        try
         {
-            Log.Information("Undoing hex dumps");
-            foreach (var file in hexDumpFiles)
+            PatchAll(patchesNames, context);
+
+            bool patchedVariables = false;
+
+            foreach (var (name, info) in context.AppliedPatches)
             {
-                File.WriteAllBytes(file.Substring(0, file.LastIndexOf('.')), HexDump.Undo(File.ReadAllText(file)));
-
-                // delete the original file
-                File.Delete(file);
-            }
-
-            hexDumpFiles.Clear();
-            Log.Debug("Done");
-        }
-
-        bool patchedVariables = false;
-
-        var files = new Dictionary<string, byte[]>();
-        foreach (var (name, info) in context.AppliedPatches)
-        {
-            if (info.BinaryVariables.Count is 0)
-            {
-                continue;
-            }
-
-            Log.Information($"Patching variables for patch '{name}'");
-            patchedVariables = true;
-
-            foreach (var variable in info.BinaryVariables)
-            {
-                var val = variable.TemplateString;
-
-                foreach (var varName in info.VariablesUsed)
+                if (info.BinaryVariables.Count is 0)
                 {
-                    if (context.Variables.TryGetValue(varName, out string? value))
+                    continue;
+                }
+
+                Log.Information($"Patching variables for patch '{name}'");
+                patchedVariables = true;
+
+                foreach (var variable in info.BinaryVariables)
+                {
+                    var val = variable.TemplateString;
+
+                    foreach (var varName in info.VariablesUsed)
                     {
-                        val = val.Replace($"${{{varName}}}", value.ToLowerInvariant());
+                        if (context.Variables.TryGetValue(varName, out string? value))
+                        {
+                            val = val.Replace($"${{{varName}}}", value.ToLowerInvariant());
+                        }
+                        else
+                        {
+                            throw new Exception($"Variable '{varName}' doesn't exist");
+                        }
                     }
-                    else
+
+                    var valBytes = Encoding.ASCII.GetBytes(val + "\0");
+                    var lengthBytes = BitConverter.GetBytes(valBytes.Length - 1);
+
+                    if (valBytes.Length > 8 * 16 - 4)
                     {
-                        throw new Exception($"Variable '{varName}' doesn't exist");
+                        throw new Exception($"String '{val}' is too long, max length allowed is: {8 * 16 - 4}");
                     }
-                }
 
-                var valBytes = Encoding.ASCII.GetBytes(val + "\0");
-                var lengthBytes = BitConverter.GetBytes(valBytes.Length - 1);
+                    var file = Path.Combine(filesLocation, variable.File);
+                    var stream = GetBinaryStream(file);
 
-                if (valBytes.Length > 8 * 16 - 4)
-                {
-                    throw new Exception($"String '{val}' is too long, max length allowed is: {8 * 16 - 4}");
-                }
-
-                var file = Path.Combine(filesLocation, variable.File);
-                if (!files.TryGetValue(file, out byte[]? bytes))
-                {
-                    bytes = File.ReadAllBytes(file);
-                    files.Add(file, bytes);
-                }
-
-                var index = variable.Address;
-
-                // write length
-                for (var i = 0; i < 4; i++)
-                {
-                    bytes[index++] = lengthBytes[i];
-                }
-
-                // write the string
-                for (var i = 0; i < valBytes.Length; i++)
-                {
-                    bytes[index++] = valBytes[i];
+                    stream.Seek(variable.Address, SeekOrigin.Begin);
+                    stream.Write(lengthBytes, 0, 4);
+                    stream.Write(valBytes, 0, valBytes.Length);
                 }
             }
-        }
-        if (patchedVariables)
-        {
-            Log.Debug("Done");
-        }
-
-        if (files.Count is not 0)
-        {
-            Log.Debug("Writing files");
-            foreach (var (file, bytes) in files)
+            if (patchedVariables)
             {
-                File.WriteAllBytes(file, bytes);
+                Log.Debug("Done");
             }
-
-            Log.Debug("Done");
+        }
+        finally
+        {
+            if (binaryStreams.Count is not 0)
+            {
+                Log.Debug("Flushing binary files");
+                foreach (var stream in binaryStreams.Values)
+                {
+                    stream.Flush();
+                    stream.Dispose();
+                }
+                binaryStreams.Clear();
+                Log.Debug("Done");
+            }
         }
     }
 
@@ -142,7 +128,19 @@ public sealed class Patcher
         if (patchName == ExtendLibgenoa.Name)
         {
             Log.Information($"Applying patch '{patchName}'");
-            ExtendLibgenoa.Extent(new DirectoryInfo(filesLocation));
+            string libgenoaPath = Path.Combine(filesLocation, "lib", "arm64-v8a", "libgenoa.so");
+            if (File.Exists(libgenoaPath))
+            {
+                var stream = GetBinaryStream(libgenoaPath);
+                if (!ExtendLibgenoa.IsExtended(stream))
+                {
+                    ExtendLibgenoa.Extend(stream);
+                }
+            }
+            else
+            {
+                ExtendLibgenoa.Extent(new DirectoryInfo(filesLocation));
+            }
             Log.Debug("Done");
             context.AppliedPatches.Add(patchName, info);
             return;
@@ -208,21 +206,15 @@ public sealed class Patcher
             throw new InvalidDataException($"patch.From ({patch.From}) must match patch.To ({patch.To})");
         }
 
+        if (patch.IsHex())
+        {
+            PatchHexDiff(patch, patchName);
+            return;
+        }
+
         var file = new FileInfo(Path.Combine(filesLocation, patch.From));
 
         file.Directory?.Create();
-
-        var hex = patch.IsHex();
-
-        if (hex && !file.Exists)
-        {
-            // TODO: check if dumping libgenoa and if extend-libgenoa is needed, do it
-            string _from = file.FullName.Substring(0, file.FullName.LastIndexOf('.')); // remove .hexdump
-            Log.Information($"Creating hexdump for '{_from}'");
-            File.WriteAllText(file.FullName, HexDump.Create(File.ReadAllBytes(_from)));
-            Log.Debug("Done");
-            file.Refresh();
-        }
 
         if (!file.Exists)
         {
@@ -237,11 +229,96 @@ public sealed class Patcher
         }
 
         File.WriteAllLines(file.FullName, lines);
+    }
 
-        if (hex)
+    private void PatchHexDiff(FileDiff patch, string patchName)
+    {
+        string relBinaryPath = patch.From.Substring(0, patch.From.LastIndexOf('.'));
+        string fullBinaryPath = Path.Combine(filesLocation, relBinaryPath);
+
+        if (!File.Exists(fullBinaryPath))
         {
-            hexDumpFiles.Add(file.FullName);
+            throw new FileNotFoundException($"Binary file '{fullBinaryPath}' doesn't exist, it is used by patch '{patchName}'");
         }
+
+        var stream = GetBinaryStream(fullBinaryPath);
+
+        if (relBinaryPath.EndsWith("libgenoa.so") && !ExtendLibgenoa.IsExtended(stream))
+        {
+            ExtendLibgenoa.Extend(stream);
+        }
+
+        Span<byte> lineBytes = stackalloc byte[16];
+
+        foreach (var chunk in patch.Chunks)
+        {
+            foreach (var change in chunk.Changes)
+            {
+                if (change.Type != LineChangeType.Add)
+                {
+                    continue;
+                }
+
+                if (!TryParseHexDumpLine(change.Content, out long offset, lineBytes, out int bytesParsed))
+                {
+                    throw new InvalidDataException($"Failed to parse hexdump line in patch '{patchName}': {change.Content}");
+                }
+
+                if (offset + bytesParsed > stream.Length)
+                {
+                    throw new InvalidDataException($"Hex patch offset 0x{offset:X} + {bytesParsed} is out of bounds for '{fullBinaryPath}' (size: {stream.Length}) in patch '{patchName}'");
+                }
+
+                stream.Seek(offset, SeekOrigin.Begin);
+                stream.Write(lineBytes.Slice(0, bytesParsed));
+            }
+        }
+    }
+
+    private static bool TryParseHexDumpLine(string line, out long offset, Span<byte> outBuffer, out int bytesParsed)
+    {
+        offset = 0;
+        bytesParsed = 0;
+        line = line.TrimEnd('\r', '\n');
+        if (line.Length < 10)
+        {
+            return false;
+        }
+
+        if (!long.TryParse(line.AsSpan(0, 8), System.Globalization.NumberStyles.HexNumber, null, out offset))
+        {
+            return false;
+        }
+
+        // Group 1 (up to 8 bytes, starts at index 10)
+        for (int i = 0; i < 8; i++)
+        {
+            int idx = 10 + i * 3;
+            if (idx + 2 > line.Length) break;
+            var span = line.AsSpan(idx, 2);
+            if (span[0] == ' ') break;
+            if (byte.TryParse(span, System.Globalization.NumberStyles.HexNumber, null, out byte b))
+            {
+                outBuffer[bytesParsed++] = b;
+            }
+            else break;
+        }
+
+        // Group 2 (up to 8 bytes, starts at index 35)
+        for (int i = 0; i < 8; i++)
+        {
+            int idx = 35 + i * 3;
+            if (idx + 2 > line.Length) break;
+            var span = line.AsSpan(idx, 2);
+            if (span[0] == ' ') break;
+            if (byte.TryParse(span, System.Globalization.NumberStyles.HexNumber, null, out byte b))
+            {
+                outBuffer[bytesParsed++] = b;
+            }
+            else break;
+        }
+
+        return bytesParsed > 0;
     }
 
     private void PatchChunk(Chunk chunk, List<string> lines)
@@ -268,7 +345,7 @@ public sealed class Patcher
         }
     }
 
-    private static Dictionary<string, PatchInfo> LoadPatches(IEnumerable<string> patchNames)
+    private Dictionary<string, PatchInfo> LoadPatches(IEnumerable<string> patchNames)
     {
         var patches = new Dictionary<string, PatchInfo>();
 
@@ -279,7 +356,7 @@ public sealed class Patcher
                 continue;
             }
 
-            string path = Path.Combine("Patches", $"{name}.patch.info");
+            string path = Path.Combine(patchesLoation, $"{name}.patch.info");
 
             patches.Add(name, PatchInfo.Load(path, name));
         }
