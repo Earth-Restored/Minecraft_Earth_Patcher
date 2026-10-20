@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using MCEPatcher.UI.Utils;
@@ -8,9 +8,11 @@ using Serilog;
 using System;
 using System.Text;
 
+using Avalonia.Controls;
+
 namespace MCEPatcher.UI;
 
-public partial class App : Application
+public sealed partial class App : Application
 {
     internal static event Action<string?>? OnLogWritten;
 
@@ -59,14 +61,28 @@ public partial class App : Application
                 DataContext = new MainViewModel()
             };
         }
-        //else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
-        //{
-        //    singleViewPlatform.MainView = new MainView
-        //    {
-        //        DataContext = new MainViewModel()
-        //    };
-        //}
+        else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
+        {
+            singleViewPlatform.MainView = new MainView
+            {
+                DataContext = new MainViewModel()
+            };
+        }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    public static void NavigateTo(Control view)
+    {
+        if (Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow is not null)
+        {
+            ((desktop.MainWindow.Content as UserControl)?.DataContext as ViewModelBase)?.OnClose();
+            desktop.MainWindow.Content = view;
+        }
+        else if (Current?.ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
+        {
+            ((singleViewPlatform.MainView as UserControl)?.DataContext as ViewModelBase)?.OnClose();
+            singleViewPlatform.MainView = view;
+        }
     }
 }

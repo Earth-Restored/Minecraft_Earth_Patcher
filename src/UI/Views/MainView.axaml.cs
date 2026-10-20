@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using MCEPatcher.UI.Utils;
@@ -7,10 +7,13 @@ using MsBox.Avalonia;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
+
+using MCEPatcher.UI.Services;
 
 namespace MCEPatcher.UI.Views;
 
-public partial class MainView : UserControl
+public sealed partial class MainView : UserControl
 {
     public MainView()
     {
@@ -44,14 +47,11 @@ public partial class MainView : UserControl
             {
                 if (!Core.IpaProcessor.VerifyHash(fs))
                 {
-                    var dialog = MessageBoxManager.GetMessageBoxStandard(
-                        title: "Warning",
-                        text: "The .ipa file hash does not match. Patching may fail. Do you want to continue?",
-                        @enum: MsBox.Avalonia.Enums.ButtonEnum.YesNo,
-                        icon: MsBox.Avalonia.Enums.Icon.Error,
-                        windowStartupLocation: WindowStartupLocation.CenterOwner);
-
-                    var result = await dialog.ShowWindowDialogAsync(MainWindow.Instance);
+                    var result = await U.ShowDialogAsync(
+                        "Warning",
+                        "The .ipa file hash does not match. Patching may fail. Do you want to continue?",
+                        MsBox.Avalonia.Enums.Icon.Error,
+                        MsBox.Avalonia.Enums.ButtonEnum.YesNo);
 
                     if (result is MsBox.Avalonia.Enums.ButtonResult.No)
                     {
@@ -112,7 +112,7 @@ public partial class MainView : UserControl
             {
                 Autonomous = true,
                 InIpa = ipaFile,
-                OutIpa = "Solace.ipa",
+                OutIpa = PlatformService.Current.GetDefaultOutputPath("Solace.ipa"),
                 DecodedDir = "IpaDecoded",
                 Protocol = viewModel.IosProtocol,
                 Hostname = viewModel.IosHostname,
@@ -144,7 +144,9 @@ public partial class MainView : UserControl
                 ipaOptions.XboxLiveHostname = viewModel.IosXboxLiveHostname;
             }
 
-            MainWindow.Instance.Patch(ipaOptions);
+            PatchView view = new PatchView();
+            view.Patch(ipaOptions);
+            App.NavigateTo(view);
             return;
         }
 
@@ -166,14 +168,11 @@ public partial class MainView : UserControl
         {
             if (!Core.ApkProcessor.VerifyApkHash(fs))
             {
-                var dialog = MessageBoxManager.GetMessageBoxStandard(
-                    title: "Warning",
-                    text: "The .apk file hash does not match. Patching may fail. Do you want to continue?",
-                    @enum: MsBox.Avalonia.Enums.ButtonEnum.YesNo,
-                    icon: MsBox.Avalonia.Enums.Icon.Error,
-                    windowStartupLocation: WindowStartupLocation.CenterOwner);
-
-                var result = await dialog.ShowWindowDialogAsync(MainWindow.Instance);
+                var result = await U.ShowDialogAsync(
+                    "Warning",
+                    "The .apk file hash does not match. Patching may fail. Do you want to continue?",
+                    MsBox.Avalonia.Enums.Icon.Error,
+                    MsBox.Avalonia.Enums.ButtonEnum.YesNo);
 
                 if (result is MsBox.Avalonia.Enums.ButtonResult.No)
                 {
@@ -196,14 +195,11 @@ public partial class MainView : UserControl
             {
                 if (!Core.ApkProcessor.VerifyResourcePackHash(fs))
                 {
-                    var dialog = MessageBoxManager.GetMessageBoxStandard(
-                        title: "Warning",
-                        text: "The resource pack file hash does not match. Game may not function correctly. Do you want to continue?",
-                        @enum: MsBox.Avalonia.Enums.ButtonEnum.YesNo,
-                        icon: MsBox.Avalonia.Enums.Icon.Error,
-                        windowStartupLocation: WindowStartupLocation.CenterOwner);
-
-                    var result = await dialog.ShowWindowDialogAsync(MainWindow.Instance);
+                    var result = await U.ShowDialogAsync(
+                        "Warning",
+                        "The resource pack file hash does not match. Game may not function correctly. Do you want to continue?",
+                        MsBox.Avalonia.Enums.Icon.Error,
+                        MsBox.Avalonia.Enums.ButtonEnum.YesNo);
 
                     if (result is MsBox.Avalonia.Enums.ButtonResult.No)
                     {
@@ -245,14 +241,11 @@ public partial class MainView : UserControl
 
         if (string.IsNullOrEmpty(resourcePackFile))
         {
-            var dialog = MessageBoxManager.GetMessageBoxStandard(
-                   title: "Info",
-                   text: "Resource Pack file not selected. Do you want to continue?",
-                   @enum: MsBox.Avalonia.Enums.ButtonEnum.YesNo,
-                   icon: MsBox.Avalonia.Enums.Icon.Info,
-                   windowStartupLocation: WindowStartupLocation.CenterOwner);
-
-            var result = await dialog.ShowWindowDialogAsync(MainWindow.Instance);
+            var result = await U.ShowDialogAsync(
+                "Info",
+                "Resource Pack file not selected. Do you want to continue?",
+                MsBox.Avalonia.Enums.Icon.Info,
+                MsBox.Avalonia.Enums.ButtonEnum.YesNo);
 
             if (result is MsBox.Avalonia.Enums.ButtonResult.No)
             {
@@ -260,17 +253,19 @@ public partial class MainView : UserControl
             }
         }
 
-        MainWindow.Instance.Patch(new Core.ApkProcessor.Options()
+        var apkView = new PatchView();
+        apkView.Patch(new Core.ApkProcessor.Options()
         {
             NonInteractive = true,
             InApk = apkFile,
-            OutApk = "Solace.apk",
+            OutApk = PlatformService.Current.GetDefaultOutputPath("Solace.apk"),
             ResourcePack = resourcePackFile,
             DecodedDir = Path.Combine("tmp", "apk"),
             AndroidOSVersion = viewModel.AndroidVersion.Value,
             Patches = viewModel.GetPatches(),
             Variables = viewModel.GetVariables(),
         });
+        App.NavigateTo(apkView);
     }
 
     public async void PickApkFile(object sender, RoutedEventArgs args)
@@ -288,14 +283,9 @@ public partial class MainView : UserControl
             } ],
         });
 
-        IStorageFile? file;
-        string? filePath = files is not null && (file = files.FirstOrDefault()) is not null
-            ? file.Path.LocalPath
-            : null;
-
         if (DataContext is MainViewModel viewModel)
         {
-            viewModel.ApkFile = filePath;
+            viewModel.ApkFile = await GetFilePathAsync(files?.FirstOrDefault());
         }
     }
 
@@ -314,14 +304,9 @@ public partial class MainView : UserControl
             } ],
         });
 
-        IStorageFile? file;
-        string? filePath = files is not null && (file = files.FirstOrDefault()) is not null
-            ? file.Path.LocalPath
-            : null;
-
         if (DataContext is MainViewModel viewModel)
         {
-            viewModel.ResourcePackFile = filePath;
+            viewModel.ResourcePackFile = await GetFilePathAsync(files?.FirstOrDefault());
         }
     }
 
@@ -339,15 +324,27 @@ public partial class MainView : UserControl
             } ],
         });
 
-        IStorageFile? file;
-        string? filePath = files is not null && (file = files.FirstOrDefault()) is not null
-            ? file.Path.LocalPath
-            : null;
-
         if (DataContext is MainViewModel viewModel)
         {
-            viewModel.IpaFile = filePath;
+            viewModel.IpaFile = await GetFilePathAsync(files?.FirstOrDefault());
         }
+    }
+
+    private static async Task<string?> GetFilePathAsync(IStorageFile? file)
+    {
+        if (file is null) return null;
+
+        string? path = file.TryGetLocalPath();
+        if (path is not null && File.Exists(path))
+        {
+            return path;
+        }
+
+        var tempFile = Path.Combine(Path.GetTempPath(), file.Name);
+        await using var src = await file.OpenReadAsync();
+        await using var dst = File.Create(tempFile);
+        await src.CopyToAsync(dst);
+        return tempFile;
     }
 
     public void SelectAndroid(object sender, RoutedEventArgs args)

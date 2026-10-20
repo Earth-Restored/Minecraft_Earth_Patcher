@@ -7,9 +7,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 
+using MCEPatcher.UI.Services;
+
 namespace MCEPatcher.UI.Views;
 
-public partial class PatchView : UserControl
+public sealed partial class PatchView : UserControl
 {
     public PatchView()
     {
@@ -30,17 +32,27 @@ public partial class PatchView : UserControl
 
     public void Back(object sender, RoutedEventArgs args)
     {
-        MainWindow.Instance.OpenMainView();
+        App.NavigateTo(new MainView());
+    }
+
+    public async void InstallPatchedAPK(object sender, RoutedEventArgs args)
+    {
+        if (DataContext is PatchViewModel model && !string.IsNullOrEmpty(model.OutputFilePath))
+        {
+            await PlatformService.Current.InstallApkAsync(model.OutputFilePath);
+        }
     }
 
     public void OpenPatchedAPKLocation(object sender, RoutedEventArgs args)
     {
-        OpenFileLocation(Path.GetFullPath("Solace.apk"));
+        string path = (DataContext as PatchViewModel)?.OutputFilePath ?? Path.GetFullPath("Solace.apk");
+        OpenFileLocation(path);
     }
 
     public void OpenPatchedIPALocation(object sender, RoutedEventArgs args)
     {
-        OpenFileLocation(Path.GetFullPath("Solace.ipa"));
+        string path = (DataContext as PatchViewModel)?.OutputFilePath ?? Path.GetFullPath("Solace.ipa");
+        OpenFileLocation(path);
     }
 
     private static void OpenFileLocation(string filePath)

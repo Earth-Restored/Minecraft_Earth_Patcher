@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -9,9 +9,11 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
+using MCEPatcher.UI.Services;
+
 namespace MCEPatcher.UI.ViewModels;
 
-public class PatchViewModel : ViewModelBase
+public sealed class PatchViewModel : ViewModelBase
 {
     private ScrollViewer scrollViewer;
     private StackPanel panel;
@@ -31,6 +33,20 @@ public class PatchViewModel : ViewModelBase
     {
         get => isIpa;
         set => this.RaiseAndSetIfChanged(ref isIpa, value);
+    }
+
+    private bool canInstallApk;
+    public bool CanInstallApk
+    {
+        get => canInstallApk;
+        set => this.RaiseAndSetIfChanged(ref canInstallApk, value);
+    }
+
+    private bool isApkLocationVisible;
+    public bool IsApkLocationVisible
+    {
+        get => isApkLocationVisible;
+        set => this.RaiseAndSetIfChanged(ref isApkLocationVisible, value);
     }
 
     public void Start(ApkProcessor.Options options, ScrollViewer _scrollViewer, StackPanel _panel, Grid finishedContainer)
@@ -53,12 +69,16 @@ public class PatchViewModel : ViewModelBase
             OutputFilePath = Path.GetFullPath(apkOpts.OutApk);
             IsApk = true;
             IsIpa = false;
+            CanInstallApk = PlatformService.Current.CanInstallApk;
+            IsApkLocationVisible = !PlatformService.Current.CanInstallApk;
         }
         else if (options is IpaProcessor.Options ipaOpts)
         {
             OutputFilePath = Path.GetFullPath(ipaOpts.OutIpa);
             IsApk = false;
             IsIpa = true;
+            CanInstallApk = false;
+            IsApkLocationVisible = false;
         }
 
         App.OnLogWritten += onLogWritten;
@@ -86,6 +106,8 @@ public class PatchViewModel : ViewModelBase
                 scrollViewer.ScrollToEnd();
                 if (!patchResult)
                 {
+                    CanInstallApk = false;
+                    IsApkLocationVisible = false;
                     for (int i = 1; i < finishedContainer.Children.Count; i++)
                         finishedContainer.Children[i].IsVisible = false;
                 }

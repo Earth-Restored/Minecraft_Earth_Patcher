@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using MCEPatcher.UI.Views;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -21,6 +21,16 @@ internal static class U
 
     public static async Task ShowError(string message)
     {
-        await MessageBoxManager.GetMessageBoxStandard("Error", message, icon: Icon.Error, windowStartupLocation: WindowStartupLocation.CenterOwner).ShowWindowDialogAsync(MainWindow.Instance);
+        await ShowDialogAsync("Error", message, Icon.Error);
+    }
+
+    public static async Task<ButtonResult> ShowDialogAsync(string title, string message, Icon icon = Icon.None, ButtonEnum buttonEnum = ButtonEnum.Ok)
+    {
+        var box = MessageBoxManager.GetMessageBoxStandard(title, message, @enum: buttonEnum, icon: icon, windowStartupLocation: WindowStartupLocation.CenterOwner);
+        if (MainWindow.Instance is not null)
+        {
+            return await box.ShowWindowDialogAsync(MainWindow.Instance);
+        }
+        return await box.ShowAsync();
     }
 }

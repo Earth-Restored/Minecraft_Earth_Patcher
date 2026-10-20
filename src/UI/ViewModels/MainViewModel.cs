@@ -1,4 +1,5 @@
-﻿using MCEPatcher.UI.Models;
+using MCEPatcher.UI.Models;
+using MCEPatcher.UI.Services;
 using MCEPatcher.UI.Utils;
 using ReactiveUI;
 using System.Collections.Generic;
@@ -465,6 +466,7 @@ public sealed class MainViewModel : ViewModelBase
 
     public MainViewModel()
     {
+        AndroidVersion = PlatformService.Current.GetDefaultAndroidVersion() ?? 14;
         ChangeLocatorAddress = true;
         LocatorProtocol = (int)ProtocolEnum.Http;
         LocatorHostname = "";
