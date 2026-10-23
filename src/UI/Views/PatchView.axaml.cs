@@ -20,6 +20,16 @@ public sealed partial class PatchView : UserControl
         DataContext = model;
     }
 
+    public PatchView(ApkProcessor.Options options) : this()
+    {
+        Patch(options);
+    }
+
+    public PatchView(IpaProcessor.Options options) : this()
+    {
+        Patch(options);
+    }
+
     public void Patch(ApkProcessor.Options options)
     {
         (DataContext as PatchViewModel)?.Start(options, scrollViewer, chat, finishedContainer);
@@ -32,7 +42,7 @@ public sealed partial class PatchView : UserControl
 
     public void Back(object sender, RoutedEventArgs args)
     {
-        App.NavigateTo(new MainView());
+        App.NavigateBack();
     }
 
     public async void InstallPatchedAPK(object sender, RoutedEventArgs args)

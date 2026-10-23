@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace MCEPatcher.Core;
@@ -13,7 +13,7 @@ public static class APK
         Process process;
         if (OperatingSystem.IsWindows() && File.Exists(FileNameBat))
         {
-            process = U.Run(Path.GetFullPath(FileNameBat), Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            process = ProcessRunner.Run(Path.GetFullPath(FileNameBat), Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
             [
                 "d",
                 "-f",
@@ -23,7 +23,7 @@ public static class APK
         }
         else
         {
-            process = U.Run("java", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            process = ProcessRunner.Run("java", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
             [
                 "-jar", $"\"{Path.GetFullPath(FileName)}\"",
                 "d",
@@ -50,7 +50,7 @@ public static class APK
         Process process;
         if (OperatingSystem.IsWindows() && File.Exists(FileNameBat))
         {
-            process = U.Run(Path.GetFullPath(FileNameBat), Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            process = ProcessRunner.Run(Path.GetFullPath(FileNameBat), Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
             [
                 "b",
                 "-f",
@@ -60,7 +60,7 @@ public static class APK
         }
         else
         {
-            process = U.Run("java", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            process = ProcessRunner.Run("java", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
             [
                 "-jar", $"\"{Path.GetFullPath(FileName)}\"",
                 "b",

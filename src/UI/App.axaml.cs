@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using MCEPatcher.UI.Utils;
@@ -6,9 +7,8 @@ using MCEPatcher.UI.ViewModels;
 using MCEPatcher.UI.Views;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Text;
-
-using Avalonia.Controls;
 
 namespace MCEPatcher.UI;
 
@@ -52,37 +52,72 @@ public sealed partial class App : Application
         AvaloniaXamlLoader.Load(this);
     }
 
+    private static readonly Stack<Control> s_backStack = new();
+    private static ContentControl? s_rootContentControl;
+
     public override void OnFrameworkInitializationCompleted()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = new MainViewModel()
-            };
+            desktop.MainWindow = new MainWindow();
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
-            singleViewPlatform.MainView = new MainView
+            s_rootContentControl = new ContentControl
             {
-                DataContext = new MainViewModel()
+                Content = new MainView()
             };
+            singleViewPlatform.MainView = s_rootContentControl;
         }
 
         base.OnFrameworkInitializationCompleted();
     }
 
-    public static void NavigateTo(Control view)
+    public static void NavigateTo(Control view, bool rememberInBackStack = true)
     {
+        Control? current = null;
         if (Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow is not null)
         {
-            ((desktop.MainWindow.Content as UserControl)?.DataContext as ViewModelBase)?.OnClose();
+            current = desktop.MainWindow.Content as Control;
+            ((current as UserControl)?.DataContext as ViewModelBase)?.OnClose();
             desktop.MainWindow.Content = view;
         }
-        else if (Current?.ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
+        else if (s_rootContentControl is not null)
         {
-            ((singleViewPlatform.MainView as UserControl)?.DataContext as ViewModelBase)?.OnClose();
-            singleViewPlatform.MainView = view;
+            current = s_rootContentControl.Content as Control;
+            ((current as UserControl)?.DataContext as ViewModelBase)?.OnClose();
+            s_rootContentControl.Content = view;
         }
+
+        if (rememberInBackStack && current is not null)
+        {
+            s_backStack.Push(current);
+        }
+    }
+
+    public static void NavigateBack()
+    {
+        if (s_backStack.TryPop(out var previousView))
+        {
+            s_backStack.Clear();
+            NavigateTo(previousView, rememberInBackStack: false);
+        }
+        else
+        {
+            NavigateTo(new MainView(), rememberInBackStack: false);
+        }
+    }
+
+    public static Avalonia.Platform.Storage.IStorageProvider? GetStorageProvider()
+    {
+        if (Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            return desktop.MainWindow?.StorageProvider;
+        }
+        if (Current?.ApplicationLifetime is ISingleViewApplicationLifetime singleView)
+        {
+            return TopLevel.GetTopLevel(singleView.MainView)?.StorageProvider;
+        }
+        return null;
     }
 }

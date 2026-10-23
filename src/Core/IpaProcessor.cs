@@ -156,7 +156,7 @@ public static class IpaProcessor
             Log.Information("Patching service endpoints");
             PatchServiceEndpoints(exePath,
                 options.Protocol == 0 ? "http" : "https",
-                options.Hostname?.Trim()?.ToLowerInvariant(),
+                options.Hostname?.Trim()?.ToLowerInvariant() ?? "",
                 options.ChangeXboxLiveAddress,
                 options.ChangeXboxABAddress,
                 options.ChangePlayfabApiAddress,

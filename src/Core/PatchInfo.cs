@@ -48,7 +48,7 @@ public sealed class PatchInfo
             catch (Exception ex)
             {
                 Log.Fatal($"Couldn't deserialize info for patch '{name}', ex: {ex}");
-                U.PAKE();
+                ConsoleHelper.PAKE();
                 Environment.Exit(1);
                 return null;
             }

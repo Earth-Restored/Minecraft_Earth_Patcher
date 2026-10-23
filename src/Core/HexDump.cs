@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace MCEPatcher.Core;
 
@@ -86,7 +86,7 @@ public static class HexDump
 
     public static byte[] Undo(string hexdump)
     {
-        var newLine = U.GetNewLine(hexdump);
+        var newLine = StringExtensions.GetNewLine(hexdump);
         var lines = hexdump.Split(newLine);
 
         var bytes = new byte[(lines.Length - 3) * BytesPerLine];

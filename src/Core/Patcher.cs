@@ -161,7 +161,7 @@ public sealed class Patcher
 
     private void Patch(string patch, string patchName, Dictionary<string, string>? variables = null)
     {
-        var newLine = U.GetNewLine(patch);
+        var newLine = StringExtensions.GetNewLine(patch);
         var filesToPatch = Parse(patch);
 
         if (variables is not null && variables.Count is not 0)
@@ -173,7 +173,7 @@ public sealed class Patcher
 
             foreach (var filePatch in textPatches)
             {
-                string str = U.ToString(filePatch);
+                string str = DiffExtensions.ToString(filePatch);
 
                 foreach (var item in variables)
                 {
@@ -187,7 +187,7 @@ public sealed class Patcher
 
             foreach (var filePatch in hexPatches)
             {
-                sb.Append(U.ToString(filePatch));
+                sb.Append(DiffExtensions.ToString(filePatch));
             }
 
             filesToPatch = Parse(sb.ToString());

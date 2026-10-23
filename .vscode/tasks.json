@@ -1,0 +1,35 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/MCEPatcher.sln",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Run Android",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "-t:Run",
+        "${workspaceFolder}/src/UI.Android/MCEPatcher.UI.Android.csproj"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": "build"
+    },
+    {
+      "label": "Start Emulator",
+      "type": "shell",
+      "command": "emulator -avd Pixel_API_35 -no-metrics &",
+      "problemMatcher": []
+    }
+  ]
+}

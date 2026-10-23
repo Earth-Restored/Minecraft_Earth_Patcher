@@ -15,9 +15,10 @@ namespace MCEPatcher.UI.ViewModels;
 
 public sealed class PatchViewModel : ViewModelBase
 {
-    private ScrollViewer scrollViewer;
-    private StackPanel panel;
+    private ScrollViewer scrollViewer = null!;
+    private StackPanel panel = null!;
     private bool patchResult;
+    private readonly System.Threading.CancellationTokenSource _cts = new();
 
     public string? OutputFilePath { get; set; }
 
@@ -64,6 +65,11 @@ public sealed class PatchViewModel : ViewModelBase
         scrollViewer = _scrollViewer;
         panel = _panel;
 
+        panel.Children.Clear();
+        scrollViewer.ScrollToHome();
+        finishedContainer.IsVisible = false;
+        patchResult = false;
+
         if (options is ApkProcessor.Options apkOpts)
         {
             OutputFilePath = Path.GetFullPath(apkOpts.OutApk);
@@ -100,8 +106,12 @@ public sealed class PatchViewModel : ViewModelBase
         });
         task.ContinueWith(t =>
         {
-            Dispatcher.UIThread.Invoke(() =>
+            if (_cts.IsCancellationRequested) return;
+
+            Dispatcher.UIThread.Post(() =>
             {
+                if (_cts.IsCancellationRequested) return;
+
                 finishedContainer.IsVisible = true;
                 scrollViewer.ScrollToEnd();
                 if (!patchResult)
@@ -117,8 +127,12 @@ public sealed class PatchViewModel : ViewModelBase
 
     private void onLogWritten(string? text)
     {
-        Dispatcher.UIThread.Invoke(() =>
+        if (_cts.IsCancellationRequested) return;
+
+        Dispatcher.UIThread.Post(() =>
         {
+            if (_cts.IsCancellationRequested) return;
+
             SelectableTextBlock block = new SelectableTextBlock()
             {
                 Text = text,
@@ -132,6 +146,7 @@ public sealed class PatchViewModel : ViewModelBase
 
     public override void OnClose()
     {
+        _cts.Cancel();
         App.OnLogWritten -= onLogWritten;
     }
 }

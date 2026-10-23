@@ -1,0 +1,149 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:vm="clr-namespace:MCEPatcher.UI.ViewModels"
+	mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
+	x:Class="MCEPatcher.UI.Views.IosPatchOptionsView"
+	x:DataType="vm:IosPatchOptionsViewModel">
+
+	<ScrollViewer AllowAutoHide="False">
+		<StackPanel VerticalAlignment="Top" Margin="0 0 0 60">
+			<Grid HorizontalAlignment="Center" Margin="0 0 0 15">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+				</Grid.ColumnDefinitions>
+				<TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding IpaFile}" Margin="0, 0, 10, 0"/>
+				<Button Grid.Column="1" Command="{Binding PickIpaCommand}">Select</Button>
+			</Grid>
+
+			<ToggleSwitch IsChecked="{Binding IsSimpleMode}" OffContent="Custom Mode" OnContent="Simple Mode" HorizontalAlignment="Center" Margin="0 0 0 15"/>
+
+			<StackPanel IsVisible="{Binding IsSimpleMode}">
+				<Border BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="350">
+					<StackPanel HorizontalAlignment="Center" Margin="10">
+						<Grid HorizontalAlignment="Center" Margin="0 0 0 10">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<Label Grid.Column="0" VerticalAlignment="Center">Locator Protocol:</Label>
+							<ComboBox Grid.Column="1" SelectedIndex="{Binding LocatorProtocol}">
+								<ComboBoxItem>Http</ComboBoxItem>
+								<TextBlock FontSize="1">
+									<Run FontSize="14">Http</Run>
+									<Run FontSize="14" FontWeight="Bold">s</Run>
+								</TextBlock>
+							</ComboBox>
+						</Grid>
+						<Grid HorizontalAlignment="Center">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<Label Grid.Column="0" VerticalAlignment="Center">Locator Address:</Label>
+							<TextBox Text="{Binding LocatorHostname}" Grid.Column="1" PlaceholderText="192.168.x.x:x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
+						</Grid>
+					</StackPanel>
+				</Border>
+			</StackPanel>
+
+			<StackPanel IsVisible="{Binding !IsSimpleMode}">
+				<Grid HorizontalAlignment="Center">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+					</Grid.ColumnDefinitions>
+					<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">Change locator address</Label>
+					<ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangeLocatorAddress}" OffContent="No" OnContent="Yes"></ToggleSwitch>
+				</Grid>
+
+				<Border IsVisible="{Binding ChangeLocatorAddress}" BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="350">
+					<StackPanel HorizontalAlignment="Center" Margin="10">
+						<Grid HorizontalAlignment="Center" Margin="0 0 0 10">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<Label Grid.Column="0" VerticalAlignment="Center">Protocol:</Label>
+							<ComboBox Grid.Column="1" SelectedIndex="{Binding LocatorProtocol}">
+								<ComboBoxItem>Http</ComboBoxItem>
+								<TextBlock FontSize="1">
+									<Run FontSize="14">Http</Run>
+									<Run FontSize="14" FontWeight="Bold">s</Run>
+								</TextBlock>
+							</ComboBox>
+						</Grid>
+						<Grid HorizontalAlignment="Center">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<Label Grid.Column="0" VerticalAlignment="Center">Hostname/IP:</Label>
+							<TextBox Text="{Binding LocatorHostname}" Grid.Column="1" PlaceholderText="192.168.x.x:x" MaxLength="100" TextWrapping="Wrap" MaxWidth="200"/>
+						</Grid>
+					</StackPanel>
+				</Border>
+
+				<Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5" IsVisible="{Binding !ChangeLocatorAddress}"/>
+
+				<Grid HorizontalAlignment="Center">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+					</Grid.ColumnDefinitions>
+					<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">Disable sunset time check</Label>
+					<ToggleSwitch Grid.Column="1" IsChecked="{Binding DisableSunsetTimeCheck}" OffContent="No" OnContent="Yes"></ToggleSwitch>
+				</Grid>
+
+				<Grid HorizontalAlignment="Center">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+					</Grid.ColumnDefinitions>
+					<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">Change app name</Label>
+					<ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangeAppName}" OffContent="No" OnContent="Yes"></ToggleSwitch>
+				</Grid>
+
+				<Border IsVisible="{Binding ChangeAppName}" BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="350">
+					<StackPanel HorizontalAlignment="Center" Margin="10">
+						<Grid HorizontalAlignment="Center">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<Label Grid.Column="0" VerticalAlignment="Center">App name:</Label>
+							<TextBox Text="{Binding AppName}" Grid.Column="1" PlaceholderText="Solace" MaxLength="50" TextWrapping="Wrap" MaxWidth="200"/>
+						</Grid>
+					</StackPanel>
+				</Border>
+
+				<Rectangle Width="350" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5" IsVisible="{Binding !ChangeAppName}"/>
+
+				<Grid HorizontalAlignment="Center">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+					</Grid.ColumnDefinitions>
+					<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">Remove DRM and code signature</Label>
+					<ToggleSwitch Grid.Column="1" IsChecked="{Binding RemoveDrm}" OffContent="No" OnContent="Yes"></ToggleSwitch>
+				</Grid>
+
+				<Border BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Width="370" Padding="10" Margin="0 10 0 0">
+					<StackPanel HorizontalAlignment="Center">
+						<TextBlock Text="Gameplay (Experimental)" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Margin="0 0 0 5"/>
+						<Grid HorizontalAlignment="Center">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<Label Grid.Column="0" VerticalAlignment="Center" Margin="10">Disable moving-too-fast speed limit</Label>
+							<ToggleSwitch Grid.Column="1" IsChecked="{Binding DisableSpeedLimit}" OffContent="No" OnContent="Yes"></ToggleSwitch>
+						</Grid>
+					</StackPanel>
+				</Border>
+			</StackPanel>
+		</StackPanel>
+	</ScrollViewer>
+</UserControl>

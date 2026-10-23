@@ -12,18 +12,6 @@
     <application
         android:label="Minecraft Earth Patcher"
         android:requestLegacyExternalStorage="true">
-        <activity
-            android:name=".MainActivity"
-            android:label="Minecraft Earth Patcher"
-            android:configChanges="orientation|screenSize|uiMode"
-            android:exported="true"
-            android:launchMode="singleTop">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

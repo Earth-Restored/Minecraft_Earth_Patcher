@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace MCEPatcher.Core;
 
@@ -8,7 +8,7 @@ public static class Signer
 
     public static bool Sign(FileInfo apkFile, DirectoryInfo outDir)
     {
-        Process process = U.Run("java", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+        Process process = ProcessRunner.Run("java", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
         [
             "-jar", $"\"{Path.GetFullPath(FileName)}\"",
             "-a", $"\"{apkFile.FullName}\"",
