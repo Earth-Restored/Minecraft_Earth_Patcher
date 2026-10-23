@@ -3,9 +3,7 @@ param (
     [ValidateSet('Debug', 'Release')]
     [string]$config = 'Release',
 
-    [string[]]$frameworks = @('win-x64', 'win-arm64', 'linux-x64', 'linux-arm64', 'osx-x64', 'osx-arm64'),
-
-    [bool]$publishCli = $false
+    [string[]]$frameworks = @('win-x64', 'win-arm64', 'linux-x64', 'linux-arm64', 'osx-x64', 'osx-arm64')
 )
 
 $ErrorActionPreference = 'Stop'
@@ -36,10 +34,6 @@ else {
 $projects = @(
     @{ Name = "UI.Desktop"; DisplayName = "MCEPatcher_UI" }
 )
-
-if ($publishCli) {
-    $projects += @{ Name = "Cli"; DisplayName = "MCEPatcher_CLI" }
-}
 
 # Create output directory
 $outDir = Join-Path $scriptRoot "build/$config"

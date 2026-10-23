@@ -1,5 +1,4 @@
 <Solution>
-  <Project Path="src/Cli/MCEPatcher.Cli.csproj" />
   <Project Path="src/Core/MCEPatcher.Core.csproj" />
   <Project Path="src/UI.Android/MCEPatcher.UI.Android.csproj" />
   <Project Path="src/UI.Desktop/MCEPatcher.UI.Desktop.csproj" />
