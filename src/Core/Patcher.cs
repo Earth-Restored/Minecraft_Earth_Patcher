@@ -146,14 +146,14 @@ public sealed class Patcher
             return;
         }
 
-        string path = Path.Combine(patchesLoation, $"{patchName}.patch");
-        if (!File.Exists(path))
+        string? patchContent = PatchResourceLoader.TryGetPatchContent(patchesLoation, patchName);
+        if (patchContent is null)
         {
-            throw new FileNotFoundException($"Patch '{patchName}' doesn't exist");
+            throw new FileNotFoundException($"Patch '{patchName}' doesn't exist at '{Path.Combine(patchesLoation, $"{patchName}.patch")}' or as an embedded resource");
         }
 
         Log.Information($"Applying patch '{patchName}'");
-        Patch(File.ReadAllText(path), patchName, context.Variables.Where(variable => info.VariablesUsed.Contains(variable.Key)).ToDictionary(item => item.Key, item => item.Value));
+        Patch(patchContent, patchName, context.Variables.Where(variable => info.VariablesUsed.Contains(variable.Key)).ToDictionary(item => item.Key, item => item.Value));
         Log.Debug($"Done");
 
         context.AppliedPatches.Add(patchName, info);
