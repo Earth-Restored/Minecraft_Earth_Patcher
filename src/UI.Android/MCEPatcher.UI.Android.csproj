@@ -10,6 +10,12 @@
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <RuntimeIdentifiers>android-arm64</RuntimeIdentifiers>
+    <AndroidLinkTool>r8</AndroidLinkTool>
+    <TrimMode>full</TrimMode>
+  </PropertyGroup>
+
   <ItemGroup>
     <AndroidResource Include="Icon.png">
       <Link>Resources\drawable\Icon.png</Link>

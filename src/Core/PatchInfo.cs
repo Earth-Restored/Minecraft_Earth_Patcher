@@ -39,7 +39,7 @@ public sealed class PatchInfo
         {
             try
             {
-                patch = JsonSerializer.Deserialize<PatchInfo>(json);
+                patch = JsonSerializer.Deserialize(json, CoreJsonSerializerContext.Default.PatchInfo);
                 if (patch is null)
                 {
                     throw new JsonException("Json is null");

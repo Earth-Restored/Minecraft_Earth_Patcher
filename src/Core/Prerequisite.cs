@@ -1,9 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace MCEPatcher.Core;
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
+[JsonConverter(typeof(JsonStringEnumConverter<PrerequisiteType>))]
 public enum PrerequisiteType
 {
     Basic,
@@ -111,7 +111,7 @@ public sealed class ConditionalPrerequisite : Prerequisite
         return false;
     }
 
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter<EqualityType>))]
     public enum EqualityType
     {
         Equal,

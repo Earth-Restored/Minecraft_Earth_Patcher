@@ -8,10 +8,6 @@ namespace MCEPatcher.Core;
 
 internal static class ResourcePackPatcher
 {
-    private static readonly JsonSerializerOptions jsonOptions = new JsonSerializerOptions
-    {
-        WriteIndented = true,
-    };
 
     public static async Task<bool> Patch(ApkProcessor.Options options)
     {
@@ -86,7 +82,7 @@ internal static class ResourcePackPatcher
 
             File.WriteAllText(
                 (resourcePackRoot / "ui" / "_ui_defs.json").Value,
-                JsonSerializer.Serialize(new { ui_defs = contents.Order(), }, jsonOptions),
+                JsonSerializer.Serialize(new Dictionary<string, IEnumerable<string>> { { "ui_defs", contents.Order() } }, CoreJsonSerializerContext.Default.DictionaryStringIEnumerableString),
                 Encoding.UTF8);
 
             Log.Debug("Done");
@@ -120,7 +116,7 @@ internal static class ResourcePackPatcher
 
             File.WriteAllText(
                 (resourcePackRoot / "textures" / "textures_list.json").Value,
-                JsonSerializer.Serialize(contents, jsonOptions),
+                JsonSerializer.Serialize(contents, CoreJsonSerializerContext.Default.HashSetString),
                 Encoding.UTF8);
 
             Log.Debug("Done");
@@ -146,7 +142,7 @@ internal static class ResourcePackPatcher
 
             File.WriteAllText(
                 (resourcePackRoot / "contents.json").Value,
-                JsonSerializer.Serialize(new { content = contents2.OrderBy(item => item.First().Key), }, jsonOptions),
+                JsonSerializer.Serialize(new Dictionary<string, IEnumerable<Dictionary<string, string>>> { { "content", contents2.OrderBy(item => item.First().Key) } }, CoreJsonSerializerContext.Default.DictionaryStringIEnumerableDictionaryStringString),
                 Encoding.UTF8);
 
             Log.Debug("Done");
