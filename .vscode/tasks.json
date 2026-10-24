@@ -7,7 +7,7 @@
       "type": "process",
       "args": [
         "build",
-        "${workspaceFolder}/MCEPatcher.sln",
+        "${workspaceFolder}/MCEPatcher.slnx",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],
@@ -24,6 +24,32 @@
       ],
       "problemMatcher": "$msCompile",
       "group": "build"
+    },
+    {
+      "label": "Run Android (x64)",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "-t:Run",
+        "-r",
+        "android-x64",
+        "${workspaceFolder}/src/UI.Android/MCEPatcher.UI.Android.csproj"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Run Android (arm64)",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "-t:Run",
+        "-r",
+        "android-arm64",
+        "${workspaceFolder}/src/UI.Android/MCEPatcher.UI.Android.csproj"
+      ],
+      "problemMatcher": "$msCompile"
     },
     {
       "label": "Start Emulator",

@@ -11,6 +11,8 @@
 
     <application
         android:label="Minecraft Earth Patcher"
+        android:icon="@drawable/icon"
+        android:extractNativeLibs="true"
         android:requestLegacyExternalStorage="true">
         <provider
             android:name="androidx.core.content.FileProvider"

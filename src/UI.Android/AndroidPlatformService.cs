@@ -80,9 +80,9 @@ public sealed class AndroidPlatformService : IPlatformService
 
             return Task.FromResult(true);
         }
-        catch (Exception ex)
+        catch (Exception exception)
         {
-            Serilog.Log.Error($"Failed to trigger APK install: {ex}");
+            Serilog.Log.Error($"Failed to trigger APK install: {exception}");
             return Task.FromResult(false);
         }
     }

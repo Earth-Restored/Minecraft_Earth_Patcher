@@ -1,0 +1,100 @@
+plugins {
+    id 'com.android.library' version '8.4.1'
+}
+
+android {
+    namespace 'com.github.earth_restored.mcepcatcher.bridge'
+    compileSdk 34
+
+    defaultConfig {
+        minSdk 26
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+    maven {
+        url "https://maven.andob.info/repository/open_source"
+        content {
+            includeGroup "ro.andob.androidawt"
+        }
+    }
+}
+
+dependencies {
+    implementation 'org.apktool:apktool-lib:3.0.3'
+    implementation 'com.android.tools.build:apksig:8.4.1'
+    implementation 'ro.andob.androidawt:androidawt:1.0.4'
+}
+
+tasks.register('extractFramework') {
+    dependsOn 'compileReleaseJavaWithJavac'
+    def outDir = project.file("build/intermediates/framework")
+    outputs.dir(outDir)
+    doLast {
+        outDir.mkdirs()
+        configurations.releaseRuntimeClasspath.each { file ->
+            if (file.name.contains('apktool-lib')) {
+                zipTree(file).matching { include 'prebuilt/android-framework.jar' }.each { fwJar ->
+                    project.copy {
+                        from fwJar
+                        into new File(outDir, "prebuilt")
+                        rename 'android-framework.jar', 'android-framework.dat'
+                    }
+                    project.copy {
+                        from fwJar
+                        into new File(outDir, "framework")
+                        rename 'android-framework.jar', '1.apk'
+                    }
+                }
+            }
+        }
+    }
+}
+
+tasks.register('fatJar', Jar) {
+    dependsOn 'compileReleaseJavaWithJavac'
+    dependsOn 'extractFramework'
+    archiveBaseName.set('android-bridge-fat')
+    archiveClassifier.set('')
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from "build/intermediates/javac/release/compileReleaseJavaWithJavac/classes"
+    from "src/main/resources"
+    from "build/intermediates/framework"
+
+    from {
+        configurations.releaseRuntimeClasspath.collect { file ->
+            if (file.name.endsWith('.aar')) {
+                zipTree(file).matching { include 'classes.jar' }.collect { zipTree(it) }
+            } else if (file.name.endsWith('.jar')) {
+                zipTree(file)
+            } else {
+                file
+            }
+        }
+    }
+
+    exclude 'prebuilt/windows/**'
+    exclude 'prebuilt/linux/**'
+    exclude 'prebuilt/macosx/**'
+    exclude 'META-INF/*.SF'
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
+    exclude 'META-INF/INDEX.LIST'
+    exclude 'com/google/common/util/concurrent/ListenableFuture*'
+    exclude 'com/google/common/util/concurrent/internal/**'
+    exclude 'org/jspecify/**'
+    exclude 'javax/annotation/**'
+    exclude 'org/xmlpull/**'
+    exclude 'org/json/**'
+}

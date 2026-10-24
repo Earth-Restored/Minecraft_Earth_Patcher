@@ -45,9 +45,9 @@ public sealed class PatchInfo
                     throw new JsonException("Json is null");
                 }
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Log.Fatal($"Couldn't deserialize info for patch '{name}', ex: {ex}");
+                Log.Fatal($"Couldn't deserialize info for patch '{name}', ex: {exception}");
                 ConsoleHelper.PAKE();
                 Environment.Exit(1);
                 return null;

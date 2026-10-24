@@ -98,9 +98,9 @@ public sealed class PatchViewModel : ViewModelBase
                 else if (options is IpaProcessor.Options ipaOpts2)
                     patchResult = await IpaProcessor.Run(ipaOpts2);
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Log.Error(ex.ToString());
+                Log.Error(exception.ToString());
                 patchResult = false;
             }
         });

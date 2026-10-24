@@ -1,20 +1,22 @@
 using DiffPatch.Data;
 using Serilog;
+using System.ComponentModel;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace MCEPatcher.Core;
 
-public sealed class Patcher
+public sealed partial class Patcher
 {
-    private string patchesLoation;
-    private string filesLocation;
+    private string _patchesLoation;
+    private string _filesLocation;
 
-    private readonly Dictionary<string, FileStream> binaryStreams = new();
+    private readonly Dictionary<string, FileStream> binaryStreams = [];
 
-    public Patcher(string _patchesLoation, string _filesLocation = "")
+    public Patcher(string patchesLoation, string filesLocation = "")
     {
-        patchesLoation = _patchesLoation;
-        filesLocation = _filesLocation;
+        _patchesLoation = patchesLoation;
+        _filesLocation = filesLocation;
     }
 
     private FileStream GetBinaryStream(string fullPath)
@@ -24,18 +26,19 @@ public sealed class Patcher
             stream = new FileStream(fullPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
             binaryStreams.Add(fullPath, stream);
         }
+
         return stream;
     }
 
     public void Patch(IEnumerable<string> patchesNames, Dictionary<string, string> variables, Dictionary<string, PatchInfo>? appliedPatches = null)
     {
-        var context = new PatchContext(appliedPatches ?? new(), variables);
+        var context = new PatchContext(appliedPatches ?? [], variables);
 
         try
         {
             PatchAll(patchesNames, context);
 
-            bool patchedVariables = false;
+            var patchedVariables = false;
 
             foreach (var (name, info) in context.AppliedPatches)
             {
@@ -49,34 +52,34 @@ public sealed class Patcher
 
                 foreach (var variable in info.BinaryVariables)
                 {
-                    var val = variable.TemplateString;
+                    var value = variable.TemplateString;
 
-                    foreach (var varName in info.VariablesUsed)
+                    foreach (var variableName in info.VariablesUsed)
                     {
-                        if (context.Variables.TryGetValue(varName, out string? value))
+                        if (context.Variables.TryGetValue(variableName, out string? variableValue))
                         {
-                            val = val.Replace($"${{{varName}}}", value.ToLowerInvariant());
+                            value = value.Replace($"${{{variableName}}}", variableValue.ToLowerInvariant());
                         }
                         else
                         {
-                            throw new Exception($"Variable '{varName}' doesn't exist");
+                            throw new Exception($"Variable '{variableName}' doesn't exist");
                         }
                     }
 
-                    var valBytes = Encoding.ASCII.GetBytes(val + "\0");
-                    var lengthBytes = BitConverter.GetBytes(valBytes.Length - 1);
+                    var valueBytes = Encoding.ASCII.GetBytes(value + "\0");
+                    var lengthBytes = BitConverter.GetBytes(valueBytes.Length - 1);
 
-                    if (valBytes.Length > 8 * 16 - 4)
+                    if (valueBytes.Length > 8 * 16 - 4)
                     {
-                        throw new Exception($"String '{val}' is too long, max length allowed is: {8 * 16 - 4}");
+                        throw new Exception($"String '{value}' is too long, max length allowed is: {8 * 16 - 4}");
                     }
 
-                    var file = Path.Combine(filesLocation, variable.File);
+                    var file = Path.Combine(_filesLocation, variable.File);
                     var stream = GetBinaryStream(file);
 
                     stream.Seek(variable.Address, SeekOrigin.Begin);
                     stream.Write(lengthBytes, 0, 4);
-                    stream.Write(valBytes, 0, valBytes.Length);
+                    stream.Write(valueBytes, 0, valueBytes.Length);
                 }
             }
             if (patchedVariables)
@@ -94,6 +97,7 @@ public sealed class Patcher
                     stream.Flush();
                     stream.Dispose();
                 }
+
                 binaryStreams.Clear();
                 Log.Debug("Done");
             }
@@ -125,10 +129,11 @@ public sealed class Patcher
             }
         }
 
-        if (patchName == ExtendLibgenoa.Name)
+        if (patchName is ExtendLibgenoa.Name)
         {
             Log.Information($"Applying patch '{patchName}'");
-            string libgenoaPath = Path.Combine(filesLocation, "lib", "arm64-v8a", "libgenoa.so");
+            var libgenoaPath = Path.Combine(_filesLocation, "lib", "arm64-v8a", "libgenoa.so");
+
             if (File.Exists(libgenoaPath))
             {
                 var stream = GetBinaryStream(libgenoaPath);
@@ -139,17 +144,18 @@ public sealed class Patcher
             }
             else
             {
-                ExtendLibgenoa.Extent(new DirectoryInfo(filesLocation));
+                ExtendLibgenoa.Extent(new DirectoryInfo(_filesLocation));
             }
+
             Log.Debug("Done");
             context.AppliedPatches.Add(patchName, info);
             return;
         }
 
-        string? patchContent = PatchResourceLoader.TryGetPatchContent(patchesLoation, patchName);
+        var patchContent = PatchResourceLoader.TryGetPatchContent(_patchesLoation, patchName);
         if (patchContent is null)
         {
-            throw new FileNotFoundException($"Patch '{patchName}' doesn't exist at '{Path.Combine(patchesLoation, $"{patchName}.patch")}' or as an embedded resource");
+            throw new FileNotFoundException($"Patch '{patchName}' doesn't exist at '{Path.Combine(_patchesLoation, $"{patchName}.patch")}' or as an embedded resource.");
         }
 
         Log.Information($"Applying patch '{patchName}'");
@@ -169,7 +175,7 @@ public sealed class Patcher
             var textPatches = filesToPatch.Where(filePatch => !filePatch.IsHex());
             var hexPatches = filesToPatch.Where(filePatch => filePatch.IsHex());
 
-            var sb = new StringBuilder();
+            var builder = new StringBuilder();
 
             foreach (var filePatch in textPatches)
             {
@@ -182,15 +188,15 @@ public sealed class Patcher
                     str = str.Replace($"${{{name}}}", value);
                 }
 
-                sb.Append(str);
+                builder.Append(str);
             }
 
             foreach (var filePatch in hexPatches)
             {
-                sb.Append(DiffExtensions.ToString(filePatch));
+                builder.Append(DiffExtensions.ToString(filePatch));
             }
 
-            filesToPatch = Parse(sb.ToString());
+            filesToPatch = Parse(builder.ToString());
         }
 
         foreach (var filePatch in filesToPatch)
@@ -212,7 +218,7 @@ public sealed class Patcher
             return;
         }
 
-        var file = new FileInfo(Path.Combine(filesLocation, patch.From));
+        var file = new FileInfo(Path.Combine(_filesLocation, patch.From));
 
         file.Directory?.Create();
 
@@ -221,11 +227,16 @@ public sealed class Patcher
             throw new IOException($"File '{file.FullName}' doesn't exist, it is used by patch '{patchName}'");
         }
 
-        List<string> lines = File.ReadAllLines(file.FullName).ToList();
+        var lines = File.ReadAllLines(file.FullName).ToList();
+
+        if (file.Extension.Equals(".xml", StringComparison.OrdinalIgnoreCase))
+        {
+            lines = NormalizeXmlLines(lines);
+        }
 
         foreach (var chunk in patch.Chunks)
         {
-            PatchChunk(chunk, lines);
+            PatchChunk(chunk, lines, patch.From);
         }
 
         File.WriteAllLines(file.FullName, lines);
@@ -233,8 +244,8 @@ public sealed class Patcher
 
     private void PatchHexDiff(FileDiff patch, string patchName)
     {
-        string relBinaryPath = patch.From.Substring(0, patch.From.LastIndexOf('.'));
-        string fullBinaryPath = Path.Combine(filesLocation, relBinaryPath);
+        var relativeBinaryPath = patch.From.Substring(0, patch.From.LastIndexOf('.'));
+        var fullBinaryPath = Path.Combine(_filesLocation, relativeBinaryPath);
 
         if (!File.Exists(fullBinaryPath))
         {
@@ -243,7 +254,7 @@ public sealed class Patcher
 
         var stream = GetBinaryStream(fullBinaryPath);
 
-        if (relBinaryPath.EndsWith("libgenoa.so") && !ExtendLibgenoa.IsExtended(stream))
+        if (relativeBinaryPath.EndsWith("libgenoa.so") && !ExtendLibgenoa.IsExtended(stream))
         {
             ExtendLibgenoa.Extend(stream);
         }
@@ -254,19 +265,19 @@ public sealed class Patcher
         {
             foreach (var change in chunk.Changes)
             {
-                if (change.Type != LineChangeType.Add)
+                if (change.Type is not LineChangeType.Add)
                 {
                     continue;
                 }
 
                 if (!TryParseHexDumpLine(change.Content, out long offset, lineBytes, out int bytesParsed))
                 {
-                    throw new InvalidDataException($"Failed to parse hexdump line in patch '{patchName}': {change.Content}");
+                    throw new InvalidDataException($"Failed to parse hexdump line in patch '{patchName}': {change.Content}.");
                 }
 
                 if (offset + bytesParsed > stream.Length)
                 {
-                    throw new InvalidDataException($"Hex patch offset 0x{offset:X} + {bytesParsed} is out of bounds for '{fullBinaryPath}' (size: {stream.Length}) in patch '{patchName}'");
+                    throw new InvalidDataException($"Hex patch offset 0x{offset:X} + {bytesParsed} is out of bounds for '{fullBinaryPath}' (size: {stream.Length}) in patch '{patchName}'.");
                 }
 
                 stream.Seek(offset, SeekOrigin.Begin);
@@ -291,58 +302,382 @@ public sealed class Patcher
         }
 
         // Group 1 (up to 8 bytes, starts at index 10)
-        for (int i = 0; i < 8; i++)
+        for (var i = 0; i < 8; i++)
         {
-            int idx = 10 + i * 3;
-            if (idx + 2 > line.Length) break;
+            var idx = 10 + i * 3;
+            if (idx + 2 > line.Length)
+            {
+                break;
+            }
+
             var span = line.AsSpan(idx, 2);
-            if (span[0] == ' ') break;
+            if (span[0] is ' ')
+            {
+                break;
+            }
+
             if (byte.TryParse(span, System.Globalization.NumberStyles.HexNumber, null, out byte b))
             {
                 outBuffer[bytesParsed++] = b;
             }
-            else break;
+            else
+            {
+                break;
+            }
         }
 
         // Group 2 (up to 8 bytes, starts at index 35)
-        for (int i = 0; i < 8; i++)
+        for (var i = 0; i < 8; i++)
         {
-            int idx = 35 + i * 3;
-            if (idx + 2 > line.Length) break;
+            var idx = 35 + i * 3;
+            if (idx + 2 > line.Length)
+            {
+                break;
+            }
+
             var span = line.AsSpan(idx, 2);
-            if (span[0] == ' ') break;
+            if (span[0] is ' ')
+            {
+                break;
+            }
+
             if (byte.TryParse(span, System.Globalization.NumberStyles.HexNumber, null, out byte b))
             {
                 outBuffer[bytesParsed++] = b;
             }
-            else break;
+            else
+            {
+                break;
+            }
         }
 
         return bytesParsed > 0;
     }
 
-    private void PatchChunk(Chunk chunk, List<string> lines)
+    private static List<string> NormalizeXmlLines(List<string> inputLines)
     {
-        ChunkRange range = chunk.RangeInfo.NewRange;
+        var result = new List<string>(inputLines.Count);
+        var builder = new StringBuilder();
+        var inTag = false;
 
-        int lineIndex = range.StartLine - 1;
+        foreach (var line in inputLines)
+        {
+            if (inTag)
+            {
+                builder.Append(' ').Append(line.Trim());
+                if (line.Contains('>'))
+                {
+                    inTag = false;
+                    result.Add(builder.ToString());
+                    builder.Clear();
+                }
+            }
+            else
+            {
+                var trimmed = line.Trim();
+                if (trimmed.StartsWith('<') && !trimmed.StartsWith("<!--") && !line.Contains('>'))
+                {
+                    inTag = true;
+                    builder.Append(line);
+                }
+                else
+                {
+                    result.Add(line);
+                }
+            }
+        }
+
+        if (builder.Length > 0)
+        {
+            result.Add(builder.ToString());
+        }
+
+        return result;
+    }
+
+    private void PatchChunk(Chunk chunk, List<string> lines, string filePath)
+    {
+        var beforeChanges = chunk.Changes.Where(c => c.Type is LineChangeType.Normal or LineChangeType.Delete).ToList();
+        var afterChanges = chunk.Changes.Where(c => c.Type is LineChangeType.Normal or LineChangeType.Add).ToList();
+
+        var beforeLines = beforeChanges.Select(c => c.Content.TrimEnd('\r', '\n')).ToList();
+        var afterLines = afterChanges.Select(c => c.Content.TrimEnd('\r', '\n')).ToList();
+
+        var originalStart = chunk.RangeInfo.OriginalRange.StartLine;
+        var targetStart = originalStart > 0 ? originalStart - 1 : 0;
+
+        // Check if chunk has already been applied
+        if (afterLines.Count > 0 && FindSequenceIndex(lines, targetStart, afterLines) != -1)
+        {
+            Log.Debug("Chunk at line {StartLine} in '{FilePath}' is already applied, skipping.", originalStart, filePath);
+            return;
+        }
+
+        if (beforeLines.Count is 0)
+        {
+            var insertIndex = Math.Clamp(targetStart, 0, lines.Count);
+
+            foreach (var change in chunk.Changes)
+            {
+                if (change.Type == LineChangeType.Add)
+                {
+                    lines.Insert(insertIndex++, change.Content.TrimEnd('\r', '\n'));
+                }
+            }
+
+            return;
+        }
+
+        var matchIndex = FindSequenceIndex(lines, targetStart, beforeLines);
+        if (matchIndex is -1)
+        {
+            var expectedPreview = string.Join("\n", beforeLines.Take(5));
+            var actualContextStart = Math.Max(0, targetStart - 2);
+            var actualContextCount = Math.Min(lines.Count - actualContextStart, 10);
+            var actualPreview = string.Join("\n", lines.Skip(actualContextStart).Take(actualContextCount));
+
+            throw new InvalidDataException($"""
+                Failed to apply patch chunk at original line {originalStart} for '{filePath}'.
+                Could not find expected context.\nExpected context:\n{expectedPreview}\n\nActual context around line {targetStart + 1}:\n{actualPreview}.
+                """);
+        }
+
+        var currentLine = matchIndex;
+
         foreach (var change in chunk.Changes)
         {
             switch (change.Type)
             {
                 case LineChangeType.Normal:
-                    lineIndex++;
+                    {
+                        if (!LineMatches(lines[currentLine], change.Content.TrimEnd('\r', '\n')))
+                        {
+                            throw new InvalidDataException($"Mismatch on context line at index {currentLine} in '{filePath}'. Expected '{change.Content.Trim()}', found '{lines[currentLine]}'.");
+                        }
+
+                        currentLine++;
+                    }
                     break;
-                case LineChangeType.Add:
-                    lines.Insert(lineIndex++, change.Content.Replace("\r", string.Empty).Replace("\n", string.Empty));
-                    break;
+
                 case LineChangeType.Delete:
-                    lines.RemoveAt(lineIndex);
+                    {
+                        if (!LineMatches(lines[currentLine], change.Content.TrimEnd('\r', '\n')))
+                        {
+                            throw new InvalidDataException($"Mismatch on line to delete at index {currentLine} in '{filePath}'. Expected '{change.Content.Trim()}', found '{lines[currentLine]}'.");
+                        }
+
+                        lines.RemoveAt(currentLine);
+                    }
                     break;
+
+                case LineChangeType.Add:
+                    {
+                        lines.Insert(currentLine++, change.Content.TrimEnd('\r', '\n'));
+                    }
+                    break;
+
                 default:
-                    throw new InvalidDataException($"Unknown {nameof(LineChangeType)}: '{change.Type}'");
+                    throw new InvalidEnumArgumentException(nameof(change.Type), (int)change.Type, typeof(LineChangeType));
             }
         }
+    }
+
+    private static int FindSequenceIndex(List<string> lines, int targetStart, List<string> pattern)
+    {
+        if (pattern.Count is 0 || lines.Count < pattern.Count)
+        {
+            return -1;
+        }
+
+        var maxIndex = lines.Count - pattern.Count;
+        var clampedStart = int.Clamp(targetStart, 0, maxIndex);
+
+        var maxOffset = int.Max(clampedStart, maxIndex - clampedStart);
+        for (var offset = 0; offset <= maxOffset; offset++)
+        {
+            var forward = clampedStart + offset;
+            if (forward <= maxIndex && MatchesAt(lines, forward, pattern))
+            {
+                return forward;
+            }
+
+            var backward = clampedStart - offset;
+            if (offset != 0 && backward >= 0 && MatchesAt(lines, backward, pattern))
+            {
+                return backward;
+            }
+        }
+
+        return -1;
+    }
+
+    private static bool MatchesAt(List<string> lines, int startIndex, List<string> pattern)
+    {
+        for (var i = 0; i < pattern.Count; i++)
+        {
+            if (!LineMatches(lines[startIndex + i], pattern[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool LineMatches(string actual, string expected)
+    {
+        if (actual == expected)
+        {
+            return true;
+        }
+
+        var actualTrim = actual.Trim();
+        var expectedTrim = expected.Trim();
+        if (actualTrim == expectedTrim)
+        {
+            return true;
+        }
+
+        var normActual = NormalizeLine(actualTrim);
+        var normExpected = NormalizeLine(expectedTrim);
+        if (normActual == normExpected)
+        {
+            return true;
+        }
+
+        if (TryMatchXmlTags(normActual, normExpected))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static string NormalizeLine(string line)
+    {
+        var normalized = WhitespaceRegex().Replace(line, " ");
+        normalized = normalized.Replace(" />", "/>");
+        normalized = HexNumberRegex().Replace(normalized, "0x$1");
+        return normalized;
+    }
+
+    private static bool TryMatchXmlTags(string actual, string expected)
+    {
+        if (!actual.StartsWith('<') || !expected.StartsWith('<'))
+        {
+            return false;
+        }
+
+        if (!actual.EndsWith('>') || !expected.EndsWith('>'))
+        {
+            return false;
+        }
+
+        var actualTextMatch = XmlElementWithTextRegex().Match(actual);
+        var expectedTextMatch = XmlElementWithTextRegex().Match(expected);
+        if (actualTextMatch.Success || expectedTextMatch.Success)
+        {
+            if (!actualTextMatch.Success || !expectedTextMatch.Success)
+            {
+                return false;
+            }
+
+            var actualTag = actualTextMatch.Groups[1].Value;
+            var expectedTag = expectedTextMatch.Groups[1].Value;
+            if (!string.Equals(actualTag, expectedTag, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            var actualText = actualTextMatch.Groups[3].Value.Trim();
+            var expectedText = expectedTextMatch.Groups[3].Value.Trim();
+            if (!string.Equals(actualText, expectedText, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            return MatchAttributes(actualTextMatch.Groups[2].Value, expectedTextMatch.Groups[2].Value);
+        }
+
+        var actualSelfMatch = XmlSelfClosingRegex().Match(actual);
+        var expectedSelfMatch = XmlSelfClosingRegex().Match(expected);
+        if (actualSelfMatch.Success || expectedSelfMatch.Success)
+        {
+            if (!actualSelfMatch.Success || !expectedSelfMatch.Success)
+            {
+                return false;
+            }
+
+            var actualTag = actualSelfMatch.Groups[1].Value;
+            var expectedTag = expectedSelfMatch.Groups[1].Value;
+            if (!string.Equals(actualTag, expectedTag, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            return MatchAttributes(actualSelfMatch.Groups[2].Value, expectedSelfMatch.Groups[2].Value);
+        }
+
+        var actualOpenMatch = XmlOpenTagRegex().Match(actual);
+        var expectedOpenMatch = XmlOpenTagRegex().Match(expected);
+        if (actualOpenMatch.Success || expectedOpenMatch.Success)
+        {
+            if (!actualOpenMatch.Success || !expectedOpenMatch.Success)
+            {
+                return false;
+            }
+
+            var actualTag = actualOpenMatch.Groups[1].Value;
+            var expectedTag = expectedOpenMatch.Groups[1].Value;
+            if (!string.Equals(actualTag, expectedTag, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+
+            return MatchAttributes(actualOpenMatch.Groups[2].Value, expectedOpenMatch.Groups[2].Value);
+        }
+
+        return false;
+    }
+
+    private static bool MatchAttributes(string actualAttrsStr, string expectedAttrsStr)
+    {
+        var actualAttributes = ParseAttributes(actualAttrsStr);
+        var expectedAttributes = ParseAttributes(expectedAttrsStr);
+
+        foreach (var kvp in expectedAttributes)
+        {
+            if (!actualAttributes.TryGetValue(kvp.Key, out var actualValue))
+            {
+                return false;
+            }
+
+            if (kvp.Value != actualValue)
+            {
+                var normExpectedVal = HexNumberRegex().Replace(kvp.Value, "0x$1");
+                var normActualVal = HexNumberRegex().Replace(actualValue, "0x$1");
+
+                if (normExpectedVal != normActualVal)
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private static Dictionary<string, string> ParseAttributes(string tagStr)
+    {
+        var dict = new Dictionary<string, string>(StringComparer.Ordinal);
+        var matches = XmlAttrRegex().Matches(tagStr);
+        foreach (Match match in matches)
+        {
+            dict[match.Groups[1].Value] = match.Groups[2].Value;
+        }
+
+        return dict;
     }
 
     private Dictionary<string, PatchInfo> LoadPatches(IEnumerable<string> patchNames)
@@ -356,7 +691,7 @@ public sealed class Patcher
                 continue;
             }
 
-            string path = Path.Combine(patchesLoation, $"{name}.patch.info");
+            var path = Path.Combine(_patchesLoation, $"{name}.patch.info");
 
             patches.Add(name, PatchInfo.Load(path, name));
         }
@@ -371,7 +706,7 @@ public sealed class Patcher
             return [];
         }
 
-        IEnumerable<string> enumerable = SplitLines(patch);
+        var enumerable = SplitLines(patch);
         if (!enumerable.Any())
         {
             return [];
@@ -396,15 +731,21 @@ public sealed class Patcher
         }
     }
 
-    public sealed class PatchContext
-    {
-        public readonly Dictionary<string, PatchInfo> AppliedPatches;
-        public readonly Dictionary<string, string> Variables;
+    [GeneratedRegex(@"0x0+([0-9a-fA-F]+)")]
+    private static partial Regex HexNumberRegex();
 
-        public PatchContext(Dictionary<string, PatchInfo> _appliedPatches, Dictionary<string, string> _variables)
-        {
-            AppliedPatches = _appliedPatches;
-            Variables = _variables;
-        }
-    }
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex WhitespaceRegex();
+
+    [GeneratedRegex(@"^<([a-zA-Z0-9_\-:]+)((?:\s+[a-zA-Z0-9_\-:]+\s*=\s*""[^""]*"")*)\s*>(.*)</\1>$")]
+    private static partial Regex XmlElementWithTextRegex();
+
+    [GeneratedRegex(@"^<([a-zA-Z0-9_\-:]+)((?:\s+[a-zA-Z0-9_\-:]+\s*=\s*""[^""]*"")*)\s*/>$")]
+    private static partial Regex XmlSelfClosingRegex();
+
+    [GeneratedRegex(@"^<([a-zA-Z0-9_\-:]+)((?:\s+[a-zA-Z0-9_\-:]+\s*=\s*""[^""]*"")*)\s*>$")]
+    private static partial Regex XmlOpenTagRegex();
+
+    [GeneratedRegex(@"([a-zA-Z0-9_\-:]+)\s*=\s*""([^""]*)""")]
+    private static partial Regex XmlAttrRegex();
 }
