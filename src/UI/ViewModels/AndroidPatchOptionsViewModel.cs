@@ -506,7 +506,6 @@ public sealed class AndroidPatchOptionsViewModel : ViewModelBase
 
         return new Core.ApkProcessor.Options()
         {
-            NonInteractive = true,
             InApk = apkPath,
             OutApk = PlatformService.Current.GetDefaultOutputPath("Solace.apk"),
             ResourcePack = resourcePackPath,

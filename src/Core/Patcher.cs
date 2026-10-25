@@ -415,7 +415,7 @@ public sealed partial class Patcher
 
         if (beforeLines.Count is 0)
         {
-            var insertIndex = Math.Clamp(targetStart, 0, lines.Count);
+            var insertIndex = int.Clamp(targetStart, 0, lines.Count);
 
             foreach (var change in chunk.Changes)
             {
@@ -432,8 +432,8 @@ public sealed partial class Patcher
         if (matchIndex is -1)
         {
             var expectedPreview = string.Join("\n", beforeLines.Take(5));
-            var actualContextStart = Math.Max(0, targetStart - 2);
-            var actualContextCount = Math.Min(lines.Count - actualContextStart, 10);
+            var actualContextStart = int.Max(0, targetStart - 2);
+            var actualContextCount = int.Min(lines.Count - actualContextStart, 10);
             var actualPreview = string.Join("\n", lines.Skip(actualContextStart).Take(actualContextCount));
 
             throw new InvalidDataException($"""

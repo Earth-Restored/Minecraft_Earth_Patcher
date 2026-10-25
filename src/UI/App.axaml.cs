@@ -6,37 +6,23 @@ using MCEPatcher.UI.Utils;
 using MCEPatcher.UI.ViewModels;
 using MCEPatcher.UI.Views;
 using Serilog;
+using Serilog.Events;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace MCEPatcher.UI;
 
 public sealed partial class App : Application
 {
-    internal static event Action<string?>? OnLogWritten;
+    internal static event Action<LogEvent>? OnLogWritten;
 
     public override void Initialize()
     {
-        StringWriterExt writer = new StringWriterExt()
-        {
-            NewLine = "\n"
-        };
-        StringBuilder sb = new StringBuilder();
-        writer.OnWrite += (object sender, StringWriterExt.OnWriteEventArgs args) =>
-        {
-            sb.Append(args.Value);
-            string str = sb.ToString();
-            int index = str.IndexOf('\n');
-            if (index is not -1)
-            {
-                OnLogWritten?.Invoke(str.Substring(0, index));
-                sb = new StringBuilder(str.Substring(index + 1));
-            }
-        };
+        var uiSink = new UiLogSink();
+        uiSink.LogEmitted += logEvent => OnLogWritten?.Invoke(logEvent);
 
         var log = new LoggerConfiguration()
-           .WriteTo.TextWriter(writer, outputTemplate: "{Timestamp:HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+           .WriteTo.Sink(uiSink)
            .WriteTo.File("logs/debug.txt", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, fileSizeLimitBytes: 8338607, outputTemplate: "{Timestamp:HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
            .MinimumLevel.Debug()
            .CreateLogger();
@@ -52,8 +38,8 @@ public sealed partial class App : Application
         AvaloniaXamlLoader.Load(this);
     }
 
-    private static readonly Stack<Control> s_backStack = new();
-    private static ContentControl? s_rootContentControl;
+    private static readonly Stack<Control> backStack = new();
+    private static ContentControl? rootContentControl;
 
     public override void OnFrameworkInitializationCompleted()
     {
@@ -63,11 +49,11 @@ public sealed partial class App : Application
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
-            s_rootContentControl = new ContentControl
+            rootContentControl = new ContentControl
             {
                 Content = new MainView()
             };
-            singleViewPlatform.MainView = s_rootContentControl;
+            singleViewPlatform.MainView = rootContentControl;
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -76,30 +62,31 @@ public sealed partial class App : Application
     public static void NavigateTo(Control view, bool rememberInBackStack = true)
     {
         Control? current = null;
+
         if (Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop && desktop.MainWindow is not null)
         {
             current = desktop.MainWindow.Content as Control;
             ((current as UserControl)?.DataContext as ViewModelBase)?.OnClose();
             desktop.MainWindow.Content = view;
         }
-        else if (s_rootContentControl is not null)
+        else if (rootContentControl is not null)
         {
-            current = s_rootContentControl.Content as Control;
+            current = rootContentControl.Content as Control;
             ((current as UserControl)?.DataContext as ViewModelBase)?.OnClose();
-            s_rootContentControl.Content = view;
+            rootContentControl.Content = view;
         }
 
         if (rememberInBackStack && current is not null)
         {
-            s_backStack.Push(current);
+            backStack.Push(current);
         }
     }
 
     public static void NavigateBack()
     {
-        if (s_backStack.TryPop(out var previousView))
+        if (backStack.TryPop(out var previousView))
         {
-            s_backStack.Clear();
+            backStack.Clear();
             NavigateTo(previousView, rememberInBackStack: false);
         }
         else
@@ -114,10 +101,12 @@ public sealed partial class App : Application
         {
             return desktop.MainWindow?.StorageProvider;
         }
+
         if (Current?.ApplicationLifetime is ISingleViewApplicationLifetime singleView)
         {
             return TopLevel.GetTopLevel(singleView.MainView)?.StorageProvider;
         }
+
         return null;
     }
 }

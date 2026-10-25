@@ -72,7 +72,7 @@ public static class ApkProcessor
         }
         else
         {
-            Log.Information("*****Decoding apk*****");
+            PatchProgress.BeginStep("Decompiling APK");
             if (!await toolService.DecodeAsync(inApk, decodedDir))
             {
                 return false;
@@ -86,6 +86,8 @@ public static class ApkProcessor
 
             Log.Debug("Done");
         }
+
+        PatchProgress.BeginStep("Applying patches");
 
         // does not get properly extended if not done before the hexdump and will most likely be done anyway, TODO: remove once the TODO in Patcher.PatchFile is fixed
         Log.Information($"Applying patch '{ExtendLibgenoa.Name}'");
@@ -101,16 +103,19 @@ public static class ApkProcessor
 
         if (!string.IsNullOrEmpty(options.ResourcePack))
         {
+            PatchProgress.BeginStep("Applying resource pack");
             if (!await ResourcePackPatcher.Patch(options))
             {
                 return false;
             }
         }
 
+        PatchProgress.BeginStep("Updating ARCore libraries");
         await ArCoreUpdater.UpdateArCoreLibs(decodedDir);
 
         if (options.AndroidOSVersion >= 15)
         {
+            PatchProgress.BeginStep("Patching native library page size");
             if (!await toolService.PatchPageSizeAsync(decodedDir))
             {
                 return false;
@@ -123,7 +128,7 @@ public static class ApkProcessor
         }
         else
         {
-            Log.Information("*****Building apk*****");
+            PatchProgress.BeginStep("Building APK");
             if (!await toolService.EncodeAsync(decodedDir, outApk))
             {
                 return false;
@@ -131,7 +136,7 @@ public static class ApkProcessor
 
             Log.Debug("Done");
 
-            Log.Information("*****Aligning apk*****");
+            PatchProgress.BeginStep("Aligning APK");
             if (!await toolService.AlignAsync(outApk))
             {
                 return false;
@@ -146,7 +151,7 @@ public static class ApkProcessor
         }
         else
         {
-            Log.Information("*****Signing apk*****");
+            PatchProgress.BeginStep("Signing APK");
             if (!await toolService.SignAsync(outApk, new DirectoryInfo("Signed")))
             {
                 return false;

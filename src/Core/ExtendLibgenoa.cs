@@ -74,11 +74,11 @@ public static class ExtendLibgenoa
         if (oldLength < ExtendedBaseAddress)
         {
             fs.Seek(oldLength, SeekOrigin.Begin);
-            long zeroesNeeded = ExtendedBaseAddress - oldLength;
-            byte[] zeroChunk = new byte[Math.Min(64 * 1024, zeroesNeeded)];
+            var zeroesNeeded = ExtendedBaseAddress - oldLength;
+            byte[] zeroChunk = new byte[long.Min(64 * 1024, zeroesNeeded)];
             while (zeroesNeeded > 0)
             {
-                int toWrite = (int)Math.Min(zeroChunk.Length, zeroesNeeded);
+                int toWrite = (int)long.Min(zeroChunk.Length, zeroesNeeded);
                 fs.Write(zeroChunk, 0, toWrite);
                 zeroesNeeded -= toWrite;
             }
@@ -87,14 +87,14 @@ public static class ExtendLibgenoa
         // Fill from ExtendedBaseAddress (0x07000000) to newLength with 0xFF
         if (newLength > ExtendedBaseAddress)
         {
-            long ffStart = Math.Max(oldLength, ExtendedBaseAddress);
+            var ffStart = long.Max(oldLength, ExtendedBaseAddress);
             fs.Seek(ffStart, SeekOrigin.Begin);
-            long ffNeeded = newLength - ffStart;
-            byte[] ffChunk = new byte[Math.Min(64 * 1024, ffNeeded)];
+            var ffNeeded = newLength - ffStart;
+            var ffChunk = new byte[long.Min(64 * 1024, ffNeeded)];
             Array.Fill(ffChunk, (byte)0xFF);
             while (ffNeeded > 0)
             {
-                int toWrite = (int)Math.Min(ffChunk.Length, ffNeeded);
+                int toWrite = (int)long.Min(ffChunk.Length, ffNeeded);
                 fs.Write(ffChunk, 0, toWrite);
                 ffNeeded -= toWrite;
             }

@@ -1,90 +1,116 @@
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using MCEPatcher.Core;
-using MCEPatcher.UI.ViewModels;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Runtime.InteropServices;
-
 using MCEPatcher.UI.Services;
+using MCEPatcher.UI.ViewModels;
 
 namespace MCEPatcher.UI.Views;
 
 public sealed partial class PatchView : UserControl
 {
+    private const double StickToBottomThreshold = 24;
+
     public PatchView()
     {
         InitializeComponent();
         PatchViewModel model = new PatchViewModel();
+        model.Finished += OnFinished;
         DataContext = model;
+
+        AddHandler(ScrollViewer.ScrollChangedEvent, OnScrollChanged);
     }
 
-    public PatchView(ApkProcessor.Options options) : this()
+    public PatchView(ApkProcessor.Options options)
+        : this()
     {
         Patch(options);
     }
 
-    public PatchView(IpaProcessor.Options options) : this()
+    public PatchView(IpaProcessor.Options options)
+        : this()
     {
         Patch(options);
     }
+
+    private PatchViewModel? Model => DataContext as PatchViewModel;
 
     public void Patch(ApkProcessor.Options options)
     {
-        (DataContext as PatchViewModel)?.Start(options, scrollViewer, chat, finishedContainer);
+        Model?.Start(options);
     }
 
     public void Patch(IpaProcessor.Options options)
     {
-        (DataContext as PatchViewModel)?.Start(options, scrollViewer, chat, finishedContainer);
+        Model?.Start(options);
     }
+
+    private static void OnScrollChanged(object? sender, ScrollChangedEventArgs args)
+    {
+        if (args.Source is not ScrollViewer scrollViewer || !scrollViewer.Classes.Contains("autoscroll"))
+        {
+            return;
+        }
+
+        if (args.ExtentDelta.Y <= 0)
+        {
+            return;
+        }
+
+        var previousExtent = scrollViewer.Extent.Height - args.ExtentDelta.Y;
+        var previousBottom = scrollViewer.Offset.Y - args.OffsetDelta.Y + scrollViewer.Viewport.Height;
+        if (previousExtent - previousBottom <= StickToBottomThreshold)
+        {
+            scrollViewer.ScrollToEnd();
+        }
+    }
+
+    private void OnFinished()
+        => Dispatcher.UIThread.Post(resultCard.BringIntoView, DispatcherPriority.Background);
 
     public void Back(object sender, RoutedEventArgs args)
-    {
-        App.NavigateBack();
-    }
+        => App.NavigateBack();
 
-    public async void InstallPatchedAPK(object sender, RoutedEventArgs args)
+    public async void InstallPatchedApk(object sender, RoutedEventArgs args)
     {
-        if (DataContext is PatchViewModel model && !string.IsNullOrEmpty(model.OutputFilePath))
+        if (Model?.OutputFilePath is { Length: > 0 } path)
         {
-            await PlatformService.Current.InstallApkAsync(model.OutputFilePath);
+            await PlatformService.Current.InstallApkAsync(path);
         }
     }
 
-    public void OpenPatchedAPKLocation(object sender, RoutedEventArgs args)
+    public async void OpenOutputFolder(object sender, RoutedEventArgs args)
     {
-        string path = (DataContext as PatchViewModel)?.OutputFilePath ?? Path.GetFullPath("Solace.apk");
-        OpenFileLocation(path);
-    }
-
-    public void OpenPatchedIPALocation(object sender, RoutedEventArgs args)
-    {
-        string path = (DataContext as PatchViewModel)?.OutputFilePath ?? Path.GetFullPath("Solace.ipa");
-        OpenFileLocation(path);
-    }
-
-    private static void OpenFileLocation(string filePath)
-    {
-        if (!File.Exists(filePath))
-            return;
-
-        try
+        if (Model?.OutputFilePath is { Length: > 0 } path)
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                Process.Start("explorer.exe", $"/select,\"{filePath}\"");
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                Process.Start("xdg-open", Path.GetDirectoryName(filePath));
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                Process.Start("open", $"-R \"{filePath}\"");
-            }
+            await PlatformService.Current.OpenOutputFolderAsync(path);
         }
-        catch { }
+    }
+
+    public async void CopyStepLog(object sender, RoutedEventArgs args)
+    {
+        if ((sender as Control)?.DataContext is PatchStepViewModel step)
+        {
+            await CopyToClipboard(step.GetLogText());
+        }
+    }
+
+    public async void CopyAllLogs(object sender, RoutedEventArgs args)
+    {
+        if (Model is { } model)
+        {
+            await CopyToClipboard(model.GetAllLogsText());
+        }
+    }
+
+    private async System.Threading.Tasks.Task CopyToClipboard(string text)
+    {
+        var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+
+        if (clipboard is not null)
+        {
+            await clipboard.SetTextAsync(text);
+        }
     }
 }

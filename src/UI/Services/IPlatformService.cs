@@ -11,4 +11,8 @@ public interface IPlatformService
     Task<bool> InstallApkAsync(string apkPath);
 
     string GetDefaultOutputPath(string defaultFileName);
+
+    Task<string?> PublishOutputAsync(string outputPath);
+
+    Task OpenOutputFolderAsync(string outputPath);
 }

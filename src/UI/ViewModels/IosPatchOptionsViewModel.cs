@@ -11,25 +11,25 @@ namespace MCEPatcher.UI.ViewModels;
 
 public sealed class IosPatchOptionsViewModel : ViewModelBase
 {
-    private string? ipaFile;
+    private string? _ipaFile;
     public string? IpaFile
     {
-        get => "IPA File: " + (StringUtils.LimitLengthMiddle(ipaFile, 60) ?? "Not selected");
-        set => this.RaiseAndSetIfChanged(ref ipaFile, value);
+        get => "IPA File: " + (StringUtils.LimitLengthMiddle(_ipaFile, 60) ?? "Not selected");
+        set => this.RaiseAndSetIfChanged(ref _ipaFile, value);
     }
     public string? IpaFilePath
     {
-        get => ipaFile;
-        set => this.RaiseAndSetIfChanged(ref ipaFile, value);
+        get => _ipaFile;
+        set => this.RaiseAndSetIfChanged(ref _ipaFile, value);
     }
 
-    private bool isSimpleMode;
+    private bool _isSimpleMode;
     public bool IsSimpleMode
     {
-        get => isSimpleMode;
+        get => _isSimpleMode;
         set
         {
-            this.RaiseAndSetIfChanged(ref isSimpleMode, value);
+            this.RaiseAndSetIfChanged(ref _isSimpleMode, value);
             if (value)
             {
                 EnforceSimpleModeDefaults();
@@ -37,60 +37,60 @@ public sealed class IosPatchOptionsViewModel : ViewModelBase
         }
     }
 
-    private bool changeLocatorAddress;
+    private bool _changeLocatorAddress;
     public bool ChangeLocatorAddress
     {
-        get => changeLocatorAddress;
-        set => this.RaiseAndSetIfChanged(ref changeLocatorAddress, value);
+        get => _changeLocatorAddress;
+        set => this.RaiseAndSetIfChanged(ref _changeLocatorAddress, value);
     }
 
-    private bool disableSunsetTimeCheck;
+    private bool _disableSunsetTimeCheck;
     public bool DisableSunsetTimeCheck
     {
-        get => disableSunsetTimeCheck;
-        set => this.RaiseAndSetIfChanged(ref disableSunsetTimeCheck, value);
+        get => _disableSunsetTimeCheck;
+        set => this.RaiseAndSetIfChanged(ref _disableSunsetTimeCheck, value);
     }
 
-    private bool disableSpeedLimit;
+    private bool _disableSpeedLimit;
     public bool DisableSpeedLimit
     {
-        get => disableSpeedLimit;
-        set => this.RaiseAndSetIfChanged(ref disableSpeedLimit, value);
+        get => _disableSpeedLimit;
+        set => this.RaiseAndSetIfChanged(ref _disableSpeedLimit, value);
     }
 
-    private bool changeAppName;
+    private bool _changeAppName;
     public bool ChangeAppName
     {
-        get => changeAppName;
-        set => this.RaiseAndSetIfChanged(ref changeAppName, value);
+        get => _changeAppName;
+        set => this.RaiseAndSetIfChanged(ref _changeAppName, value);
     }
 
-    private bool removeDrm;
+    private bool _removeDrm;
     public bool RemoveDrm
     {
-        get => removeDrm;
-        set => this.RaiseAndSetIfChanged(ref removeDrm, value);
+        get => _removeDrm;
+        set => this.RaiseAndSetIfChanged(ref _removeDrm, value);
     }
 
-    private int locatorProtocol;
+    private int _locatorProtocol;
     public int LocatorProtocol
     {
-        get => locatorProtocol;
-        set => this.RaiseAndSetIfChanged(ref locatorProtocol, value);
+        get => _locatorProtocol;
+        set => this.RaiseAndSetIfChanged(ref _locatorProtocol, value);
     }
 
-    private string locatorHostname = "";
+    private string _locatorHostname = "";
     public string LocatorHostname
     {
-        get => locatorHostname;
-        set => this.RaiseAndSetIfChanged(ref locatorHostname, value);
+        get => _locatorHostname;
+        set => this.RaiseAndSetIfChanged(ref _locatorHostname, value);
     }
 
-    private string appName = "Solace";
+    private string _appName = "Solace";
     public string AppName
     {
-        get => appName;
-        set => this.RaiseAndSetIfChanged(ref appName, value);
+        get => _appName;
+        set => this.RaiseAndSetIfChanged(ref _appName, value);
     }
 
     public ReactiveCommand<Unit, Unit> PickIpaCommand { get; }
@@ -111,6 +111,7 @@ public sealed class IosPatchOptionsViewModel : ViewModelBase
                     Patterns = ["*.ipa"],
                 } ],
             });
+
             if (path is not null)
             {
                 IpaFile = path;
@@ -129,7 +130,7 @@ public sealed class IosPatchOptionsViewModel : ViewModelBase
 
     public async Task<Core.IpaProcessor.Options?> BuildOptionsAsync()
     {
-        string? ipaPath = IpaFilePath;
+        var ipaPath = IpaFilePath;
 
         if (ipaPath is null)
         {

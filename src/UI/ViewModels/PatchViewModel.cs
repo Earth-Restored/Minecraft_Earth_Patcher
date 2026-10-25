@@ -1,152 +1,264 @@
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Media;
 using Avalonia.Threading;
 using MCEPatcher.Core;
+using MCEPatcher.UI.Services;
 using ReactiveUI;
 using Serilog;
+using Serilog.Events;
 using System;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-
-using MCEPatcher.UI.Services;
 
 namespace MCEPatcher.UI.ViewModels;
 
 public sealed class PatchViewModel : ViewModelBase
 {
-    private ScrollViewer scrollViewer = null!;
-    private StackPanel panel = null!;
-    private bool patchResult;
-    private readonly System.Threading.CancellationTokenSource _cts = new();
+    private readonly CancellationTokenSource _cts = new();
+    private PatchStepViewModel? _currentStep;
+    private bool _subscribed;
 
-    public string? OutputFilePath { get; set; }
+    public ObservableCollection<PatchStepViewModel> Steps { get; } = new();
 
-    private bool isApk;
-    public bool IsApk
+    public string? OutputFilePath { get; private set; }
+
+    private bool _isApk;
+
+    private bool _isFinished;
+    public bool IsFinished
     {
-        get => isApk;
-        set => this.RaiseAndSetIfChanged(ref isApk, value);
+        get => _isFinished;
+        private set => this.RaiseAndSetIfChanged(ref _isFinished, value);
     }
 
-    private bool isIpa;
-    public bool IsIpa
+    private bool _isSuccess;
+    public bool IsSuccess
     {
-        get => isIpa;
-        set => this.RaiseAndSetIfChanged(ref isIpa, value);
+        get => _isSuccess;
+        private set
+        {
+            this.RaiseAndSetIfChanged(ref _isSuccess, value);
+            this.RaisePropertyChanged(nameof(IsFailure));
+        }
     }
 
-    private bool canInstallApk;
+    public bool IsFailure => IsFinished && !IsSuccess;
+
+    private string _resultTitle = string.Empty;
+    public string ResultTitle
+    {
+        get => _resultTitle;
+        private set => this.RaiseAndSetIfChanged(ref _resultTitle, value);
+    }
+
+    private string _resultMessage = string.Empty;
+    public string ResultMessage
+    {
+        get => _resultMessage;
+        private set => this.RaiseAndSetIfChanged(ref _resultMessage, value);
+    }
+
+    private bool _canInstallApk;
     public bool CanInstallApk
     {
-        get => canInstallApk;
-        set => this.RaiseAndSetIfChanged(ref canInstallApk, value);
+        get => _canInstallApk;
+        private set => this.RaiseAndSetIfChanged(ref _canInstallApk, value);
     }
 
-    private bool isApkLocationVisible;
-    public bool IsApkLocationVisible
+    private bool _canOpenOutputFolder;
+    public bool CanOpenOutputFolder
     {
-        get => isApkLocationVisible;
-        set => this.RaiseAndSetIfChanged(ref isApkLocationVisible, value);
+        get => _canOpenOutputFolder;
+        private set => this.RaiseAndSetIfChanged(ref _canOpenOutputFolder, value);
     }
 
-    public void Start(ApkProcessor.Options options, ScrollViewer _scrollViewer, StackPanel _panel, Grid finishedContainer)
+    public event Action<PatchStepViewModel>? StepActivated;
+
+    public event Action? Finished;
+
+    public void Start(ApkProcessor.Options options)
     {
-        RunPatch(options, _scrollViewer, _panel, finishedContainer);
+        _isApk = true;
+        RunPatch(Path.GetFullPath(options.OutApk), () => ApkProcessor.Run(options));
     }
 
-    public void Start(IpaProcessor.Options options, ScrollViewer _scrollViewer, StackPanel _panel, Grid finishedContainer)
+    public void Start(IpaProcessor.Options options)
     {
-        RunPatch(options, _scrollViewer, _panel, finishedContainer);
+        _isApk = false;
+        RunPatch(Path.GetFullPath(options.OutIpa), () => IpaProcessor.Run(options));
     }
 
-    private void RunPatch<T>(T options, ScrollViewer _scrollViewer, StackPanel _panel, Grid finishedContainer)
+    private void RunPatch(string outputPath, Func<Task<bool>> run)
     {
-        scrollViewer = _scrollViewer;
-        panel = _panel;
+        OutputFilePath = outputPath;
+        Steps.Clear();
+        _currentStep = null;
+        IsFinished = false;
 
-        panel.Children.Clear();
-        scrollViewer.ScrollToHome();
-        finishedContainer.IsVisible = false;
-        patchResult = false;
+        Subscribe();
 
-        if (options is ApkProcessor.Options apkOpts)
+        Task.Run(async () =>
         {
-            OutputFilePath = Path.GetFullPath(apkOpts.OutApk);
-            IsApk = true;
-            IsIpa = false;
-            CanInstallApk = PlatformService.Current.CanInstallApk;
-            IsApkLocationVisible = !PlatformService.Current.CanInstallApk;
-        }
-        else if (options is IpaProcessor.Options ipaOpts)
-        {
-            OutputFilePath = Path.GetFullPath(ipaOpts.OutIpa);
-            IsApk = false;
-            IsIpa = true;
-            CanInstallApk = false;
-            IsApkLocationVisible = false;
-        }
-
-        App.OnLogWritten += onLogWritten;
-
-        Task task = Task.Run(async () =>
-        {
+            bool result;
+            string? publishedLocation = null;
             try
             {
-                if (options is ApkProcessor.Options apkOpts2)
-                    patchResult = await ApkProcessor.Run(apkOpts2);
-                else if (options is IpaProcessor.Options ipaOpts2)
-                    patchResult = await IpaProcessor.Run(ipaOpts2);
+                result = await run();
+                if (result)
+                {
+                    publishedLocation = await PlatformService.Current.PublishOutputAsync(outputPath);
+                }
             }
             catch (Exception exception)
             {
                 Log.Error(exception.ToString());
-                patchResult = false;
+                result = false;
             }
-        });
-        task.ContinueWith(t =>
-        {
-            if (_cts.IsCancellationRequested) return;
 
-            Dispatcher.UIThread.Post(() =>
-            {
-                if (_cts.IsCancellationRequested) return;
-
-                finishedContainer.IsVisible = true;
-                scrollViewer.ScrollToEnd();
-                if (!patchResult)
-                {
-                    CanInstallApk = false;
-                    IsApkLocationVisible = false;
-                    for (int i = 1; i < finishedContainer.Children.Count; i++)
-                        finishedContainer.Children[i].IsVisible = false;
-                }
-            });
+            Dispatcher.UIThread.Post(() => Finish(result, publishedLocation));
         });
     }
 
-    private void onLogWritten(string? text)
+    private void Subscribe()
     {
-        if (_cts.IsCancellationRequested) return;
+        if (_subscribed)
+        {
+            return;
+        }
+
+        _subscribed = true;
+        App.OnLogWritten += OnLogWritten;
+        PatchProgress.StepStarted += OnStepStarted;
+        PatchProgress.ProgressChanged += OnProgressChanged;
+    }
+
+    private void Unsubscribe()
+    {
+        if (!_subscribed)
+        {
+            return;
+        }
+
+        _subscribed = false;
+        App.OnLogWritten -= OnLogWritten;
+        PatchProgress.StepStarted -= OnStepStarted;
+        PatchProgress.ProgressChanged -= OnProgressChanged;
+    }
+
+    private void OnStepStarted(string title)
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (_cts.IsCancellationRequested)
+            {
+                return;
+            }
+
+            StartStep(title);
+        });
+    }
+
+    private void OnProgressChanged(double fraction)
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (_cts.IsCancellationRequested || _currentStep is null)
+            {
+                return;
+            }
+
+            _currentStep.Progress = fraction;
+        });
+    }
+
+    private void OnLogWritten(LogEvent logEvent)
+    {
+        if (logEvent.Properties.ContainsKey(PatchProgress.StepMarkerProperty))
+        {
+            return;
+        }
+
+        var text = logEvent.RenderMessage();
+        if (logEvent.Exception is not null)
+        {
+            text += Environment.NewLine + logEvent.Exception;
+        }
+
+        var line = new LogLine(text.TrimEnd(), logEvent.Level);
 
         Dispatcher.UIThread.Post(() =>
         {
-            if (_cts.IsCancellationRequested) return;
-
-            SelectableTextBlock block = new SelectableTextBlock()
+            if (_cts.IsCancellationRequested)
             {
-                Text = text,
-                TextWrapping = TextWrapping.Wrap,
-                Padding = new Thickness(0, 0, 0, 2)
-            };
-            panel.Children.Add(block);
-            scrollViewer.ScrollToEnd();
+                return;
+            }
+
+            (_currentStep ?? StartStep("Preparing")).AddLog(line);
         });
     }
+
+    private PatchStepViewModel StartStep(string title)
+    {
+        if (_currentStep is not null)
+        {
+            _currentStep.Complete(true);
+            _currentStep.IsExpanded = false;
+        }
+
+        var step = new PatchStepViewModel(title);
+        Steps.Add(step);
+        _currentStep = step;
+        StepActivated?.Invoke(step);
+        return step;
+    }
+
+    private void Finish(bool success, string? publishedLocation)
+    {
+        if (_cts.IsCancellationRequested)
+        {
+            return;
+        }
+
+        Unsubscribe();
+
+        if (_currentStep is not null)
+        {
+            _currentStep.Complete(success);
+            // keep expanded if failed
+            _currentStep.IsExpanded = !success;
+        }
+
+        IsSuccess = success;
+        IsFinished = true;
+        this.RaisePropertyChanged(nameof(IsFailure));
+
+        if (success)
+        {
+            ResultTitle = "Patching finished";
+            ResultMessage = publishedLocation is not null
+                ? $"The patched {(_isApk ? "APK" : "IPA")} was saved to:\n{publishedLocation}"
+                : $"The patched {(_isApk ? "APK" : "IPA")} was saved to:\n{OutputFilePath}";
+            CanInstallApk = _isApk && PlatformService.Current.CanInstallApk;
+            CanOpenOutputFolder = true;
+        }
+        else
+        {
+            ResultTitle = "Patching failed";
+            ResultMessage = "Expand the failed step above to see what went wrong.";
+            CanInstallApk = false;
+            CanOpenOutputFolder = false;
+        }
+
+        Finished?.Invoke();
+    }
+
+    public string GetAllLogsText()
+        => string.Join("\n\n", Steps.Select(step => $"===== {step.Title} =====\n{step.GetLogText()}"));
 
     public override void OnClose()
     {
         _cts.Cancel();
-        App.OnLogWritten -= onLogWritten;
+        Unsubscribe();
     }
 }
