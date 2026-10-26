@@ -241,7 +241,7 @@ public sealed class AndroidPatchOptionsViewModel : ViewModelBase
         AppName = "Solace";
         AppNameShort = "Solace";
         ChangePackageName = true;
-        PackageName = "com.github.earth_restored";
+        PackageName = "com.github.earth_restored.solace";
         LoginServerSingleDomainMode = true;
         LoginServerProtocol = (int)ProtocolEnum.Http;
         LoginServerHostname = "";
