@@ -1,29 +1,29 @@
 # Minecraft Earth Patcher
 
-A tool to patch the api and login server used by a Minecraft Earth apk.
+A cross-platform tool to patch the server endpoints in Minecraft Earth APK (Android) and IPA (iOS).
 
-Patches from:
-
-- [Project-Genoa/patches](https://github.com/Project-Genoa/patches)
-- [Project-Earth-Team/Patches](https://github.com/Project-Earth-Team/Patches)
+Available for **Windows**, **Linux**, **macOS**, and **Android**.
 
 ## Usage Instructions
 
-1) Acquire a Minecraft Earth apk, such as by dumping in from you phone.
-2) Run the patcher.
-3) Select the downloaded APK file.
-4) Enter the api server's IP address or hostname, including the port number.
+1. Acquire a Minecraft Earth APK or IPA (e.g., dump it from your device).
+2. Download and run the latest release of [Minecraft Earth Patcher](https://github.com/Earth-Restored/Minecraft_Earth_Patcher/releases).
+3. Switch to the **Android** or **iOS** tab depending on your file.
+4. Select your APK or IPA file.
+5. *(Android only, optional)* Select a Minecraft Earth resource pack file.[^1]
+6. Enter your server's locator and auth server address/hostname, including the port number:
+    - For standard installations (`main`/`dev` branch), these will be the same (e.g., `your-ip:8080`).
+    - For Aspire (experimental), check the "Patcher options" on the web portal's home page.
+7. Click **Patch** and wait for the process to complete.
+8. Installation:
+    - If you are running the Android version of the patcher, tap **"Install APK"** to install it directly on your device.
+    - Otherwise, click the **"Open output folder"** button, transfer the patched APK/IPA to your phone, and install it. On iOS, using AltStore is recommended.
 
-### Configure Custom Login Server
+[^1]: This allows using servers that only host partial resource packs, which is recommended for public servers to avoid copyright issues. On iOS, the IPA already bundles the full resource pack, so this is not required.
 
-If you are using a custom login server, choose the appropriate mode based on your network setup:
+## Credits
 
-* **Option A: Multi-Domain Mode**
-  * *Use this if:* You have a registered domain name, or you are using a VPN/DNS to map a domain to an IP address.
-  * Enter your domain(s) and ports.
-  * *Note:* You can use the exact same domain for all addresses.
+Patches are from the following repositories:
 
-* **Option B: Single-Domain Mode**
-  * *Use this if:* You do *not* have a domain or DNS mapping.
-  * Enter the login server's IP address or hostname, including the port.
-  * *Note:* There are no disadvantages to using this method over Multi-Domain Mode.
+- [Project-Genoa/patches](https://github.com/Project-Genoa/patches)
+- [Project-Earth-Team/Patches](https://github.com/Project-Earth-Team/Patches)
