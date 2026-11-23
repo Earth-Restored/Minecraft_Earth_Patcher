@@ -45,10 +45,10 @@ internal static class ResourcePackPatcher
 
             Log.Information("Copying resource pack files");
 
-            (resourcePackFolder / new RelativeFile("manifest.json")).Delete(); // So it doesn't overwrite the existing one in vanilla_base
+            (resourcePackFolder / new RelativeFile("manifest.json")).Delete(); // So it doesn't overwrite the existing one in genoa_base
 
-            var resourcePackRoot = new AbsoluteDirectory(Path.GetFullPath(options.DecodedDir)) / "assets" / "resource_packs" / "vanilla_base";
-            Log.Information(resourcePackFolder + " " + resourcePackRoot);
+            var resourcePackRoot = new AbsoluteDirectory(Path.GetFullPath(options.DecodedDir)) / "assets" / "resource_packs" / "genoa_base";
+            Log.Information(resourcePackFolder.Value + " " + resourcePackRoot.Value);
             resourcePackFolder.CopyContentsTo(resourcePackRoot, overwrite: true, recursive: true);
 
             Log.Debug("Done");
@@ -116,7 +116,7 @@ internal static class ResourcePackPatcher
 
             File.WriteAllText(
                 (resourcePackRoot / "textures" / "textures_list.json").Value,
-                JsonSerializer.Serialize(contents, CoreJsonSerializerContext.Default.HashSetString),
+                JsonSerializer.Serialize(contents, CoreJsonSerializerContext.Default.ListString),
                 Encoding.UTF8);
 
             Log.Debug("Done");

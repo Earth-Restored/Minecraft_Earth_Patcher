@@ -1,5 +1,8 @@
 # Minecraft Earth Patcher
 
+> [!IMPORTANT]
+> Microsoft login is no longer working on iOS, as such playing the game on iOS is currently not possible, please wait for login server to be implemented for iOS.
+
 A cross-platform tool to patch the server endpoints in Minecraft Earth APK (Android) and IPA (iOS).
 
 Available for **Windows**, **Linux**, **macOS**, and **Android**.
@@ -11,7 +14,7 @@ Available for **Windows**, **Linux**, **macOS**, and **Android**.
 3. Switch to the **Android** or **iOS** tab depending on your file.
 4. Select your APK or IPA file.
 5. *(Android only, optional)* Select a Minecraft Earth resource pack file.[^1]
-6. Enter your server's locator and auth server address/hostname, including the port number:
+6. Enter your server's locator and auth server address/hostname, including the port number (*auth server patching is currently only implemented on android*):
     - For standard installations (`main`/`dev` branch), these will be the same (e.g., `your-ip:8080`).
     - For Aspire (experimental), check the "Patcher options" on the web portal's home page.
 7. Click **Patch** and wait for the process to complete.
