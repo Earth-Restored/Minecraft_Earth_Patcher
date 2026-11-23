@@ -5,7 +5,7 @@
     <SupportedOSPlatformVersion>29</SupportedOSPlatformVersion>
     <ApplicationId>com.github.earth_restored.mcepcatcher</ApplicationId>
     <ApplicationVersion>1</ApplicationVersion>
-    <ApplicationDisplayVersion>1.4.1</ApplicationDisplayVersion>
+    <ApplicationDisplayVersion>1.5.0</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
