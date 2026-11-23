@@ -404,18 +404,19 @@ public sealed partial class Patcher
         var afterLines = afterChanges.Select(c => c.Content.TrimEnd('\r', '\n')).ToList();
 
         var originalStart = chunk.RangeInfo.OriginalRange.StartLine;
-        var targetStart = originalStart > 0 ? originalStart - 1 : 0;
-
-        // Check if chunk has already been applied
-        if (afterLines.Count > 0 && FindSequenceIndex(lines, targetStart, afterLines) != -1)
-        {
-            Log.Debug("Chunk at line {StartLine} in '{FilePath}' is already applied, skipping.", originalStart, filePath);
-            return;
-        }
+        var newStart = chunk.RangeInfo.NewRange.StartLine;
+        var anchorLine = newStart > 0 ? newStart : originalStart;
+        var targetStart = anchorLine > 0 ? anchorLine - 1 : 0;
 
         if (beforeLines.Count is 0)
         {
             var insertIndex = int.Clamp(targetStart, 0, lines.Count);
+
+            if (afterLines.Count > 0 && insertIndex + afterLines.Count <= lines.Count && MatchesAt(lines, insertIndex, afterLines))
+            {
+                Log.Debug("Chunk at line {StartLine} in '{FilePath}' is already applied, skipping.", originalStart, filePath);
+                return;
+            }
 
             foreach (var change in chunk.Changes)
             {
@@ -429,6 +430,16 @@ public sealed partial class Patcher
         }
 
         var matchIndex = FindSequenceIndex(lines, targetStart, beforeLines);
+        var alreadyAppliedIndex = afterLines.Count > 0
+            ? FindSequenceIndex(lines, targetStart, afterLines)
+            : -1;
+
+        if (alreadyAppliedIndex != -1 && (matchIndex is -1 || int.Abs(alreadyAppliedIndex - targetStart) < int.Abs(matchIndex - targetStart)))
+        {
+            Log.Debug("Chunk at line {StartLine} in '{FilePath}' is already applied, skipping.", originalStart, filePath);
+            return;
+        }
+
         if (matchIndex is -1)
         {
             var expectedPreview = string.Join("\n", beforeLines.Take(5));
