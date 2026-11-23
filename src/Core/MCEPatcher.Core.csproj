@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Patches/**" />
+    <EmbeddedResource Include="../AndroidBridge/src/main/resources/mcep_debug.p12" LogicalName="MCEPatcher.Core.mcep_debug.p12" />
   </ItemGroup>
 
   <ItemGroup>
