@@ -85,7 +85,7 @@ if [[ "$SKIP_DESKTOP" == false ]]; then
             -p:DebugSymbols=false
 
         rm -f "$ZIP_PATH"
-        (cd "$TEMP_DIR" && zip -q -r "$ZIP_PATH" .)
+        (cd "$TEMP_DIR" && zip -q -9 -r "$ZIP_PATH" .)
         rm -rf "$TEMP_DIR"
         trap - EXIT
 
@@ -97,9 +97,9 @@ if [[ "$SKIP_ANDROID" == false ]]; then
     ANDROID_PROJ="$SCRIPT_DIR/src/UI.Android/MCEPatcher.UI.Android.csproj"
 
     for abi in "${ANDROID_ABIS[@]}"; do
-        echo -e "\033[36mBuilding Android APK for $abi ($CONFIG)...\033[0m"
+        echo -e "\033[36mPublishing Android APK for $abi ($CONFIG)...\033[0m"
 
-        dotnet build "$ANDROID_PROJ" \
+        dotnet publish "$ANDROID_PROJ" \
             --configuration "$CONFIG" \
             -r "$abi"
 
@@ -108,9 +108,16 @@ if [[ "$SKIP_ANDROID" == false ]]; then
             ABI_SHORT="x64"
         fi
 
-        APK_PATH=$(find "$SCRIPT_DIR/src/UI.Android/bin/$CONFIG/net11.0-android/$abi" -name "*-Signed.apk" 2>/dev/null | head -n 1 || true)
+        ANDROID_OUT_DIR="$SCRIPT_DIR/src/UI.Android/bin/$CONFIG/net11.0-android/$abi"
+        APK_PATH=$(find "$ANDROID_OUT_DIR/publish" -maxdepth 1 -name "*-Signed.apk" 2>/dev/null | head -n 1 || true)
         if [[ -z "$APK_PATH" ]]; then
-            APK_PATH=$(find "$SCRIPT_DIR/src/UI.Android/bin/$CONFIG/net11.0-android/$abi" -name "*.apk" 2>/dev/null | head -n 1 || true)
+            APK_PATH=$(find "$ANDROID_OUT_DIR/publish" -maxdepth 1 -name "*.apk" 2>/dev/null | head -n 1 || true)
+        fi
+        if [[ -z "$APK_PATH" ]]; then
+            APK_PATH=$(find "$ANDROID_OUT_DIR" -name "*-Signed.apk" 2>/dev/null | head -n 1 || true)
+        fi
+        if [[ -z "$APK_PATH" ]]; then
+            APK_PATH=$(find "$ANDROID_OUT_DIR" -name "*.apk" 2>/dev/null | head -n 1 || true)
         fi
 
         if [[ -n "$APK_PATH" && -f "$APK_PATH" ]]; then

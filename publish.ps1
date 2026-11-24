@@ -102,7 +102,11 @@ if (-not $skipDesktop) {
                 }
 
                 Write-Host "Zipping artifacts to $zipFileName..."
-                [System.IO.Compression.ZipFile]::CreateFromDirectory($tempPubDir, $zipFilePath)
+                $compressionLevel = [System.IO.Compression.CompressionLevel]::Optimal
+                if ([System.Enum]::IsDefined([System.IO.Compression.CompressionLevel], 'SmallestSize')) {
+                    $compressionLevel = [System.IO.Compression.CompressionLevel]::SmallestSize
+                }
+                [System.IO.Compression.ZipFile]::CreateFromDirectory($tempPubDir, $zipFilePath, $compressionLevel, $false)
                 
                 Write-Host "Success: $zipFilePath`n" -ForegroundColor Green
             }
@@ -119,27 +123,33 @@ if (-not $skipAndroid) {
     $androidProj = Join-Path $scriptRoot "src/UI.Android/MCEPatcher.UI.Android.csproj"
     if (Test-Path $androidProj) {
         foreach ($abi in $androidAbis) {
-            Write-Host "Building Android APK for $abi ($config)..." -ForegroundColor Cyan
+            Write-Host "Publishing Android APK for $abi ($config)..." -ForegroundColor Cyan
 
-            $buildArgs = @(
-                "build", "`"$androidProj`"",
+            $publishArgs = @(
+                "publish", "`"$androidProj`"",
                 "--configuration", $config,
                 "-r", $abi
             )
 
-            $process = Start-Process dotnet -ArgumentList $buildArgs -NoNewWindow -Wait -PassThru
+            $process = Start-Process dotnet -ArgumentList $publishArgs -NoNewWindow -Wait -PassThru
             if ($process.ExitCode -ne 0) {
-                Write-Error "dotnet build failed for Android ($abi). Exit Code: $($process.ExitCode)"
+                Write-Error "dotnet publish failed for Android ($abi). Exit Code: $($process.ExitCode)"
                 continue
             }
 
             $abiShort = if ($abi -eq 'android-arm64') { 'arm64' } elseif ($abi -eq 'android-x64') { 'x64' } else { $abi }
-            $apkPattern = Join-Path $scriptRoot "src/UI.Android/bin/$config/net11.0-android/$abi/*-Signed.apk"
-            $builtApk = Get-ChildItem -Path $apkPattern -ErrorAction SilentlyContinue | Select-Object -First 1
+            $androidOutDir = Join-Path $scriptRoot "src/UI.Android/bin/$config/net11.0-android/$abi"
+            $apkSearchPatterns = @(
+                (Join-Path $androidOutDir "publish/*-Signed.apk"),
+                (Join-Path $androidOutDir "publish/*.apk"),
+                (Join-Path $androidOutDir "*-Signed.apk"),
+                (Join-Path $androidOutDir "*.apk")
+            )
 
-            if (-not $builtApk) {
-                $fallbackPattern = Join-Path $scriptRoot "src/UI.Android/bin/$config/net11.0-android/$abi/*.apk"
-                $builtApk = Get-ChildItem -Path $fallbackPattern -ErrorAction SilentlyContinue | Select-Object -First 1
+            $builtApk = $null
+            foreach ($pattern in $apkSearchPatterns) {
+                $builtApk = Get-ChildItem -Path $pattern -ErrorAction SilentlyContinue | Select-Object -First 1
+                if ($builtApk) { break }
             }
 
             if ($builtApk) {
@@ -149,7 +159,7 @@ if (-not $skipAndroid) {
                 Write-Host "Success: $targetApkPath`n" -ForegroundColor Green
             }
             else {
-                Write-Warning "Could not find built APK matching $apkPattern"
+                Write-Warning "Could not find built APK in $androidOutDir"
             }
         }
     }
