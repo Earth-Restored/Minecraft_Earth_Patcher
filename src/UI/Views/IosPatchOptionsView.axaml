@@ -1,0 +1,107 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:vm="clr-namespace:MCEPatcher.UI.ViewModels"
+	mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
+	x:Class="MCEPatcher.UI.Views.IosPatchOptionsView"
+	x:DataType="vm:IosPatchOptionsViewModel">
+
+	<ScrollViewer AllowAutoHide="False" HorizontalScrollBarVisibility="Disabled">
+		<StackPanel VerticalAlignment="Top" HorizontalAlignment="Stretch" MaxWidth="440" Margin="12,0,12,20">
+			<Grid HorizontalAlignment="Stretch" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+				<TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding IpaFile}" TextWrapping="Wrap" Margin="0,0,10,0"/>
+				<Button Grid.Column="1" VerticalAlignment="Center" Command="{Binding PickIpaCommand}">Select</Button>
+			</Grid>
+
+			<ToggleSwitch IsChecked="{Binding IsSimpleMode}" OffContent="Custom Mode" OnContent="Simple Mode" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+
+			<StackPanel IsVisible="{Binding IsSimpleMode}" HorizontalAlignment="Stretch">
+				<Border BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" HorizontalAlignment="Stretch" Padding="12">
+					<StackPanel Spacing="10">
+						<Grid ColumnDefinitions="Auto,*">
+							<TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,0" Text="Locator Protocol:"/>
+							<ComboBox Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="{Binding LocatorProtocol}">
+								<ComboBoxItem>Http</ComboBoxItem>
+								<ComboBoxItem>
+									<TextBlock FontSize="1">
+										<Run FontSize="14">Http</Run>
+										<Run FontSize="14" FontWeight="Bold">s</Run>
+									</TextBlock>
+								</ComboBoxItem>
+							</ComboBox>
+						</Grid>
+						<Grid ColumnDefinitions="Auto,*">
+							<TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,0" Text="Locator Address:"/>
+							<TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding LocatorHostname}" PlaceholderText="192.168.x.x:x" MaxLength="100" TextWrapping="Wrap"/>
+						</Grid>
+					</StackPanel>
+				</Border>
+			</StackPanel>
+
+			<StackPanel IsVisible="{Binding !IsSimpleMode}" HorizontalAlignment="Stretch" Spacing="4">
+				<Grid ColumnDefinitions="*,Auto" Margin="0,2">
+					<TextBlock Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,10,0" Text="Change locator address"/>
+					<ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangeLocatorAddress}" OffContent="No" OnContent="Yes"/>
+				</Grid>
+
+				<Border IsVisible="{Binding ChangeLocatorAddress}" BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" HorizontalAlignment="Stretch" Padding="12" Margin="0,0,0,6">
+					<StackPanel Spacing="10">
+						<Grid ColumnDefinitions="Auto,*">
+							<TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,0" Text="Protocol:"/>
+							<ComboBox Grid.Column="1" HorizontalAlignment="Stretch" SelectedIndex="{Binding LocatorProtocol}">
+								<ComboBoxItem>Http</ComboBoxItem>
+								<ComboBoxItem>
+									<TextBlock FontSize="1">
+										<Run FontSize="14">Http</Run>
+										<Run FontSize="14" FontWeight="Bold">s</Run>
+									</TextBlock>
+								</ComboBoxItem>
+							</ComboBox>
+						</Grid>
+						<Grid ColumnDefinitions="Auto,*">
+							<TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,0" Text="Hostname/IP:"/>
+							<TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding LocatorHostname}" PlaceholderText="192.168.x.x:x" MaxLength="100" TextWrapping="Wrap"/>
+						</Grid>
+					</StackPanel>
+				</Border>
+
+				<Rectangle HorizontalAlignment="Stretch" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5" IsVisible="{Binding !ChangeLocatorAddress}"/>
+
+				<Grid ColumnDefinitions="*,Auto" Margin="0,2">
+					<TextBlock Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,10,0" Text="Disable sunset time check"/>
+					<ToggleSwitch Grid.Column="1" IsChecked="{Binding DisableSunsetTimeCheck}" OffContent="No" OnContent="Yes"/>
+				</Grid>
+
+				<Grid ColumnDefinitions="*,Auto" Margin="0,2">
+					<TextBlock Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,10,0" Text="Change app name"/>
+					<ToggleSwitch Grid.Column="1" IsChecked="{Binding ChangeAppName}" OffContent="No" OnContent="Yes"/>
+				</Grid>
+
+				<Border IsVisible="{Binding ChangeAppName}" BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" HorizontalAlignment="Stretch" Padding="12" Margin="0,0,0,6">
+					<Grid ColumnDefinitions="Auto,*">
+						<TextBlock Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,0" Text="App name:"/>
+						<TextBox Grid.Column="1" HorizontalAlignment="Stretch" Text="{Binding AppName}" PlaceholderText="Solace" MaxLength="50" TextWrapping="Wrap"/>
+					</Grid>
+				</Border>
+
+				<Rectangle HorizontalAlignment="Stretch" Height="0.5" Fill="{DynamicResource SystemControlForegroundBaseHighBrush}" Margin="0,5" IsVisible="{Binding !ChangeAppName}"/>
+
+				<Grid ColumnDefinitions="*,Auto" Margin="0,2">
+					<TextBlock Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,10,0" Text="Remove DRM and code signature"/>
+					<ToggleSwitch Grid.Column="1" IsChecked="{Binding RemoveDrm}" OffContent="No" OnContent="Yes"/>
+				</Grid>
+
+				<Border BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" HorizontalAlignment="Stretch" Padding="12" Margin="0,10,0,0">
+					<StackPanel Spacing="6">
+						<TextBlock Text="Gameplay (Experimental)" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center"/>
+						<Grid ColumnDefinitions="*,Auto">
+							<TextBlock Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,10,0" Text="Disable moving-too-fast speed limit"/>
+							<ToggleSwitch Grid.Column="1" IsChecked="{Binding DisableSpeedLimit}" OffContent="No" OnContent="Yes"/>
+						</Grid>
+					</StackPanel>
+				</Border>
+			</StackPanel>
+		</StackPanel>
+	</ScrollViewer>
+</UserControl>

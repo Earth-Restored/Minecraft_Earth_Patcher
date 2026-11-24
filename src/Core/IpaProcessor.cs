@@ -38,7 +38,7 @@ public static class IpaProcessor
         string locatorProtocol = options.LocatorProtocol == 0 ? "http://" : "https://";
         string locatorBaseUrl = $"{locatorProtocol}{options.LocatorHostname}";
 
-        Log.Information("*****Extracting IPA*****");
+        PatchProgress.BeginStep("Extracting IPA");
         if (Directory.Exists(decodedDir))
             Directory.Delete(decodedDir, true);
 
@@ -67,6 +67,8 @@ public static class IpaProcessor
             Log.Fatal($"Main executable not found at '{exePath}'");
             return false;
         }
+
+        PatchProgress.BeginStep("Applying patches");
 
         if (options.ChangeLocatorAddress)
         {
@@ -156,7 +158,7 @@ public static class IpaProcessor
             Log.Information("Patching service endpoints");
             PatchServiceEndpoints(exePath,
                 options.Protocol == 0 ? "http" : "https",
-                options.Hostname?.Trim()?.ToLowerInvariant(),
+                options.Hostname?.Trim()?.ToLowerInvariant() ?? "",
                 options.ChangeXboxLiveAddress,
                 options.ChangeXboxABAddress,
                 options.ChangePlayfabApiAddress,
@@ -176,7 +178,7 @@ public static class IpaProcessor
             Log.Debug("Done");
         }
 
-        Log.Information("*****Building IPA*****");
+        PatchProgress.BeginStep("Building IPA");
         if (string.Equals(Path.GetFullPath(inIpa), Path.GetFullPath(outIpa), StringComparison.OrdinalIgnoreCase))
         {
             Log.Fatal("Input and output IPA paths must be different");

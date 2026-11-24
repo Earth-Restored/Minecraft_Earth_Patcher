@@ -1,9 +1,9 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 #nullable disable
 namespace MCEPatcher.Core;
 
-public class BinaryVariable
+public sealed class BinaryVariable
 {
     public string File { get; set; }
     public string HexAddress

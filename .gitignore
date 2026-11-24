@@ -3,6 +3,8 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+/**/tmp/*
+
 # User-specific files
 *.rsuser
 *.suo
@@ -455,3 +457,17 @@ $RECYCLE.BIN/
 
 # IPA build artifacts
 *.ipa
+
+# Android & Gradle artifacts
+.gradle/
+build/
+local.properties
+*.apk
+*.aligned
+*.aab
+Signed/
+build-tools-*/
+patchelf-*/
+*.keystore
+*.jks
+*.bks

@@ -1,8 +1,9 @@
-﻿using System.IO.Compression;
+using System.IO.Compression;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using MCEPatcher.Core.Services;
 using Serilog;
 
 namespace MCEPatcher.Core;
@@ -13,16 +14,16 @@ public static class ApkProcessor
 
     public static readonly string ResourcePackHash = "7473B7B99FD181453D7D520903726F62F3C2433FE941EA8968E6FE589EF5A9E7";
 
-    internal static bool NonInteractive { get; private set; }
+    public static IApkToolService ToolService { get; set; } = new DesktopApkToolService();
 
-    public static async Task<bool> Run(Options options)
+    public static async Task<bool> Run(Options options, IApkToolService? toolService = null)
     {
-        NonInteractive = options.NonInteractive;
-        HashSet<string> patches = new(options.Patches);
+        toolService ??= ToolService;
+        HashSet<string> patches = [.. options.Patches];
 
-        FileInfo inApk = new FileInfo(options.InApk);
-        FileInfo outApk = new FileInfo(options.OutApk);
-        DirectoryInfo decodedDir = new DirectoryInfo(options.DecodedDir);
+        var inApk = new FileInfo(options.InApk);
+        var outApk = new FileInfo(options.OutApk);
+        var decodedDir = new DirectoryInfo(options.DecodedDir);
 
         if (!inApk.Exists)
         {
@@ -30,11 +31,11 @@ public static class ApkProcessor
             return false;
         }
 
-        Dictionary<string, string> variables = new();
+        Dictionary<string, string> variables = [];
 
         foreach (var item in options.Variables)
         {
-            string[] split = item.Split('=');
+            var split = item.Split('=');
 
             if (split.Length < 2)
             {
@@ -63,23 +64,7 @@ public static class ApkProcessor
             variables.Add(name, value);
         }
 
-        if (!options.SkipDecode || !options.SkipBuild)
-        {
-            await DependencyDownloader.Download("https://github.com/iBotPeaches/Apktool/releases/download/v3.0.3/apktool_3.0.3.jar", APK.FileName);
-            await DependencyDownloader.Download(BuildTools.DownloadUrl, BuildTools.FileName);
-        }
-
-        if (options.AndroidOSVersion >= 15)
-        {
-            await DependencyDownloader.Download(PatchElf.DownloadUrl, PatchElf.FileName);
-        }
-
-        await DependencyDownloader.Download(ArCoreUpdater.DownloadUrl, ArCoreUpdater.FileName);
-
-        if (!options.SkipSign)
-        {
-            await DependencyDownloader.Download("https://github.com/patrickfav/uber-apk-signer/releases/download/v1.3.0/uber-apk-signer-1.3.0.jar", Signer.FileName);
-        }
+        await toolService.EnsurePrerequisitesAsync(options);
 
         if (options.SkipDecode)
         {
@@ -87,8 +72,8 @@ public static class ApkProcessor
         }
         else
         {
-            Log.Information("*****Decoding apk*****");
-            if (!APK.Decode(inApk, decodedDir))
+            PatchProgress.BeginStep("Decompiling APK");
+            if (!await toolService.DecodeAsync(inApk, decodedDir))
             {
                 return false;
             }
@@ -101,6 +86,8 @@ public static class ApkProcessor
 
             Log.Debug("Done");
         }
+
+        PatchProgress.BeginStep("Applying patches");
 
         // does not get properly extended if not done before the hexdump and will most likely be done anyway, TODO: remove once the TODO in Patcher.PatchFile is fixed
         Log.Information($"Applying patch '{ExtendLibgenoa.Name}'");
@@ -116,17 +103,23 @@ public static class ApkProcessor
 
         if (!string.IsNullOrEmpty(options.ResourcePack))
         {
+            PatchProgress.BeginStep("Applying resource pack");
             if (!await ResourcePackPatcher.Patch(options))
             {
                 return false;
             }
         }
 
+        PatchProgress.BeginStep("Updating ARCore libraries");
         await ArCoreUpdater.UpdateArCoreLibs(decodedDir);
 
         if (options.AndroidOSVersion >= 15)
         {
-            await PatchElf.PatchPageSizeAsync(decodedDir, Log.Logger);
+            PatchProgress.BeginStep("Patching native library page size");
+            if (!await toolService.PatchPageSizeAsync(decodedDir))
+            {
+                return false;
+            }
         }
 
         if (options.SkipBuild)
@@ -135,16 +128,16 @@ public static class ApkProcessor
         }
         else
         {
-            Log.Information("*****Building apk*****");
-            if (!APK.Encode(decodedDir, outApk))
+            PatchProgress.BeginStep("Building APK");
+            if (!await toolService.EncodeAsync(decodedDir, outApk))
             {
                 return false;
             }
 
             Log.Debug("Done");
 
-            Log.Information("*****Aligning apk*****");
-            if (!await BuildTools.AlignAsync(outApk))
+            PatchProgress.BeginStep("Aligning APK");
+            if (!await toolService.AlignAsync(outApk))
             {
                 return false;
             }
@@ -158,8 +151,8 @@ public static class ApkProcessor
         }
         else
         {
-            Log.Information("*****Signing apk*****");
-            if (!Signer.Sign(outApk, new DirectoryInfo("Signed")))
+            PatchProgress.BeginStep("Signing APK");
+            if (!await toolService.SignAsync(outApk, new DirectoryInfo("Signed")))
             {
                 return false;
             }
@@ -174,7 +167,7 @@ public static class ApkProcessor
 
     public static bool VerifyApkHash(Stream stream)
     {
-        byte[] hashBytes = SHA256.HashData(stream);
+        var hashBytes = SHA256.HashData(stream);
 
         var hash = Convert.ToHexString(hashBytes);
 
@@ -183,7 +176,7 @@ public static class ApkProcessor
 
     public static bool VerifyResourcePackHash(Stream stream)
     {
-        byte[] hashBytes = SHA256.HashData(stream);
+        var hashBytes = SHA256.HashData(stream);
 
         var hash = Convert.ToHexString(hashBytes);
 
@@ -205,8 +198,6 @@ public static class ApkProcessor
         public required IEnumerable<string> Patches { get; init; }
 
         public required IEnumerable<string> Variables { get; init; }
-
-        public bool NonInteractive { get; init; }
 
         public bool SkipDecode { get; init; }
 

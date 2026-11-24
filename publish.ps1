@@ -5,8 +5,20 @@ param (
 
     [string[]]$frameworks = @('win-x64', 'win-arm64', 'linux-x64', 'linux-arm64', 'osx-x64', 'osx-arm64'),
 
-    [bool]$publishCli = $false
+    [string[]]$androidAbis = @('android-arm64', 'android-x64'),
+
+    [switch]$skipDesktop,
+    [switch]$skipAndroid,
+    [switch]$androidOnly,
+    [switch]$desktopOnly
 )
+
+if ($androidOnly) {
+    $skipDesktop = $true
+}
+if ($desktopOnly) {
+    $skipAndroid = $true
+}
 
 $ErrorActionPreference = 'Stop'
 
@@ -37,10 +49,6 @@ $projects = @(
     @{ Name = "UI.Desktop"; DisplayName = "MCEPatcher_UI" }
 )
 
-if ($publishCli) {
-    $projects += @{ Name = "Cli"; DisplayName = "MCEPatcher_CLI" }
-}
-
 # Create output directory
 $outDir = Join-Path $scriptRoot "build/$config"
 if (-not (Test-Path $outDir)) {
@@ -50,60 +58,113 @@ if (-not (Test-Path $outDir)) {
 # Load the compression assembly (Required for Windows PowerShell 5.1; already loaded in PS Core)
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-foreach ($proj in $projects) {
-    $projName = $proj.Name
-    $displayName = $proj.DisplayName
-    $csprojPath = Join-Path $scriptRoot "src/$projName/MCEPatcher.$projName.csproj"
+if (-not $skipDesktop) {
+    foreach ($proj in $projects) {
+        $projName = $proj.Name
+        $displayName = $proj.DisplayName
+        $csprojPath = Join-Path $scriptRoot "src/$projName/MCEPatcher.$projName.csproj"
 
-    if (-not (Test-Path $csprojPath)) {
-        Write-Error "Project file not found: $csprojPath"
-        continue
+        if (-not (Test-Path $csprojPath)) {
+            Write-Error "Project file not found: $csprojPath"
+            continue
+        }
+
+        foreach ($fx in $frameworks) {
+            Write-Host "Publishing $displayName for $fx ($config)..." -ForegroundColor Cyan
+
+            $zipFileName = "$displayName-$fx-$version.zip"
+            $zipFilePath = Join-Path $outDir $zipFileName
+
+            $tempPubDir = Join-Path $scriptRoot "temp_publish_$([guid]::NewGuid().ToString().Substring(0,8))"
+
+            try {
+                $publishArgs = @(
+                    "publish", "`"$csprojPath`"",
+                    "--configuration", $config,
+                    "--runtime", $fx,
+                    "--output", "`"$tempPubDir`"",
+                    "--self-contained",
+                    "-p:PublishSingleFile=true",
+                    "-p:IncludeNativeLibrariesForSelfExtract=true",
+                    "-p:PublishTrimmed=false",
+                    "-p:DebugType=None",
+                    "-p:DebugSymbols=false"
+                )
+                
+                $process = Start-Process dotnet -ArgumentList $publishArgs -NoNewWindow -Wait -PassThru
+                if ($process.ExitCode -ne 0) {
+                    Write-Error "dotnet publish failed for $projName ($fx). Exit Code: $($process.ExitCode)"
+                    continue
+                }
+
+                if (Test-Path $zipFilePath) {
+                    Remove-Item $zipFilePath -Force
+                }
+
+                Write-Host "Zipping artifacts to $zipFileName..."
+                $compressionLevel = [System.IO.Compression.CompressionLevel]::Optimal
+                if ([System.Enum]::IsDefined([System.IO.Compression.CompressionLevel], 'SmallestSize')) {
+                    $compressionLevel = [System.IO.Compression.CompressionLevel]::SmallestSize
+                }
+                [System.IO.Compression.ZipFile]::CreateFromDirectory($tempPubDir, $zipFilePath, $compressionLevel, $false)
+                
+                Write-Host "Success: $zipFilePath`n" -ForegroundColor Green
+            }
+            finally {
+                if (Test-Path $tempPubDir) {
+                    Remove-Item -Path $tempPubDir -Recurse -Force
+                }
+            }
+        }
     }
+}
 
-    foreach ($fx in $frameworks) {
-        Write-Host "Publishing $displayName for $fx ($config)..." -ForegroundColor Cyan
+if (-not $skipAndroid) {
+    $androidProj = Join-Path $scriptRoot "src/UI.Android/MCEPatcher.UI.Android.csproj"
+    if (Test-Path $androidProj) {
+        foreach ($abi in $androidAbis) {
+            Write-Host "Publishing Android APK for $abi ($config)..." -ForegroundColor Cyan
 
-        $zipFileName = "$displayName-$fx-$version.zip"
-        $zipFilePath = Join-Path $outDir $zipFileName
-
-        # Create a unique temporary directory for the raw publish output
-        $tempPubDir = Join-Path $scriptRoot "temp_publish_$([guid]::NewGuid().ToString().Substring(0,8))"
-
-        try {
             $publishArgs = @(
-                "publish", "`"$csprojPath`"",
+                "publish", "`"$androidProj`"",
                 "--configuration", $config,
-                "--runtime", $fx,
-                "--output", "`"$tempPubDir`"",
-                "--self-contained",
-                "-p:PublishSingleFile=true",
-                "-p:IncludeNativeLibrariesForSelfExtract=true",
-                "-p:PublishTrimmed=false",
-                "-p:DebugType=None",
-                "-p:DebugSymbols=false"
+                "-r", $abi
             )
-            
+
             $process = Start-Process dotnet -ArgumentList $publishArgs -NoNewWindow -Wait -PassThru
             if ($process.ExitCode -ne 0) {
-                Write-Error "dotnet publish failed for $projName ($fx). Exit Code: $($process.ExitCode)"
+                Write-Error "dotnet publish failed for Android ($abi). Exit Code: $($process.ExitCode)"
                 continue
             }
 
-            # Delete the zip if it already exists from a previous run
-            if (Test-Path $zipFilePath) {
-                Remove-Item $zipFilePath -Force
+            $abiShort = if ($abi -eq 'android-arm64') { 'arm64' } elseif ($abi -eq 'android-x64') { 'x64' } else { $abi }
+            $androidOutDir = Join-Path $scriptRoot "src/UI.Android/bin/$config/net11.0-android/$abi"
+            $apkSearchPatterns = @(
+                (Join-Path $androidOutDir "publish/*-Signed.apk"),
+                (Join-Path $androidOutDir "publish/*.apk"),
+                (Join-Path $androidOutDir "*-Signed.apk"),
+                (Join-Path $androidOutDir "*.apk")
+            )
+
+            $builtApk = $null
+            foreach ($pattern in $apkSearchPatterns) {
+                $builtApk = Get-ChildItem -Path $pattern -ErrorAction SilentlyContinue | Select-Object -First 1
+                if ($builtApk) { break }
             }
 
-            Write-Host "Zipping artifacts to $zipFileName..."
-            [System.IO.Compression.ZipFile]::CreateFromDirectory($tempPubDir, $zipFilePath)
-            
-            Write-Host "Success: $zipFilePath`n" -ForegroundColor Green
-        }
-        finally {
-            if (Test-Path $tempPubDir) {
-                Remove-Item -Path $tempPubDir -Recurse -Force
+            if ($builtApk) {
+                $targetApkName = "MCEPatcher-$abiShort-$version.apk"
+                $targetApkPath = Join-Path $outDir $targetApkName
+                Copy-Item $builtApk.FullName -Destination $targetApkPath -Force
+                Write-Host "Success: $targetApkPath`n" -ForegroundColor Green
+            }
+            else {
+                Write-Warning "Could not find built APK in $androidOutDir"
             }
         }
+    }
+    else {
+        Write-Error "Android project file not found: $androidProj"
     }
 }
 

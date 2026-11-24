@@ -1,4 +1,4 @@
-﻿using Serilog;
+using Serilog;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -34,20 +34,20 @@ public sealed class PatchInfo
     public static PatchInfo Load(string path, string name)
     {
         PatchInfo? patch;
-        if (File.Exists(path))
+        string? json = PatchResourceLoader.TryGetPatchInfoContent(path, name);
+        if (json is not null)
         {
             try
             {
-                patch = JsonSerializer.Deserialize<PatchInfo>(File.ReadAllText(path));
+                patch = JsonSerializer.Deserialize(json, CoreJsonSerializerContext.Default.PatchInfo);
                 if (patch is null)
                 {
                     throw new JsonException("Json is null");
                 }
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Log.Fatal($"Couldn't deserialize info for patch '{name}', ex: {ex}");
-                U.PAKE();
+                Log.Fatal($"Couldn't deserialize info for patch '{name}', ex: {exception}");
                 Environment.Exit(1);
                 return null;
             }
@@ -57,7 +57,9 @@ public sealed class PatchInfo
             patch = Default;
         }
 
-        patch.Path = System.IO.Path.GetFullPath(System.IO.Path.Combine("Patches", $"{name}.patch"));
+        patch.Path = File.Exists(path)
+            ? System.IO.Path.GetFullPath(System.IO.Path.Combine("Patches", $"{name}.patch"))
+            : $"resource://Patches/{name}.patch";
 
         return patch;
     }

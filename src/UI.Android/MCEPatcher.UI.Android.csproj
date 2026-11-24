@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net11.0-android</TargetFramework>
+    <SupportedOSPlatformVersion>29</SupportedOSPlatformVersion>
+    <ApplicationId>com.github.earth_restored.mcepcatcher</ApplicationId>
+    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>1.5.0</ApplicationDisplayVersion>
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <AndroidLinkTool>r8</AndroidLinkTool>
+    <TrimMode>full</TrimMode>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'android-arm64' or '$(RuntimeIdentifier)' == ''">
+    <AndroidNativeLibrary Include="native-libs/arm64-v8a/libaapt2.so">
+      <Abi>arm64-v8a</Abi>
+    </AndroidNativeLibrary>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'android-x64' or '$(RuntimeIdentifier)' == ''">
+    <AndroidNativeLibrary Include="native-libs/x86_64/libaapt2.so">
+      <Abi>x86_64</Abi>
+    </AndroidNativeLibrary>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AndroidResource Include="Icon.png">
+      <Link>Resources/drawable/Icon.png</Link>
+    </AndroidResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Android" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.15" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Core/MCEPatcher.Core.csproj" />
+    <ProjectReference Include="../UI/MCEPatcher.UI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AndroidJavaLibrary Include="../AndroidBridge/build/libs/android-bridge-fat.jar" />
+  </ItemGroup>
+
+  <Target Name="BuildAndroidBridge" BeforeTargets="BeforeBuild" Condition="!Exists('../AndroidBridge/build/libs/android-bridge-fat.jar')">
+    <Exec Command="./gradlew fatJar" WorkingDirectory="../AndroidBridge" />
+  </Target>
+
+  <Target Name="_ClearLibrariesToBind" BeforeTargets="_SetAndroidGenerateManagedBindings">
+    <ItemGroup>
+      <_LibrariesToBind Remove="@(_LibrariesToBind)" />
+    </ItemGroup>
+  </Target>
+</Project>

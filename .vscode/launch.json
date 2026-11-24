@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Desktop (Debug)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/src/UI.Desktop/bin/Debug/net11.0/MCEPatcher.UI.Desktop.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/UI.Desktop",
+      "stopAtEntry": false,
+      "console": "internalConsole"
+    }
+  ]
+}

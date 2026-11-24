@@ -6,7 +6,7 @@
         xmlns:views="clr-namespace:MCEPatcher.UI.Views"
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
         x:Class="MCEPatcher.UI.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/icon.ico"
         Title="Minecraft Earth Patcher">
 	<views:MainView />
 </Window>

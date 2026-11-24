@@ -34,7 +34,7 @@ internal static class BuildTools
 
         var alignedApkName = apkFile.FullName + ".aligned";
 
-        var process = U.Run(ZipAlignPath, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+        var process = ProcessRunner.Run(ZipAlignPath, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
         [
             "-f",
             "-P", "16",

@@ -73,7 +73,7 @@ public static class PatchElf
     {
         logger.Information($"Patching page size for {file}");
 
-        var process = U.Run(PatchElfPath, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+        var process = ProcessRunner.Run(PatchElfPath, Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
         [
             "--page-size", "16384",
             file,

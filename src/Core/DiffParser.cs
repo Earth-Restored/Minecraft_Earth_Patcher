@@ -1,10 +1,10 @@
-﻿using DiffPatch.Data;
+using DiffPatch.Data;
 using System.Collections;
 using System.Text.RegularExpressions;
 
 namespace MCEPatcher.Core;
 
-internal class DiffParser
+public sealed class DiffParser
 {
     private delegate void ParserAction(string line, Match m);
 

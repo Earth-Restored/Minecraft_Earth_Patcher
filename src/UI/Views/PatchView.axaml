@@ -1,43 +1,141 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:MCEPatcher.UI.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
-             x:Class="MCEPatcher.UI.Views.PatchView"
-             x:DataType="vm:PatchViewModel">
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-	  <vm:PatchViewModel />
-  </Design.DataContext>
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:vm="clr-namespace:MCEPatcher.UI.ViewModels" mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600" x:Class="MCEPatcher.UI.Views.PatchView" x:DataType="vm:PatchViewModel">
+	<Design.DataContext>
+		<!-- This only sets the DataContext for the previewer in an IDE,
+		     to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+		<vm:PatchViewModel />
+	</Design.DataContext>
+
+	<UserControl.Resources>
+		<StreamGeometry x:Key="CheckIcon">M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z</StreamGeometry>
+		<StreamGeometry x:Key="ErrorIcon">M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z</StreamGeometry>
+		<StreamGeometry x:Key="SpinnerIcon">M12 2A10 10 0 1 0 22 12h-2.5A7.5 7.5 0 1 1 12 4.5z</StreamGeometry>
+		<SolidColorBrush x:Key="SuccessBrush" Color="#2EA043" />
+		<SolidColorBrush x:Key="FailureBrush" Color="#E5534B" />
+		<SolidColorBrush x:Key="WarningBrush" Color="#D29922" />
+		<FontFamily x:Key="LogFont">Cascadia Mono, Consolas, Menlo, DejaVu Sans Mono, Droid Sans Mono, monospace</FontFamily>
+	</UserControl.Resources>
+
 	<UserControl.Styles>
+		<Style Selector="Expander.step /template/ ToggleButton#ExpanderHeader">
+			<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+		</Style>
+		<Style Selector="Expander.step">
+			<Setter Property="HorizontalAlignment" Value="Stretch" />
+			<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+		</Style>
+
+		<Style Selector="PathIcon.spinner">
+			<Setter Property="RenderTransform">
+				<RotateTransform />
+			</Setter>
+			<Style.Animations>
+				<Animation Duration="0:0:0.9" IterationCount="Infinite">
+					<KeyFrame Cue="0%">
+						<Setter Property="RotateTransform.Angle" Value="0" />
+					</KeyFrame>
+					<KeyFrame Cue="100%">
+						<Setter Property="RotateTransform.Angle" Value="360" />
+					</KeyFrame>
+				</Animation>
+			</Style.Animations>
+		</Style>
+
+		<Style Selector="SelectableTextBlock.log">
+			<Setter Property="FontFamily" Value="{StaticResource LogFont}" />
+			<Setter Property="FontSize" Value="12" />
+			<Setter Property="TextWrapping" Value="Wrap" />
+			<Setter Property="Padding" Value="0,0,0,2" />
+		</Style>
+		<Style Selector="SelectableTextBlock.log.verbose">
+			<Setter Property="Opacity" Value="0.6" />
+		</Style>
+		<Style Selector="SelectableTextBlock.log.warning">
+			<Setter Property="Foreground" Value="{StaticResource WarningBrush}" />
+		</Style>
+		<Style Selector="SelectableTextBlock.log.error">
+			<Setter Property="Foreground" Value="{StaticResource FailureBrush}" />
+		</Style>
+
+		<Style Selector="Border.card">
+			<Setter Property="Background" Value="{DynamicResource SystemControlBackgroundBaseLowBrush}" />
+			<Setter Property="CornerRadius" Value="6" />
+			<Setter Property="Padding" Value="16" />
+		</Style>
 	</UserControl.Styles>
 
-	<Grid HorizontalAlignment="Stretch" RowDefinitions="1*, 4*, 1*">
-		<Label Grid.Row="0" FontSize="40" VerticalAlignment="Center" HorizontalAlignment="Center">
-			Minecraft Earth Patcher
-		</Label>
-		<Border Grid.Row="1" HorizontalAlignment="Center" BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}" CornerRadius="7" Margin="10" Padding="5">
-			<ScrollViewer x:Name="scrollViewer" AllowAutoHide="False">
-			<StackPanel x:Name="chat" MinWidth="250" VerticalAlignment="Stretch">
+	<Grid RowDefinitions="Auto,*">
+		<TextBlock Grid.Row="0" Text="Minecraft Earth Patcher" FontSize="26" FontWeight="SemiBold" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" Margin="12,16,12,8" />
+
+		<ScrollViewer Grid.Row="1" x:Name="pageScrollViewer" Classes="autoscroll" HorizontalScrollBarVisibility="Disabled">
+			<StackPanel MaxWidth="760" Margin="12,4,12,16" Spacing="6">
+				<ItemsControl x:Name="stepsControl" ItemsSource="{Binding Steps}">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<StackPanel Spacing="6" />
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+					<ItemsControl.ItemTemplate>
+						<DataTemplate x:DataType="vm:PatchStepViewModel">
+							<Expander Classes="step" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+								<Expander.Header>
+									<Grid ColumnDefinitions="Auto,*,Auto">
+										<Panel Grid.Column="0" Width="18" Height="18" VerticalAlignment="Center">
+											<PathIcon Classes="spinner" Width="18" Height="18" Data="{StaticResource SpinnerIcon}" Foreground="{DynamicResource SystemControlHighlightAccentBrush}" IsVisible="{Binding IsRunning}" />
+											<PathIcon Width="18" Height="18" Data="{StaticResource CheckIcon}" Foreground="{StaticResource SuccessBrush}" IsVisible="{Binding IsSucceeded}" />
+											<PathIcon Width="16" Height="16" Data="{StaticResource ErrorIcon}" Foreground="{StaticResource FailureBrush}" IsVisible="{Binding IsFailed}" />
+										</Panel>
+										<TextBlock Grid.Column="1" Text="{Binding Title}" Margin="12,0" VerticalAlignment="Center" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+										<TextBlock Grid.Column="2" Text="{Binding StatusText}" VerticalAlignment="Center" Opacity="0.7" FontSize="12" />
+									</Grid>
+								</Expander.Header>
+
+								<StackPanel Spacing="8">
+									<ProgressBar IsVisible="{Binding IsRunning}" IsIndeterminate="{Binding !HasProgress}" Minimum="0" Maximum="100" Value="{Binding ProgressPercent}" />
+
+									<TextBlock Text="No output" Opacity="0.6" FontStyle="Italic" IsVisible="{Binding !HasLogs}" />
+
+									<Border IsVisible="{Binding HasLogs}" Background="{DynamicResource SystemControlBackgroundBaseLowBrush}" CornerRadius="4" Padding="8">
+										<ScrollViewer Classes="autoscroll" MaxHeight="320" HorizontalScrollBarVisibility="Disabled">
+											<ItemsControl ItemsSource="{Binding Logs}">
+												<ItemsControl.ItemTemplate>
+													<DataTemplate x:DataType="vm:LogLine">
+														<SelectableTextBlock Classes="log" Text="{Binding Text}" Classes.verbose="{Binding IsVerbose}" Classes.warning="{Binding IsWarning}" Classes.error="{Binding IsError}" />
+													</DataTemplate>
+												</ItemsControl.ItemTemplate>
+											</ItemsControl>
+										</ScrollViewer>
+									</Border>
+
+									<Button Content="Copy log" HorizontalAlignment="Right" IsVisible="{Binding HasLogs}" Click="CopyStepLog" />
+								</StackPanel>
+							</Expander>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+
+				<Border x:Name="resultCard" Classes="card" IsVisible="{Binding IsFinished}" Margin="0,6,0,0">
+					<StackPanel Spacing="12">
+						<StackPanel Orientation="Horizontal" Spacing="10">
+							<PathIcon Width="22" Height="22" Data="{StaticResource CheckIcon}" Foreground="{StaticResource SuccessBrush}" IsVisible="{Binding IsSuccess}" />
+							<PathIcon Width="18" Height="18" Data="{StaticResource ErrorIcon}" Foreground="{StaticResource FailureBrush}" IsVisible="{Binding IsFailure}" />
+							<TextBlock Text="{Binding ResultTitle}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
+						</StackPanel>
+
+						<SelectableTextBlock Text="{Binding ResultMessage}" TextWrapping="Wrap" />
+
+						<WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
+							<Button Content="Back" Click="Back" />
+							<Button Content="Install APK" Classes="accent" IsVisible="{Binding CanInstallApk}" Click="InstallPatchedApk" />
+							<Button Content="Open output folder" IsVisible="{Binding CanOpenOutputFolder}" Click="OpenOutputFolder" />
+							<Button Content="Copy all logs" Click="CopyAllLogs" />
+						</WrapPanel>
+					</StackPanel>
+				</Border>
 			</StackPanel>
-			</ScrollViewer>
-		</Border>
-		<Grid x:Name="finishedContainer" Grid.Row="2" HorizontalAlignment="Center" IsVisible="False">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="Auto"/>
-				<ColumnDefinition Width="Auto"/>
-				<ColumnDefinition Width="Auto"/>
-			</Grid.ColumnDefinitions>
-			<Button Grid.Column="0" Margin="0 0 5 0" FontSize="20" Click="Back">Back</Button>
-			<Button Grid.Column="1" FontSize="16" Click="OpenPatchedAPKLocation" Margin="0 0 5 0" IsVisible="{Binding IsApk}">
-				Open patched APK location
-			</Button>
-			<Button Grid.Column="2" FontSize="16" Click="OpenPatchedIPALocation" IsVisible="{Binding IsIpa}">
-				Open patched IPA location
-			</Button>
-		</Grid>
+		</ScrollViewer>
 	</Grid>
-	
 </UserControl>
