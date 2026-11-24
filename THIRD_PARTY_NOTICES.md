@@ -18,6 +18,34 @@ This project includes or makes use of third-party open source software under the
 - **Copyright:** Copyright (C) The Android Open Source Project, Google LLC
 - **License:** Apache License, Version 2.0
 
+## Apktool (`apktool-lib`)
+
+- **Component:** `org.apktool:apktool-lib`
+- **Source:** https://github.com/iBotPeaches/Apktool
+- **Copyright:** Copyright (C) Ryszard Wiśniewski, Connor Tumbleson, and Apktool Contributors
+- **License:** Apache License, Version 2.0
+
+## Android AWT (`androidawt`)
+
+- **Component:** `ro.andob.androidawt:androidawt`
+- **Source:** https://github.com/andob/android-awt
+- **Copyright:** Copyright (C) Andrei Dobrescu and Contributors
+- **License:** Apache License, Version 2.0
+
+## AndroidX Core SplashScreen
+
+- **Component:** `androidx.core:core-splashscreen` (via `Xamarin.AndroidX.Core.SplashScreen`)
+- **Source:** Android Open Source Project (AOSP) / Google
+- **Copyright:** Copyright (C) The Android Open Source Project, Google LLC
+- **License:** Apache License, Version 2.0
+
+## Serilog
+
+- **Component:** `Serilog`, `Serilog.Sinks.Console`, `Serilog.Sinks.File`
+- **Source:** https://github.com/serilog/serilog
+- **Copyright:** Copyright (C) Serilog Contributors
+- **License:** Apache License, Version 2.0
+
 ---
 
 ## Apache License, Version 2.0
