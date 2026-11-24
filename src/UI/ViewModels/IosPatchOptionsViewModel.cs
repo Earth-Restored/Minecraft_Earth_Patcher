@@ -93,11 +93,135 @@ public sealed class IosPatchOptionsViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _appName, value);
     }
 
+    private bool _loginServerSingleDomainMode;
+    public bool LoginServerSingleDomainMode
+    {
+        get => _loginServerSingleDomainMode;
+        set => this.RaiseAndSetIfChanged(ref _loginServerSingleDomainMode, value);
+    }
+
+    private int _loginServerProtocol;
+    public int LoginServerProtocol
+    {
+        get => _loginServerProtocol;
+        set => this.RaiseAndSetIfChanged(ref _loginServerProtocol, value);
+    }
+
+    private string _loginServerHostname = "";
+    public string LoginServerHostname
+    {
+        get => _loginServerHostname;
+        set => this.RaiseAndSetIfChanged(ref _loginServerHostname, value);
+    }
+
+    private bool _changeXalAuthAddress;
+    public bool ChangeXalAuthAddress
+    {
+        get => _changeXalAuthAddress;
+        set => this.RaiseAndSetIfChanged(ref _changeXalAuthAddress, value);
+    }
+
+    private int _xalProtocol;
+    public int XalProtocol
+    {
+        get => _xalProtocol;
+        set => this.RaiseAndSetIfChanged(ref _xalProtocol, value);
+    }
+
+    private string _xalHostname = "";
+    public string XalHostname
+    {
+        get => _xalHostname;
+        set => this.RaiseAndSetIfChanged(ref _xalHostname, value);
+    }
+
+    private bool _forceInAppWebView;
+    public bool ForceInAppWebView
+    {
+        get => _forceInAppWebView;
+        set => this.RaiseAndSetIfChanged(ref _forceInAppWebView, value);
+    }
+
+    private bool _forceInteractiveSignIn;
+    public bool ForceInteractiveSignIn
+    {
+        get => _forceInteractiveSignIn;
+        set => this.RaiseAndSetIfChanged(ref _forceInteractiveSignIn, value);
+    }
+
+    private bool _changePlayfabApiAddress;
+    public bool ChangePlayfabApiAddress
+    {
+        get => _changePlayfabApiAddress;
+        set => this.RaiseAndSetIfChanged(ref _changePlayfabApiAddress, value);
+    }
+
+    private int _playfabApiProtocol;
+    public int PlayfabApiProtocol
+    {
+        get => _playfabApiProtocol;
+        set => this.RaiseAndSetIfChanged(ref _playfabApiProtocol, value);
+    }
+
+    private string _playfabApiHostname = "";
+    public string PlayfabApiHostname
+    {
+        get => _playfabApiHostname;
+        set => this.RaiseAndSetIfChanged(ref _playfabApiHostname, value);
+    }
+
+    private bool _changeXboxABAddress;
+    public bool ChangeXboxABAddress
+    {
+        get => _changeXboxABAddress;
+        set => this.RaiseAndSetIfChanged(ref _changeXboxABAddress, value);
+    }
+
+    private int _xboxABProtocol;
+    public int XboxABProtocol
+    {
+        get => _xboxABProtocol;
+        set => this.RaiseAndSetIfChanged(ref _xboxABProtocol, value);
+    }
+
+    private string _xboxABHostname = "";
+    public string XboxABHostname
+    {
+        get => _xboxABHostname;
+        set => this.RaiseAndSetIfChanged(ref _xboxABHostname, value);
+    }
+
+    private bool _changeXboxLiveAddress;
+    public bool ChangeXboxLiveAddress
+    {
+        get => _changeXboxLiveAddress;
+        set => this.RaiseAndSetIfChanged(ref _changeXboxLiveAddress, value);
+    }
+
+    private int _xboxLiveProtocol;
+    public int XboxLiveProtocol
+    {
+        get => _xboxLiveProtocol;
+        set => this.RaiseAndSetIfChanged(ref _xboxLiveProtocol, value);
+    }
+
+    private string _xboxLiveHostname = "";
+    public string XboxLiveHostname
+    {
+        get => _xboxLiveHostname;
+        set => this.RaiseAndSetIfChanged(ref _xboxLiveHostname, value);
+    }
+
     public ReactiveCommand<Unit, Unit> PickIpaCommand { get; }
 
     public IosPatchOptionsViewModel()
     {
         LocatorProtocol = (int)ProtocolEnum.Http;
+        LoginServerProtocol = (int)ProtocolEnum.Http;
+        XalProtocol = (int)ProtocolEnum.Http;
+        PlayfabApiProtocol = (int)ProtocolEnum.Http;
+        XboxABProtocol = (int)ProtocolEnum.Http;
+        XboxLiveProtocol = (int)ProtocolEnum.Http;
         IsSimpleMode = true;
 
         PickIpaCommand = ReactiveCommand.CreateFromTask(async () =>
@@ -126,6 +250,14 @@ public sealed class IosPatchOptionsViewModel : ViewModelBase
         DisableSpeedLimit = true;
         ChangeAppName = true;
         RemoveDrm = true;
+        LoginServerSingleDomainMode = true;
+
+        ChangeXalAuthAddress = true;
+        ForceInAppWebView = true;
+        ForceInteractiveSignIn = true;
+        ChangePlayfabApiAddress = true;
+        ChangeXboxABAddress = true;
+        ChangeXboxLiveAddress = true;
     }
 
     public async Task<Core.IpaProcessor.Options?> BuildOptionsAsync()
@@ -167,27 +299,77 @@ public sealed class IosPatchOptionsViewModel : ViewModelBase
             return null;
         }
 
+        if (LoginServerSingleDomainMode)
+        {
+            if ((ChangeXalAuthAddress || ChangePlayfabApiAddress || ChangeXboxABAddress || ChangeXboxLiveAddress)
+                && string.IsNullOrWhiteSpace(LoginServerHostname))
+            {
+                await DialogHelper.ShowError("Enter an auth server hostname/IP first");
+                return null;
+            }
+        }
+        else
+        {
+            if (ChangeXalAuthAddress && string.IsNullOrWhiteSpace(XalHostname))
+            {
+                await DialogHelper.ShowError("Enter a Xal auth hostname/IP first");
+                return null;
+            }
+
+            if (ChangePlayfabApiAddress && string.IsNullOrWhiteSpace(PlayfabApiHostname))
+            {
+                await DialogHelper.ShowError("Enter a PlayFab API hostname/IP first");
+                return null;
+            }
+
+            if (ChangeXboxABAddress && string.IsNullOrWhiteSpace(XboxABHostname))
+            {
+                await DialogHelper.ShowError("Enter an XboxAB hostname/IP first");
+                return null;
+            }
+
+            if (ChangeXboxLiveAddress && string.IsNullOrWhiteSpace(XboxLiveHostname))
+            {
+                await DialogHelper.ShowError("Enter an Xbox live hostname/IP first");
+                return null;
+            }
+        }
+
         var ipaOptions = new Core.IpaProcessor.Options()
         {
             Autonomous = true,
             InIpa = ipaPath,
             OutIpa = PlatformService.Current.GetDefaultOutputPath("Solace.ipa"),
             DecodedDir = "IpaDecoded",
+            Protocol = LoginServerProtocol,
+            Hostname = LoginServerHostname,
             LocatorProtocol = LocatorProtocol,
             LocatorHostname = LocatorHostname,
             AppName = AppName,
             ChangeLocatorAddress = ChangeLocatorAddress,
-            ChangeXalAuthAddress = false,
-            ForceInAppWebView = false,
-            ForceInteractiveSignIn = false,
-            ChangePlayfabApiAddress = false,
-            ChangeXboxABAddress = false,
-            ChangeXboxLiveAddress = false,
+            ChangeXalAuthAddress = ChangeXalAuthAddress,
+            ForceInAppWebView = ForceInAppWebView,
+            ForceInteractiveSignIn = ForceInteractiveSignIn,
+            ChangePlayfabApiAddress = ChangePlayfabApiAddress,
+            ChangeXboxABAddress = ChangeXboxABAddress,
+            ChangeXboxLiveAddress = ChangeXboxLiveAddress,
             DisableSunsetTimeCheck = DisableSunsetTimeCheck,
             DisableSpeedLimit = DisableSpeedLimit,
             ChangeAppName = ChangeAppName,
             RemoveDrm = RemoveDrm,
         };
+
+        if (!LoginServerSingleDomainMode)
+        {
+            ipaOptions.XalProtocol = XalProtocol;
+            ipaOptions.XalHostname = XalHostname;
+            ipaOptions.PlayfabApiProtocol = PlayfabApiProtocol;
+            ipaOptions.PlayfabApiHostname = PlayfabApiHostname;
+            ipaOptions.XboxABProtocol = XboxABProtocol;
+            ipaOptions.XboxABHostname = XboxABHostname;
+            ipaOptions.XboxLiveProtocol = XboxLiveProtocol;
+            ipaOptions.XboxLiveHostname = XboxLiveHostname;
+        }
 
         return ipaOptions;
     }
